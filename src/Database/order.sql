@@ -1,7 +1,7 @@
 -- order table
 
 
-CREATE TABLE orders (
+CREATE TABLE Orders (
     order_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     address_id INT NOT NULL,
@@ -9,6 +9,6 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (address_id) REFERENCES addresses(address_id)
+    FOREIGN KEY (address_id) REFERENCES Addresses(address_id)
 );
 
