@@ -14,7 +14,7 @@ CREATE TABLE Users (
 );
 
 
-INSERT INTO Users (username, firstname, lastname, email, password, phone_number, is_admin)
+INSERT INTO Users (username, first_name, last_name, email, password, phone_number, is_admin)
  VALUES 
  ('hawra_alramadan', 'Hawra', 'Alramadan', 'hawra@gmail.com', '1234qwer', '966588563487', TRUE),
  ('Amani_Atiah', 'Amani', 'Atiah', 'amani@gmail.com', '1234qwer', '966549563487', FALSE),
@@ -22,4 +22,3 @@ INSERT INTO Users (username, firstname, lastname, email, password, phone_number,
  ('Fatimah_alramadan', 'Fatimah', 'Alramadan', 'fatimah@gmail.com', '1234qwer', '966533563487', FALSE);
 
 
- 
