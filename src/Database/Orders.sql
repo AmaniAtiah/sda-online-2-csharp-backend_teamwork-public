@@ -12,3 +12,14 @@ CREATE TABLE Orders (
     FOREIGN KEY (address_id) REFERENCES Addresses(address_id)
 );
 
+
+INSERT INTO orders (user_id, address_id, total_price)
+ VALUES 
+ (2, 1, 300),
+ (3, 2, 400),
+ (4, 3, 500);
+ (2, 1, 600);
+ (3, 2, 1000),
+ (4, 3, 1200);
+
+
