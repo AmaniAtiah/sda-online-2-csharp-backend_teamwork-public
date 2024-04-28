@@ -22,4 +22,4 @@ INSERT INTO Users (username, first_name, last_name, email, password, phone_numbe
  ('Fatimah_alramadan', 'Fatimah', 'Alramadan', 'fatimah@gmail.com', '1234qwer', '966533563487', FALSE),
  ('Reem_Ahmed', 'Reem', 'Ahmed', 'reem@gmail.com', '1234qwer', '966567563487', FALSE),
  ('Rawabi_Khaled', 'Rawabi', 'Khaled', 'rawabi@gmail.com', '1234qwer', '966579553487', FALSE),
- ('Lama_Waleed', 'Lama', 'Waleed', 'lama@gmail.com', '1234qwer', '96653563487', FALSE),
+ ('Lama_Waleed', 'Lama', 'Waleed', 'lama@gmail.com', '1234qwer', '96653563487', FALSE);
