@@ -1,7 +1,8 @@
+
 CREATE TABLE Products(
 product_id SERIAL PRIMARY KEY,
 name VARCHAR(150) NOT NULL,
-descriotion TEXT,
+description TEXT,
 price DECIMAL(10,2) NOT NULL,
 color VARCHAR(50),
 size VARCHAR(50),
