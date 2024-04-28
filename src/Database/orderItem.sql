@@ -2,9 +2,9 @@ CREATE TABLE Order_Item(
 order_item_id SERIAL PRIMARY KEY,
 price VARCHAR(50) NOT NULL,
 quantity INT NOT NULL,
-order_id SERIAL,
-product_id SERIAL,
-FOREIGN KEY (product_id) REFERENCES Proudects(product_id) ,
+order_id INT,
+product_id INT,
+FOREIGN KEY (product_id) REFERENCES Products(product_id) ,
 FOREIGN KEY (order_id) REFERENCES Orders (order_id)
 );
 
