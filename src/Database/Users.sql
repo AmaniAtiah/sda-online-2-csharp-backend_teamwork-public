@@ -19,6 +19,7 @@ INSERT INTO Users (username, first_name, last_name, email, password, phone_numbe
  ('hawra_alramadan', 'Hawra', 'Alramadan', 'hawra@gmail.com', '1234qwer', '966588563487', TRUE),
  ('Amani_Atiah', 'Amani', 'Atiah', 'amani@gmail.com', '1234qwer', '966549563487', FALSE),
  ('Atheer_alsaedi', 'Atheer', 'Alsaedi', 'atheer@gmail.com', '1234qwer', '966549553487', FALSE),
- ('Fatimah_alramadan', 'Fatimah', 'Alramadan', 'fatimah@gmail.com', '1234qwer', '966533563487', FALSE);
-
-
+ ('Fatimah_alramadan', 'Fatimah', 'Alramadan', 'fatimah@gmail.com', '1234qwer', '966533563487', FALSE),
+ ('Reem_Ahmed', 'Reem', 'Ahmed', 'reem@gmail.com', '1234qwer', '966567563487', FALSE),
+ ('Rawabi_Khaled', 'Rawabi', 'Khaled', 'rawabi@gmail.com', '1234qwer', '966579553487', FALSE),
+ ('Lama_Waleed', 'Lama', 'Waleed', 'lama@gmail.com', '1234qwer', '96653563487', FALSE),
