@@ -13,10 +13,12 @@ CREATE TABLE Addresses (
 
 INSERT INTO Addresses (address, city, state, country, zip_code, user_id)
 VALUES
-    ('123 Street', 'Cairo', NULL, 'Egypt', '12345', 1),
-    ('456 Street', 'Dubai', NULL, 'UAE', '67890', 2),
-    ('789 Street', 'Riyadh', NULL, 'Saudi Arabia', '98765', 3),
-    ('101 Street', 'Amman', NULL, 'Jordan', '10101', 6),
-    ('222 Street', 'Beirut', NULL, 'Lebanon', '54321', 1),
-    ('333 Street', 'Casablanca', NULL, 'Morocco', '98765', 5),
-    ('444 Street', 'Tunis', NULL, 'Tunisia', '13579', 3);
+
+    ('123 Street', 'Cairo', 'Cairo Governorate', 'Egypt', '12345', 1),
+    ('456 Street', 'Dubai', 'Dubai', 'UAE', '67890', 2),
+    ('789 Street', 'Riyadh', 'Riyadh Province', 'Saudi Arabia', '98765', 3),
+    ('101 Street', 'Amman', 'Amman Governorate', 'Jordan', '10101', 6),
+    ('222 Street', 'Beirut', 'Beirut Governorate', 'Lebanon', '54321', 1),
+    ('333 Street', 'Casablanca', 'Grand Casablanca', 'Morocco', '98765', 5),
+    ('444 Street', 'Tunis', 'Tunis', 'Tunisia', '13579', 3);
+
