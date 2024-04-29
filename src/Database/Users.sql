@@ -1,3 +1,4 @@
+-- Amani 
 -- Users Table
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
@@ -13,7 +14,7 @@ CREATE TABLE Users (
 
 );
 
-
+-- insert into data to the users table
 INSERT INTO Users (username, first_name, last_name, email, password, phone_number, is_admin)
  VALUES 
  ('hawra_alramadan', 'Hawra', 'Alramadan', 'hawra@gmail.com', '1234qwer', '966588563487', TRUE),
@@ -23,3 +24,14 @@ INSERT INTO Users (username, first_name, last_name, email, password, phone_numbe
  ('Reem_Ahmed', 'Reem', 'Ahmed', 'reem@gmail.com', '1234qwer', '966567563487', FALSE),
  ('Rawabi_Khaled', 'Rawabi', 'Khaled', 'rawabi@gmail.com', '1234qwer', '966579553487', FALSE),
  ('Lama_Waleed', 'Lama', 'Waleed', 'lama@gmail.com', '1234qwer', '96653563487', FALSE);
+
+
+-- display all data from users table
+SELECT * FROM Users;
+
+-- Display all data from the users table provided that the user is an administrator
+SELECT * FROM Users WHERE is_admin = TRUE; 
+
+-- Update email address
+UPDATE Users SET email = 'amaniatiah@gmail.com' WHERE user_id = 2; 
+
