@@ -4,7 +4,6 @@ public class Order {
     public required Guid UserId { get; set; }
     public User? user { get; set; } 
     public required Guid AddressId { get; set; }
-    // public Address? address { get; set; }
     public required decimal TotalPrice { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
