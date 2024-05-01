@@ -31,6 +31,41 @@ namespace api.Controllers
             var product = _productServices.FindProductById(productIdGuid);
             return Ok(product);
         }
+        [HttpPost]
+        public IActionResult CreateCategory(Product newProduct)
+        {
+            var createdProduct = _productServices.CreateProductService(newProduct);
+            return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductsId }, createdProduct);
+        }
 
+        [HttpPut("{productId}")]
+        public IActionResult UpdateProduct(string proudectId, Product updateProudect)
+        {
+            if (!Guid.TryParse(proudectId, out Guid proudectIdGuid))
+            {
+                return BadRequest("Invalid Product ID Format");
+            }
+            var productToUpdate = _productServices.UpdateProductService(proudectIdGuid, updateProudect);
+            if (productToUpdate == null)
+            {
+                return NotFound();
+            }
+            return Ok(productToUpdate);
+        }
+
+        [HttpDelete("{productId}")]
+        public IActionResult DeleteProduct(string productId)
+        {
+            if (!Guid.TryParse(productId, out Guid productIdGuid))
+            {
+                return BadRequest("Invalid Product ID Format");
+            }
+            var result = _productServices.DeleteProductService(productIdGuid);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
     }
 }

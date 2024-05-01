@@ -35,4 +35,33 @@ public class ProductService
     {
         return products.Find(product => product.ProductsId == id);
     }
+    public Product CreateProductService(Product newProduct)
+    {
+        newProduct.ProductsId = Guid.NewGuid();
+        newProduct.CreateAt = DateTime.Now;
+        products.Add(newProduct);
+        return newProduct;
+    }
+    public Product? UpdateProductService(Guid productId, Product updateProduct)
+    {
+        var existingProduct = products.FirstOrDefault(p => p.ProductsId == productId);
+        if (existingProduct != null)
+        {
+            existingProduct.Name = updateProduct.Name;
+            existingProduct.Description = updateProduct.Description;
+
+        }
+        return existingProduct;
+    }
+
+    public bool DeleteProductService(Guid productId)
+    {
+        var productToRemove = products.FirstOrDefault(p => p.ProductsId == productId);
+        if (productToRemove != null)
+        {
+            products.Remove(productToRemove);
+            return true;
+        }
+        return false;
+    }
 }
