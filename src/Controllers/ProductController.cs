@@ -18,54 +18,105 @@ namespace api.Controllers
         [HttpGet]
         public IActionResult GetAllProductControllers()
         {
-            var products = _productServices.GetAllProducts();
-            return Ok(products);
+            try
+            {
+                var products = _productServices.GetAllProducts();
+                if (products.ToList().Count < 1)
+                {
+                    return NotFound(new ErrorResponse { Message = "There Is No User Found ..." });
+                }
+                return Ok(new SuccessResponse<IEnumerable<Product>>
+                {
+                    Message = "Return All Users Successfully.",
+                    Data = products
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            }
         }
         [HttpGet("{productId}")]
-        public IActionResult GetAllProductControllers(string proudectId)
+        public IActionResult GetAllProductByIdControllers(string proudectId)
         {
-            if (!Guid.TryParse(proudectId, out Guid productIdGuid))
+            try
             {
-                return BadRequest("Invalid product id try again ...");
+                if (!Guid.TryParse(proudectId, out Guid productIdGuid))
+                {
+                    return BadRequest("Invalid product id try again ...");
+                }
+                var product = _productServices.FindProductById(productIdGuid);
+                return Ok(new SuccessResponse<Product>
+                {
+                    Message = "Return Single User Successfully.",
+                    Data = product
+                });
             }
-            var product = _productServices.FindProductById(productIdGuid);
-            return Ok(product);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            }
         }
         [HttpPost]
         public IActionResult CreateCategory(Product newProduct)
         {
-            var createdProduct = _productServices.CreateProductService(newProduct);
-            return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductsId }, createdProduct);
+            try
+            {
+                var createdProduct = _productServices.CreateProductService(newProduct);
+                return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductsId }, createdProduct);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
+            }
         }
 
         [HttpPut("{productId}")]
         public IActionResult UpdateProduct(string proudectId, Product updateProudect)
         {
-            if (!Guid.TryParse(proudectId, out Guid proudectIdGuid))
+            try
             {
-                return BadRequest("Invalid Product ID Format");
+                if (!Guid.TryParse(proudectId, out Guid proudectIdGuid))
+                {
+                    return BadRequest("Invalid Product ID Format");
+                }
+                var productToUpdate = _productServices.UpdateProductService(proudectIdGuid, updateProudect);
+                if (productToUpdate == null)
+                {
+                    return NotFound(new ErrorResponse { Message = "The User Is Not Found To Update ..." });
+                }
+                return Ok(new SuccessResponse<Product>
+                {
+                    Message = "Update User Successfully.",
+                    Data = productToUpdate
+                });
             }
-            var productToUpdate = _productServices.UpdateProductService(proudectIdGuid, updateProudect);
-            if (productToUpdate == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
-            return Ok(productToUpdate);
         }
 
         [HttpDelete("{productId}")]
         public IActionResult DeleteProduct(string productId)
         {
-            if (!Guid.TryParse(productId, out Guid productIdGuid))
+            try
             {
-                return BadRequest("Invalid Product ID Format");
+                if (!Guid.TryParse(productId, out Guid productIdGuid))
+                {
+                    return BadRequest("Invalid Product ID Format");
+                }
+                var result = _productServices.DeleteProductService(productIdGuid);
+                if (!result)
+                {
+                    return NotFound(new ErrorResponse { Message = "The User Is Not Found To Delete ..." });
+                }
+                return NoContent();
             }
-            var result = _productServices.DeleteProductService(productIdGuid);
-            if (!result)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
-            return NoContent();
         }
     }
 }

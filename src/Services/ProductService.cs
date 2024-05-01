@@ -47,8 +47,13 @@ public class ProductService
         var existingProduct = products.FirstOrDefault(p => p.ProductsId == productId);
         if (existingProduct != null)
         {
-            existingProduct.Name = updateProduct.Name;
-            existingProduct.Description = updateProduct.Description;
+            existingProduct.Name = updateProduct.Name ?? existingProduct.Name;
+            existingProduct.Description = updateProduct.Description ?? existingProduct.Description;
+            existingProduct.Price = updateProduct.Price ?? existingProduct.Price;
+            existingProduct.Color = updateProduct.Color ?? existingProduct.Color;
+            existingProduct.Size = updateProduct.Size ?? existingProduct.Size;
+            existingProduct.Brand = updateProduct.Brand ?? existingProduct.Brand;
+            existingProduct.Quantity = updateProduct.Quantity ?? existingProduct.Quantity;
 
         }
         return existingProduct;
