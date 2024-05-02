@@ -12,6 +12,20 @@ CREATE TABLE Users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Drop the default value for the user_id column
+ALTER TABLE Users ALTER COLUMN user_id DROP DEFAULT;
+
+-- Alter the user_id column to UUID data type and set default value
+ALTER TABLE Users
+    ALTER COLUMN user_id SET DATA TYPE UUID USING uuid_generate_v4(),
+    ALTER COLUMN user_id SET DEFAULT uuid_generate_v4();
+
+-- Add primary key constraint
+ALTER TABLE Users ADD PRIMARY KEY (user_id);
+
+
 -- Addresses Table
 CREATE TABLE Addresses (
     address_id SERIAL PRIMARY KEY,
