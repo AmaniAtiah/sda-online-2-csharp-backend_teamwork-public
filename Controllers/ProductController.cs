@@ -36,7 +36,7 @@ namespace api.Controllers
                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
         }
-        [HttpGet("{productId}")]
+        [HttpGet("{productId:guid}")]
         public IActionResult GetAllProductByIdControllers(string proudectId)
         {
             try
@@ -71,7 +71,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpPut("{productId}")]
+        [HttpPut("{productId:guid}")]
         public IActionResult UpdateProduct(string proudectId, Product updateProudect)
         {
             try
@@ -97,7 +97,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("{productId:guid}")]
         public IActionResult DeleteProduct(string productId)
         {
             try
