@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using api.Data;
@@ -11,9 +12,11 @@ using api.Data;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240504034007_editProductTable")]
+    partial class editProductTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,9 +83,6 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("text");
@@ -111,22 +111,23 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("categoriescategory_id")
+                        .HasColumnType("uuid");
+
                     b.HasKey("ProductId");
 
-                    b.HasIndex("CategoriesId");
+                    b.HasIndex("categoriescategory_id");
 
                     b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Product", b =>
                 {
-                    b.HasOne("Categories", "Categories")
+                    b.HasOne("Categories", "categories")
                         .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("categoriescategory_id");
 
-                    b.Navigation("Categories");
+                    b.Navigation("categories");
                 });
 #pragma warning restore 612, 618
         }

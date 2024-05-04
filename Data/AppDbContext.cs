@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Data
@@ -9,7 +13,7 @@ namespace api.Data
         //public DbSet<User> Users { get; set; }
         //public DbSet<Address> Addresses { get; set; }
         public DbSet<Categories> Categories { get; set; }
-        //public DbSet<Product> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
         //public DbSet<Order> Orders { get; set; }
         //public DbSet<Order_Item> Order_Items { get; set; }
         //public DbSet<Wishlist> Wishlists { get; set; }
@@ -19,7 +23,7 @@ namespace api.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Categories>()
-                .HasKey(c => c.category_id); 
+                .HasKey(c => c.category_id);
         }
 
     }

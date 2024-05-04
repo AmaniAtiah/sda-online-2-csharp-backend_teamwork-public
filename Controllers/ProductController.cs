@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -11,9 +12,9 @@ namespace api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productServices;
-        public ProductController()
+        public ProductController(AppDbContext appDbContext)
         {
-            _productServices = new ProductService();
+            _productServices = new ProductService(appDbContext);
         }
         [HttpGet]
         public IActionResult GetAllProductControllers()
@@ -23,11 +24,11 @@ namespace api.Controllers
                 var products = _productServices.GetAllProducts();
                 if (products.ToList().Count < 1)
                 {
-                    return NotFound(new ErrorResponse { Message = "There Is No User Found ..." });
+                    return NotFound(new ErrorResponse { Message = "There Is No Product Found ..." });
                 }
                 return Ok(new SuccessResponse<IEnumerable<Product>>
                 {
-                    Message = "Return All Users Successfully.",
+                    Message = "Return All Product Successfully.",
                     Data = products
                 });
             }
@@ -48,7 +49,7 @@ namespace api.Controllers
                 var product = _productServices.FindProductById(productIdGuid);
                 return Ok(new SuccessResponse<Product>
                 {
-                    Message = "Return Single User Successfully.",
+                    Message = "Return Single Product Successfully.",
                     Data = product
                 });
             }
@@ -63,7 +64,7 @@ namespace api.Controllers
             try
             {
                 var createdProduct = _productServices.CreateProductService(newProduct);
-                return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductsId }, createdProduct);
+                return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductId }, createdProduct);
             }
             catch (Exception ex)
             {

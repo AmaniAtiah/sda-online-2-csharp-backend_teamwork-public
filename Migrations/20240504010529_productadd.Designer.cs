@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using api.Data;
@@ -11,9 +12,11 @@ using api.Data;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240504010529_productadd")]
+    partial class productadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,16 +75,13 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Product", b =>
                 {
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("ProductsId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Color")
                         .IsRequired()
@@ -96,37 +96,21 @@ namespace Backend.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<decimal?>("Price")
-                        .IsRequired()
                         .HasColumnType("numeric");
 
                     b.Property<int?>("Quantity")
-                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("Size")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ProductId");
-
-                    b.HasIndex("CategoriesId");
+                    b.HasKey("ProductsId");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Product", b =>
-                {
-                    b.HasOne("Categories", "Categories")
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categories");
                 });
 #pragma warning restore 612, 618
         }
