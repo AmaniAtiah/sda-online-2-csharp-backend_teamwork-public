@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Data
+namespace Backend.EntityFramework
 {
     public class AppDbContext : DbContext
     {
@@ -8,7 +8,7 @@ namespace api.Data
 
         //public DbSet<User> Users { get; set; }
         //public DbSet<Address> Addresses { get; set; }
-        public DbSet<Categories> Categories { get; set; }
+        public DbSet<CategoryTable> Categories { get; set; }
         //public DbSet<Product> Products { get; set; }
         //public DbSet<Order> Orders { get; set; }
         //public DbSet<Order_Item> Order_Items { get; set; }
@@ -17,9 +17,13 @@ namespace api.Data
         public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Categories>()
-                .HasKey(c => c.category_id); 
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+
+        modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
+        modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
         }
 
     }
