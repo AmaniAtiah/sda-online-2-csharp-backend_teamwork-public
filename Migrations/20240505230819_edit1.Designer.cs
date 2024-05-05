@@ -12,8 +12,8 @@ using api.Data;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240504011403_edit")]
-    partial class edit
+    [Migration("20240505230819_edit1")]
+    partial class edit1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,13 +75,16 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Product", b =>
                 {
-                    b.Property<Guid>("ProductsId")
+                    b.Property<Guid>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid>("CategoriesId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Color")
                         .IsRequired()
@@ -111,9 +114,22 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ProductsId");
+                    b.HasKey("ProductId");
 
-                    b.ToTable("Products");
+                    b.HasIndex("CategoriesId");
+
+                    b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.HasOne("Categories", "Categories")
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Categories");
                 });
 #pragma warning restore 612, 618
         }

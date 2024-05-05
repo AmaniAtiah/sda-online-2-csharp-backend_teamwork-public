@@ -26,12 +26,12 @@ namespace api.Data
             modelBuilder.Entity<Categories>()
                 .HasKey(c => c.category_id);
             //Fluent API for Product:    
-            //modelBuilder.Entity<Product>().HasKey(productId => productId.ProductId);//PK
-            //modelBuilder.Entity<Product>().Property(product => product.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id
-            //modelBuilder.Entity<Product>().Property(productName => productName.Name).IsRequired().HasMaxLength(100);
-            //modelBuilder.Entity<Product>().Property(productDescription => productDescription.Description).IsRequired();
-            //modelBuilder.Entity<Product>().Property(productPrice => productPrice.Price).IsRequired();
-            //modelBuilder.Entity<Product>().Property(productQuanttity => productQuanttity.Quantity).IsRequired();
+            modelBuilder.Entity<Product>().HasKey(productId => productId.ProductId);//PK
+            modelBuilder.Entity<Product>().Property(product => product.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id
+            modelBuilder.Entity<Product>().Property(productName => productName.Name).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<Product>().Property(productDescription => productDescription.Description).IsRequired();
+            modelBuilder.Entity<Product>().Property(productPrice => productPrice.Price).IsRequired();
+            modelBuilder.Entity<Product>().Property(productQuanttity => productQuanttity.Quantity).IsRequired();
             //Relations:
             //1 to 1:
             //modelBuilder.Entity<Product>().HasOne(product => product.Categories).WithOne(categories => categories.product).HasForeingKey(categories => categories.productId);

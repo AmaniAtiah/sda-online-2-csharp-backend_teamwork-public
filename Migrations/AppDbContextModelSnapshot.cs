@@ -115,7 +115,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("CategoriesId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("Product", b =>
