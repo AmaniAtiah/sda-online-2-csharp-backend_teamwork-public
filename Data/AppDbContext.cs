@@ -6,7 +6,7 @@ namespace api.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        //public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         //public DbSet<Address> Addresses { get; set; }
         public DbSet<Categories> Categories { get; set; }
         //public DbSet<Product> Products { get; set; }
@@ -20,6 +20,54 @@ namespace api.Data
         {
             modelBuilder.Entity<Categories>()
                 .HasKey(c => c.category_id); 
+
+            
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.UserId);
+
+                entity.Property(e => e.UserName)
+                .IsRequired()
+                .HasMaxLength(32);
+
+                entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(32);
+
+                entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(32);
+
+                entity.Property(user => user.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(user => user.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+
+
+                entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(255);
+
+                 entity.HasIndex(e => e.Email).IsUnique();
+
+                 entity.HasIndex(e => e.UserName).IsUnique();
+                 entity.HasIndex(e => e.PhoneNumber).IsUnique();
+
+
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+
+                entity.Property(e => e.IsAdmin)
+                .HasDefaultValue(false);
+
+
+            });
         }
 
     }
