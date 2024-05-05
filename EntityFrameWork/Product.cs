@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace api.EntityFrameWork
 {
-    [Table("Product")]
+    //[Table("Product")]
     public class Product
     {
         [Key, Required]
