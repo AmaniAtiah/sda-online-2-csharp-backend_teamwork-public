@@ -1,4 +1,4 @@
-namespace api.Helpers
+namespace Backend.Helpers
 {
   public class ErrorResponse
   {
