@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -11,9 +12,9 @@ namespace api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productServices;
-        public ProductController()
+        public ProductController(AppDbContext appDbContext)
         {
-            _productServices = new ProductService();
+            _productServices = new ProductService(appDbContext);
         }
         [HttpGet]
         public IActionResult GetAllProductControllers()
@@ -23,11 +24,11 @@ namespace api.Controllers
                 var products = _productServices.GetAllProducts();
                 if (products.ToList().Count < 1)
                 {
-                    return NotFound(new ErrorResponse { Message = "There Is No User Found ..." });
+                    return NotFound(new ErrorResponse { Message = "There Is No Product Found ..." });
                 }
                 return Ok(new SuccessResponse<IEnumerable<Product>>
                 {
-                    Message = "Return All Users Successfully.",
+                    Message = "Return All Product Successfully.",
                     Data = products
                 });
             }
@@ -36,19 +37,19 @@ namespace api.Controllers
                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
             }
         }
-        [HttpGet("{productId}")]
+        [HttpGet("{productId:guid}")]
         public IActionResult GetAllProductByIdControllers(string proudectId)
         {
             try
             {
                 if (!Guid.TryParse(proudectId, out Guid productIdGuid))
                 {
-                    return BadRequest("Invalid product id try again ...");
+                    return BadRequest("Invalid Product id try again ...");
                 }
                 var product = _productServices.FindProductById(productIdGuid);
                 return Ok(new SuccessResponse<Product>
                 {
-                    Message = "Return Single User Successfully.",
+                    Message = "Return Single Product Successfully.",
                     Data = product
                 });
             }
@@ -63,7 +64,7 @@ namespace api.Controllers
             try
             {
                 var createdProduct = _productServices.CreateProductService(newProduct);
-                return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductsId }, createdProduct);
+                return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductId }, createdProduct);
             }
             catch (Exception ex)
             {
@@ -71,7 +72,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpPut("{productId}")]
+        [HttpPut("{productId:guid}")]
         public IActionResult UpdateProduct(string proudectId, Product updateProudect)
         {
             try
@@ -83,7 +84,7 @@ namespace api.Controllers
                 var productToUpdate = _productServices.UpdateProductService(proudectIdGuid, updateProudect);
                 if (productToUpdate == null)
                 {
-                    return NotFound(new ErrorResponse { Message = "The User Is Not Found To Update ..." });
+                    return NotFound(new ErrorResponse { Message = "The Product Is Not Found To Update ..." });
                 }
                 return Ok(new SuccessResponse<Product>
                 {
@@ -97,7 +98,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("{productId:guid}")]
         public IActionResult DeleteProduct(string productId)
         {
             try
@@ -109,7 +110,7 @@ namespace api.Controllers
                 var result = _productServices.DeleteProductService(productIdGuid);
                 if (!result)
                 {
-                    return NotFound(new ErrorResponse { Message = "The User Is Not Found To Delete ..." });
+                    return NotFound(new ErrorResponse { Message = "The Product Is Not Found To Delete ..." });
                 }
                 return NoContent();
             }

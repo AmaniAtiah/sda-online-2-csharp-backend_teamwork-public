@@ -1,13 +1,27 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+[Table("Product")]
 public class Product
 {
-    public Guid ProductsId { get; set; }
-    public required string Name { get; set; }
-    public required string Description { get; set; }
-    public required decimal? Price { get; set; }
+    public Guid ProductId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal? Price { get; set; }
     public string Color { get; set; } = string.Empty;
     public string Size { get; set; } = string.Empty;
     public string Brand { get; set; } = string.Empty;
-    public required int? Quantity { get; set; }
+    public int? Quantity { get; set; }
     public DateTime CreateAt { get; set; }
-    //Adding categories Id
+    public Guid CategoriesId { get; set; }
+    [ForeignKey("CategoriesId")]
+    public virtual Categories? Categories { get; set; }
+
+    /*     public Guid WishListId { get; set; }
+        [ForeignKey("WishListId")]
+        public virtual WishLis? WishList { get; set; }
+
+        public Guid CartId { get; set; }
+        [ForeignKey("CartId")]
+        public virtual Cart? Cart { get; set; } */
 }
