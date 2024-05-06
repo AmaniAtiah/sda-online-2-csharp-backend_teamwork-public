@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace api.Controllers
 {
@@ -12,73 +11,124 @@ namespace api.Controllers
     {
         private readonly AddressesService _addressService;
 
-        public AddressController()
+        public AddressController(AddressesService addressService)
         {
-            _addressService = new AddressesService();
+            _addressService = addressService;
         }
 
         [HttpGet]
-        public IActionResult GetAllAddresses()
+        public async Task<IActionResult> GetAllAddresses()
         {
-            var addresses = _addressService.GetAllAddresses();
-            return Ok(addresses);
+            try
+            {
+                var addresses = await _addressService.GetAllAddressesAsync();
+
+                Console.WriteLine($"{addresses.ToList()}.Count");
+
+                if (addresses.ToList().Count < 1)
+                {
+                    return NotFound(new ErrorResponse
+                    {
+                        Success = false,
+                        Message = "No address"
+                    });
+                }
+
+                return Ok(new SuccessResponse<IEnumerable<Address>>()
+                {
+                    Success = true,
+                    Data = addresses,
+                    Message = "Addresses returned successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+            }
         }
 
-        [HttpGet("{AddressId}")]
-        public IActionResult GetAddressById(string addressId)
+        [HttpGet("{addressId}")]
+        public async Task<IActionResult> GetAddressById(string AddressId)
         {
-            if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+            try
             {
-                return BadRequest("Invalid address ID Format");
+                if (!Guid.TryParse(AddressId, out Guid AddressIdGuid))
+                {
+                    return BadRequest("Invalid address ID Format");
+                }
+                var address = await _addressService.GetAddressByIdAsync(AddressIdGuid);
+                if (address == null)
+                {
+                    return NotFound();
+                }
+                return Ok(new SuccessResponse<Address>() { Data = address, Message = "Address retrieved successfully." });
             }
-            var address = _addressService.GetAddressById(addressIdGuid);
-            if (address == null)
+            catch (Exception ex)
             {
-                return NotFound();
-            }
-            else
-            {
-                return Ok(address);
+                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
             }
         }
-
 
         [HttpPost]
-        public IActionResult CreateAddress(Address newAddress)
+        public async Task<IActionResult> CreateAddress(Address newAddress)
         {
-            var createdAddress = _addressService.CreateAddressService(newAddress);
-            return CreatedAtAction(nameof(GetAddressById), new { addressId = createdAddress.AddressId }, createdAddress);
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var createdAddress = await _addressService.CreateAddressService(newAddress);
+                return CreatedAtAction(nameof(GetAddressById), new { addressId = createdAddress.AddressId }, createdAddress);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+            }
         }
 
         [HttpPut("{addressId}")]
-        public IActionResult UpdateAddress(string addressId, Address updateAddress)
+        public async Task<IActionResult> UpdateAddress(string addressId, Address updateAddress)
         {
-            if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+            try
             {
-                return BadRequest("Invalid address ID Format");
+                if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+                {
+                    return BadRequest("Invalid address ID Format");
+                }
+                var address = await _addressService.UpdateAddressService(addressIdGuid, updateAddress);
+                if (address == null)
+                {
+                    return NotFound();
+                }
+                return Ok(new SuccessResponse<Address>() { Data = address, Message = "Address updated successfully." });
             }
-            var address = _addressService.UpdateAddressService(addressIdGuid, updateAddress);
-            if (address == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
             }
-            return Ok(address);
         }
 
         [HttpDelete("{addressId}")]
-        public IActionResult DeleteAddress(string addressId)
+        public async Task<IActionResult> DeleteAddress(string addressId)
         {
-            if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+            try
             {
-                return BadRequest("Invalid address ID Format");
+                if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+                {
+                    return BadRequest("Invalid address ID Format");
+                }
+                var result = await _addressService.DeleteAddressService(addressIdGuid);
+                if (!result)
+                {
+                    return NotFound();
+                }
+                return NoContent();
             }
-            var result = _addressService.DeleteAddressService(addressIdGuid);
-            if (!result)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
             }
-            return NoContent();
         }
-
     }
 }

@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<CategoriesService>();
+builder.Services.AddScoped<AddressesService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
@@ -25,7 +26,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseHttpsRedirection();
-    app.MapControllers();
-    app.Run();
 }
+
+
+app.UseHttpsRedirection();
+app.MapControllers().WithParameterValidation();
+app.Run();
