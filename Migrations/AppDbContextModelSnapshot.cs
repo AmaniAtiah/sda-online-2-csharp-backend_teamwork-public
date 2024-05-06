@@ -70,6 +70,7 @@ namespace Backend.Migrations
                     b.ToTable("Payments");
                 });
 
+
             modelBuilder.Entity("User", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -134,6 +135,7 @@ namespace Backend.Migrations
 
                     b.ToTable("Users");
                 });
+
 
             modelBuilder.Entity("Product", b =>
                 {
