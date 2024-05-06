@@ -44,7 +44,7 @@ namespace api.Controllers
             {
                 if (!Guid.TryParse(proudectId, out Guid productIdGuid))
                 {
-                    return BadRequest("Invalid product id try again ...");
+                    return BadRequest("Invalid Product id try again ...");
                 }
                 var product = _productServices.FindProductById(productIdGuid);
                 return Ok(new SuccessResponse<Product>
@@ -84,7 +84,7 @@ namespace api.Controllers
                 var productToUpdate = _productServices.UpdateProductService(proudectIdGuid, updateProudect);
                 if (productToUpdate == null)
                 {
-                    return NotFound(new ErrorResponse { Message = "The User Is Not Found To Update ..." });
+                    return NotFound(new ErrorResponse { Message = "The Product Is Not Found To Update ..." });
                 }
                 return Ok(new SuccessResponse<Product>
                 {
@@ -110,7 +110,7 @@ namespace api.Controllers
                 var result = _productServices.DeleteProductService(productIdGuid);
                 if (!result)
                 {
-                    return NotFound(new ErrorResponse { Message = "The User Is Not Found To Delete ..." });
+                    return NotFound(new ErrorResponse { Message = "The Product Is Not Found To Delete ..." });
                 }
                 return NoContent();
             }

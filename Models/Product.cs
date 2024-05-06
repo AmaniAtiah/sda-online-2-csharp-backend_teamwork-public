@@ -14,7 +14,7 @@ public class Product
     public int? Quantity { get; set; }
     public DateTime CreateAt { get; set; }
     public Guid CategoriesId { get; set; }
-    //[ForeignKey("CategoriesId")]
+    [ForeignKey("CategoriesId")]
     public virtual Categories? Categories { get; set; }
 
     /*     public Guid WishListId { get; set; }

@@ -14,15 +14,14 @@ public class ProductService
         var dataList = _dbContext.Products.ToList();
         dataList.ForEach(row => products.Add(new Product
         {
-            ProductId = row.ProductId,
             Name = row.Name,
             Description = row.Description,
             Price = row.Price,
             Color = row.Color,
             Size = row.Size,
             Brand = row.Brand,
-            Quantity = row.Quantity,
-            CategoriesId = row.CategoriesId,
+            Quantity = row.Quantity
+            //CategoriesId = row.CategoriesId
             // Categories = new Categories
             // {
 
@@ -51,7 +50,9 @@ public class ProductService
             Size = newProduct.Size,
             Brand = newProduct.Brand,
             Quantity = newProduct.Quantity,
-            CategoriesId = newProduct.CategoriesId,
+            CreateAt = DateTime.UtcNow,
+            CategoriesId = newProduct.CategoriesId
+            // CategoriesId = newProduct.CategoriesId,
         };
         //Step2: Add the record to the context:
         _dbContext.Products.Add(newProduct);
