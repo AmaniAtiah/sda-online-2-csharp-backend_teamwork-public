@@ -2,66 +2,69 @@
 using Microsoft.AspNetCore.Mvc;
 
 
-public static class ApiResponse
+namespace Backend.Controllers
 {
-
-    public static IActionResult Success<T>(T Data, string message = "Success")
+    public static class ApiResponse
     {
-        return new ObjectResult(new ApiResponseTemplate<T>(true, Data, message, 200));
+
+        public static IActionResult Success<T>(T Data, string message = "Success")
+        {
+            return new ObjectResult(new ApiResponseTemplate<T>(true, Data, message, 200));
+
+        }
+
+        public static IActionResult Created<T>(T data, string message = "Resource Created")
+        {
+            return new ObjectResult(new ApiResponseTemplate<T>(true, data, message, 201));
+        }
+
+        public static IActionResult NotFound(string message = "Resource not found")
+        {
+            return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 404));
+        }
+
+        public static IActionResult Conflict(string message = "Conflict Detected")
+        {
+            return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 409));
+        }
+
+        public static IActionResult BadRequest(string message = "Bad request")
+        {
+            return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 400));
+        }
+
+        public static IActionResult UnAuthorized(string message = "Unauthorized access")
+        {
+            return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 401));
+        }
+
+        public static IActionResult Forbidden(string message = "Forbidden access")
+        {
+            return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 403));
+        }
+
+        public static IActionResult ServerError(string message = "Internal server error")
+        {
+            return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 500));
+        }
 
     }
-
-    public static IActionResult Created<T>(T data, string message = "Resource Created")
+    public class ApiResponseTemplate<T>
     {
-        return new ObjectResult(new ApiResponseTemplate<T>(true, data, message, 201));
-    }
+        public bool Success { get; set; } = true;
+        public T Data { get; set; }
+        public string Message { get; set; }
+        public int StatusCode { get; set; }
 
-    public static IActionResult NotFound(string message = "Resource not found")
-    {
-        return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 404));
-    }
+        public ApiResponseTemplate(bool success, T data, string message = null, int statusCode = 200)
+        {
+            Success = success;
+            Data = data;
+            Message = message;
+            StatusCode = statusCode;
 
-    public static IActionResult Conflict(string message = "Conflict Detected")
-    {
-        return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 409));
-    }
+        }
 
-    public static IActionResult BadRequest(string message = "Bad request")
-    {
-        return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 400));
-    }
-
-    public static IActionResult UnAuthorized(string message = "Unauthorized access")
-    {
-        return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 401));
-    }
-
-    public static IActionResult Forbidden(string message = "Forbidden access")
-    {
-        return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 403));
-    }
-
-    public static IActionResult ServerError(string message = "Internal server error")
-    {
-        return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 500));
     }
 
 }
-public class ApiResponseTemplate<T>
-{
-    public bool Success { get; set; } = true;
-    public T Data { get; set; }
-    public string Message { get; set; }
-    public int StatusCode { get; set; }
-
-    public ApiResponseTemplate(bool success, T data, string message = null, int statusCode = 200)
-    {
-        Success = success;
-        Data = data;
-        Message = message;
-        StatusCode = statusCode;
-
-    }
-
-}
-

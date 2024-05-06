@@ -1,17 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-
-
-using api.Data;
-
-using api.Helpers;
-
+using Backend.EntityFramework;
+using Backend.Helpers;
+using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace api.Controllers
+namespace Backend.Controllers
 {
     [ApiController]//api controllers
     [Route("/api/products")] // for httpget
