@@ -1,184 +1,111 @@
 using Microsoft.AspNetCore.Mvc;
-using api.Services;
+using Backend.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
-using api.Helpers;
+using Backend.Helpers;
+using Backend.EntityFramework;
 
-namespace api.Controllers;
-
-[ApiController]
-[Route("/api/categories")]
-public class CategoriesController : ControllerBase
+namespace Backend.Controllers
 {
-
-  private readonly CategoriesService _dbContext;
-  public CategoriesController(CategoriesService CategoriesService)
-  {
-    _dbContext = CategoriesService;
-  }
-
-
-  [HttpGet]
-  public async Task<IActionResult> GetAllCategories()
-  {
-    try
+    [ApiController]
+    [Route("/Backend/categories")]
+    public class CategoriesController : ControllerBase
     {
-      var categories = await _dbContext.GetAllCategoryService();
-
-      if (categories.ToList().Count < 1)
-      {
-        return NotFound(new ErrorResponse
+        private readonly CategoriesService _categoriesService;
+        public CategoriesController(CategoriesService categoriesService)
         {
-          Message = "No Categories To Display"
-        });
-      }
-      return Ok(new SuccessResponse<IEnumerable<Categories>>
-      {
-        Message = "Categories are returned succeefully",
-        Data = categories
-      });
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"An error occured , can not return the category list");
-      return StatusCode(500, new ErrorResponse
-      {
-        Message = ex.Message
-      });
-    }
-  }
+            _categoriesService = categoriesService;
+        }
 
-
-  [HttpGet("{category_id:guid}")]
-  public async Task<IActionResult> GetCategory(string category_id)
-  {
-    try
-    {
-      if (!Guid.TryParse(category_id, out Guid categoryIdGuid))
-      {
-        return BadRequest("Invalid category ID Format");
-      }
-      var category = await _dbContext.GetCategoryById(categoryIdGuid);
-      if (category == null)
-      {
-        return NotFound(new ErrorResponse
+        [HttpGet]
+        public async Task<IActionResult> GetAllCategories()
         {
-          Message = $"No Category Found With ID : ({categoryIdGuid})"
-        });
-      }
-      else
-      {
-        return Ok(new SuccessResponse<Categories>
+            try
+            {
+                var categories = await _categoriesService.GetAllCategoryService();
+                return ApiResponse.Success(categories, "all categories retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
+
+        [HttpGet("{category_id:guid}")]
+        public async Task<IActionResult> GetCategory(Guid category_id)
         {
-          Success = true,
-          Message = "Category is returned succeefully",
-          Data = category
-        });
-      }
+            try
+            {
+                var category = await _categoriesService.GetCategoryById(category_id);
+                if (category != null)
+                {
+                    return ApiResponse.Created(category);
+                }
+                else
+                {
+                    return ApiResponse.NotFound("Category was not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
 
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"An error occured , can not return the category");
-      return StatusCode(500, new ErrorResponse
-      {
-        Message = ex.Message
-      });
-    }
-  }
-
-
-  [HttpPost]
-  public async Task<IActionResult> CreateCategory(Categories newCategory)
-  {
-    try
-    {
-      var createdCategory = await _dbContext.CreateCategoryService(newCategory);
-      if (createdCategory != null)
-      {
-        return CreatedAtAction(nameof(GetCategory), new
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(Categories newCategory)
         {
-          categoryId = createdCategory.category_id
-        }, createdCategory);
-      }
+            try
+            {
+                newCategory.Slug = SlugResponse.GenerateSlug(newCategory.category_name);
+                var createdCategory = await _categoriesService.CreateCategoryService(newCategory);
+                return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.category_id },createdCategory);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
 
-      return Ok(new SuccessResponse<Categories>
-      {
-        Success = true,
-        Message = "Category is created succeefully",
-        Data = createdCategory
-      });
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"An error occured , can not create new category");
-      return StatusCode(500, new ErrorResponse
-      {
-        Message = ex.Message
-      });
-    }
-  }
-
-  [HttpPut("{category_id:guid}")]
-  public async Task<IActionResult> UpdateCategory(string categoryId, Categories updateCategory)
-  {
-    try
-    {
-      if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
-      {
-        return BadRequest("Invalid category ID Format");
-      }
-      var category = await _dbContext.UpdateCategoryService(categoryIdGuid, updateCategory);
-      if (category == null)
-      {
-        return NotFound(new ErrorResponse
+        [HttpPut("{category_id:guid}")]
+        public async Task<IActionResult> UpdateCategory(Guid category_id, Categories updateCategory)
         {
-          Message = "No Category To Founed To Update"
-        });
-      }
-      return Ok(new SuccessResponse<Categories>
-      {
-        Success = true,
-        Message = "Category is updated succeefully",
-        Data = category
-      });
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"An error occured , can not update the category");
-      return StatusCode(500, new ErrorResponse
-      {
-        Message = ex.Message
-      });
-    }
-  }
+            try
+            {
+                var category = await _categoriesService.UpdateCategoryService(category_id, updateCategory);
+                if (category == null)
+                {
+                    return ApiResponse.NotFound("Category was not found");
+                }
+                else
+                {
+                    return ApiResponse.Success(category, "Update Category successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
 
-
-  [HttpDelete("{category_id:guid}")]
-  public async Task<IActionResult> DeleteCategory(string categoryId)
-  {
-    try
-    {
-      if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
-      {
-        return BadRequest("Invalid Category ID Format");
-      }
-      var result = await _dbContext.DeleteCategoryService(categoryIdGuid);
-      if (!result)
-      {
-        return NotFound(new ErrorResponse
+        [HttpDelete("{category_id:guid}")]
+        public async Task<IActionResult> DeleteCategory(Guid category_id)
         {
-          Message = "The category is not found to be deleted"
-        });
-      }
-      return Ok(new { success = true, message = "Category is deleted succeefully" });
+            try
+            {
+                var result = await _categoriesService.DeleteCategoryService(category_id);
+                if (result)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return ApiResponse.NotFound("Category was not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
     }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"An error occured , the category can not deleted");
-      return StatusCode(500, new ErrorResponse
-      {
-        Message = ex.Message
-      });
-    }
-  }
 }

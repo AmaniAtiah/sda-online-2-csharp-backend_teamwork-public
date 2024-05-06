@@ -1,97 +1,103 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using api.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace api.Controllers
+[ApiController]
+[Route("/api/users")]
+public class UserController : ControllerBase
 {
-    [ApiController]
-    [Route("/api/users")]
-    public class UserController : ControllerBase
+    private readonly UserService _userService;
+    public UserController(AppDbContext appDbContext)
     {
-        private readonly UserService _userService;
-        public UserController()
+        _userService = new UserService(appDbContext);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        try
         {
-            _userService = new UserService();
-
-        }
-
-        [HttpGet]
-        public IActionResult GetAllUsers()
-        {
-            var users = _userService.GetAllUsersService();
-            return Ok(users);
-
-        }
-
-        [HttpGet("{userId}")]
-        public IActionResult GetUser(string userId)
-        {
-            if (!Guid.TryParse(userId, out Guid userIdGuid))
+            var users = await _userService.GetAllUsersAsync();
+            if (users.ToList().Count < 1)
             {
-                return BadRequest("Invalid user ID format");
+                return ApiResponse.NotFound("No users found");
             }
-            var user = _userService.GetUserById(userIdGuid);
+            return ApiResponse.Success(users, "All users are returned");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
+        }
+    }
+
+    [HttpGet("{userId:guid}")]
+    public async Task<IActionResult> GetUserById(Guid userId)
+    {
+        try
+        {
+            var user = await _userService.GetUserAsync(userId);
             if (user == null)
             {
-                return NotFound("User not found");
+                return ApiResponse.NotFound("User was not found");
             }
-            else
-            {
-                return Ok(user);
-            }
-
+            return ApiResponse.Created(user);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
 
         }
+    }
 
-        [HttpPost]
-        public IActionResult CreateUser(User newUser)
+    [HttpPost]
+    public async Task<IActionResult> AddUser(User user)
+    {
+        try
         {
-            var createdUser = _userService.CreateUserService(newUser);
-            return CreatedAtAction(nameof(GetUser), new { userId = createdUser.UserId },
-            createdUser);
+            var response = await _userService.AddUserAsync(user);
+            return ApiResponse.Created(response);
         }
-
-        [HttpPut("{userId}")]
-        public IActionResult UpdateUser(string userId, User updatedUser)
+        catch (Exception ex)
         {
-            if (!Guid.TryParse(userId, out Guid userIdGuid))
-            {
-                return BadRequest("Invalid user ID format");
-            }
-            var user = _userService.UpdateUserService(userIdGuid, updatedUser);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user);
-            
-
+            return ApiResponse.ServerError(ex.Message);
         }
+    }
 
-
-
-        [HttpDelete("{userId}")]
-        public IActionResult DeleteUser(string userId)
+    [HttpPut("{userId:guid}")]
+    public async Task<IActionResult> UpdateUser(Guid UserId, User user)
+    {
+        try
         {
-            if (!Guid.TryParse(userId, out Guid userIdGuid))
+            var updateUser = await _userService.UpdateUserAsync(UserId, user);
+            if (updateUser == null)
             {
-                return BadRequest("Invalid user ID format");
+                return ApiResponse.NotFound("User was not found");
             }
-            var result = _userService.DeleteUserService(userIdGuid);
+            return ApiResponse.Success(updateUser, "User updated successfully");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
+        }
+    }
+
+    [HttpDelete("{userId:guid}")]
+    public async Task<IActionResult> DeleteUser(Guid userId)
+    {
+        try
+        {
+            var result = await _userService.DeleteUserAsync(userId);
             if (!result)
             {
-                return NotFound();
+                return ApiResponse.NotFound("User was not found");
             }
             else
             {
                 return NoContent();
             }
-
         }
-
-
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError(ex.Message);
+        }
     }
 }

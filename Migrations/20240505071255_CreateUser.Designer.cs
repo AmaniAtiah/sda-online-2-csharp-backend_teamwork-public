@@ -5,19 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-
 using api.Data;
-=======
-using Backend.EntityFramework;
-
 
 #nullable disable
 
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240505230819_edit1")]
-    partial class edit1
+    [Migration("20240505071255_CreateUser")]
+    partial class CreateUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,63 +73,69 @@ namespace Backend.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("Product", b =>
+            modelBuilder.Entity("User", b =>
                 {
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Brand")
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Color")
+                    b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("IsAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
-                    b.Property<string>("Description")
+                    b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("numeric");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("integer");
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.HasKey("UserId");
 
-                    b.HasKey("ProductId");
+                    b.HasIndex("Email")
+                        .IsUnique();
 
-                    b.HasIndex("CategoriesId");
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
-                    b.ToTable("Product");
-                });
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
-            modelBuilder.Entity("Product", b =>
-                {
-                    b.HasOne("Categories", "Categories")
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categories");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

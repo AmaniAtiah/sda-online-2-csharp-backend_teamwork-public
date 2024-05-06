@@ -1,6 +1,6 @@
 public class AddressesService
 {
-    public static List<Address> _addresses = new List<Address>()
+    private static List<Address> _addresses = new List<Address>()
     {
          new Address
     {
@@ -43,27 +43,29 @@ public class AddressesService
         }
     };
 
-    public IEnumerable<Address> GetAllAddresses()
+    public async Task<IEnumerable<Address>> GetAllAddressesAsync()
     {
+        await Task.CompletedTask;
         return _addresses;
     }
 
-    // Method to get an address by its ID
-    public Address? GetAddressById(Guid addressId)
+    public Task<Address?> GetAddressByIdAsync(Guid addressId)
     {
-        return _addresses.Find(address => address.AddressId == addressId);
+        var address = _addresses.FirstOrDefault(address => address.AddressId == addressId);
+        return Task.FromResult<Address?>(address);
     }
 
-    public Address? CreateAddressService(Address newAddress)
+
+    public Task<Address> CreateAddressService(Address newAddress)
     {
         newAddress.AddressId = Guid.NewGuid();
         _addresses.Add(newAddress);
-        return newAddress;
+        return Task.FromResult(newAddress);
     }
 
-    public Address UpdateAddressService(Guid AddressId, Address updateAddress)
+    public Task<Address> UpdateAddressService(Guid addressId, Address updateAddress)
     {
-        var existingAddress = _addresses.FirstOrDefault(a => a.AddressId == AddressId);
+        var existingAddress = _addresses.FirstOrDefault(a => a.AddressId == addressId);
         if (existingAddress != null)
         {
             existingAddress.AddressLine = updateAddress.AddressLine;
@@ -73,18 +75,18 @@ public class AddressesService
             existingAddress.ZipCode = updateAddress.ZipCode;
             existingAddress.UserId = updateAddress.UserId;
         }
-        return existingAddress;
+        return Task.FromResult(existingAddress);
     }
 
-    public bool DeleteAddressService(Guid addressId)
+    public Task<bool> DeleteAddressService(Guid addressId)
     {
         var addressToRemove = _addresses.FirstOrDefault(a => a.AddressId == addressId);
         if (addressToRemove != null)
         {
             _addresses.Remove(addressToRemove);
-            return true;
+            return Task.FromResult(true);
         }
-        return false;
+        return Task.FromResult(false);
     }
 
 
