@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using api.Data;
-using api.Services;
+using Backend.EntityFramework;
+using Backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

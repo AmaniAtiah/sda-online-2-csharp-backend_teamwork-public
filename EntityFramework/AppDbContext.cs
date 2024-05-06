@@ -4,16 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Data
+namespace Backend.EntityFramework
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         //public DbSet<User> Users { get; set; }
+<<<<<<< HEAD:Data/AppDbContext.cs
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+=======
+        //public DbSet<Address> Addresses { get; set; }
+        public DbSet<CategoryTable> Categories { get; set; }
+        //public DbSet<Product> Products { get; set; }
+>>>>>>> fc0c8bc295d0bede5a8beb9a3d38801b79e0fdd4:EntityFramework/AppDbContext.cs
         //public DbSet<Order> Orders { get; set; }
         //public DbSet<Order_Item> Order_Items { get; set; }
         //public DbSet<Wishlist> Wishlists { get; set; }
@@ -21,6 +27,7 @@ namespace api.Data
         public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
+<<<<<<< HEAD:Data/AppDbContext.cs
         {
             //Fluent API for Categories: 
             modelBuilder.Entity<Categories>()
@@ -36,6 +43,15 @@ namespace api.Data
             //1 to 1:
             //modelBuilder.Entity<Product>().HasOne(product => product.Categories).WithOne(categories => categories.product).HasForeingKey(categories => categories.productId);
 
+=======
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+
+        modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
+        modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
+>>>>>>> fc0c8bc295d0bede5a8beb9a3d38801b79e0fdd4:EntityFramework/AppDbContext.cs
         }
 
     }
