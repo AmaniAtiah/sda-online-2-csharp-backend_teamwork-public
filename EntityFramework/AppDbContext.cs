@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.EntityFramework
@@ -10,16 +8,16 @@ namespace Backend.EntityFramework
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        //public DbSet<User> Users { get; set; }
-<<<<<<< HEAD:Data/AppDbContext.cs
+       public DbSet<User> Users { get; set; }
+
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<Categories> Categories { get; set; }
+//       public DbSet<Categories> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
-=======
+
         //public DbSet<Address> Addresses { get; set; }
         public DbSet<CategoryTable> Categories { get; set; }
         //public DbSet<Product> Products { get; set; }
->>>>>>> fc0c8bc295d0bede5a8beb9a3d38801b79e0fdd4:EntityFramework/AppDbContext.cs
+
         //public DbSet<Order> Orders { get; set; }
         //public DbSet<Order_Item> Order_Items { get; set; }
         //public DbSet<Wishlist> Wishlists { get; set; }
@@ -27,8 +25,55 @@ namespace Backend.EntityFramework
         public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-<<<<<<< HEAD:Data/AppDbContext.cs
+
         {
+         modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.UserId);
+
+                entity.Property(e => e.UserName)
+                .IsRequired()
+                .HasMaxLength(32);
+
+                entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(32);
+
+                entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(32);
+
+                entity.Property(user => user.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(user => user.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+
+
+                entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(255);
+
+                 entity.HasIndex(e => e.Email).IsUnique();
+
+                 entity.HasIndex(e => e.UserName).IsUnique();
+                 entity.HasIndex(e => e.PhoneNumber).IsUnique();
+
+
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+
+                entity.Property(e => e.IsAdmin)
+                .HasDefaultValue(false);
+
+
+            });
+
             //Fluent API for Categories: 
             modelBuilder.Entity<Categories>()
                 .HasKey(c => c.category_id);
@@ -43,7 +88,6 @@ namespace Backend.EntityFramework
             //1 to 1:
             //modelBuilder.Entity<Product>().HasOne(product => product.Categories).WithOne(categories => categories.product).HasForeingKey(categories => categories.productId);
 
-=======
     {
         base.OnModelCreating(modelBuilder);
 
@@ -51,8 +95,10 @@ namespace Backend.EntityFramework
 
         modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
         modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
->>>>>>> fc0c8bc295d0bede5a8beb9a3d38801b79e0fdd4:EntityFramework/AppDbContext.cs
         }
 
+     
+
     }
+}
 }
