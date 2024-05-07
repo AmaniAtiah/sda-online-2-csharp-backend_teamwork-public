@@ -1,7 +1,7 @@
-// using Microsoft.EntityFrameworkCore;
-// using Backend.EntityFramework;
-// using Backend.Helpers;
-// using Backend.Models;
+using Microsoft.EntityFrameworkCore;
+using Backend.EntityFramework;
+using Backend.Helpers;
+using Backend.Models;
 
 
 namespace Backend.Services
@@ -25,20 +25,20 @@ namespace Backend.Services
     }
 
     public async Task<Categories> CreateCategoryService(Categories newCategory)
-{
-    var categories = new Categories
     {
+      var categories = new Categories
+      {
         category_id = Guid.NewGuid(),
         category_name = newCategory.category_name,
         Slug = SlugResponse.GenerateSlug(newCategory.category_name),
         description = newCategory.description
-    };
+      };
 
-    _appDbContext.Categories.Add(newCategory);
-    await _appDbContext.SaveChangesAsync();
+      _appDbContext.Categories.Add(newCategory);
+      await _appDbContext.SaveChangesAsync();
 
-    return newCategory;
-}
+      return newCategory;
+    }
 
 
     public async Task<Categories?> UpdateCategoryService(Guid category_id, Categories updateCategory)
