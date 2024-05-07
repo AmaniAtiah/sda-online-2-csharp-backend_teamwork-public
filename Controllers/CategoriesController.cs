@@ -37,7 +37,7 @@ namespace Backend.Controllers
                 var category = await _categoriesService.GetCategoryById(category_id);
                 if (category != null)
                 {
-                    return ApiResponse.Created(category);
+                    return ApiResponse.Success(category, "Category is retrieved successfully");
                 }
                 else
                 {
