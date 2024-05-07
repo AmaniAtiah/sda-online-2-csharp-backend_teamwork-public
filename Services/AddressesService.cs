@@ -49,10 +49,10 @@ public class AddressesService
         return _addresses;
     }
 
-    public Task<Address?> GetAddressByIdAsync(Guid addressId)
+    public Task<Address> GetAddressByIdAsync(Guid addressId)
     {
         var address = _addresses.FirstOrDefault(address => address.AddressId == addressId);
-        return Task.FromResult<Address?>(address);
+        return Task.FromResult<Address>(address);
     }
 
 

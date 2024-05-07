@@ -1,4 +1,8 @@
-using api.Data;
+using Microsoft.AspNetCore.Mvc;
+using Backend.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Backend.Helpers;
+using Backend.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 public class UserService
@@ -13,7 +17,7 @@ public class UserService
     {
         try
         {
-            return await _appDbContext.Users.ToArrayAsync();
+            return await _appDbContext.Users.ToListAsync();
         }
         catch (Exception e)
         {

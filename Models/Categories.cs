@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 public class Categories
 {
-  public Guid category_id { get; set; }
+  public Guid CategoriesId { get; set; }
 
   [Required(ErrorMessage = "Category name is requierd")]
   [MinLength(2, ErrorMessage = "Category name must be at least 2 characters long.")]

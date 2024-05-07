@@ -6,7 +6,7 @@ namespace Backend.EntityFramework
   [Table("Categories")]
   public class CategoryTable
   {
-    [Key] 
+    [Key]
     [Column("category_id")]
     public Guid category_id { get; set; }
 
@@ -21,6 +21,6 @@ namespace Backend.EntityFramework
     [Column("description")]
     public string description { get; set; } = string.Empty;
 
-    public ICollection<Product> Products { get; } = new List<Product>();
+    // public ICollection<Product> Products { get; } = new List<Product>();
   }
 }

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+/* using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Backend.Helpers;
@@ -108,4 +108,4 @@ namespace Backend.Controllers
             }
         }
     }
-}
+} */
