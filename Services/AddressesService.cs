@@ -1,75 +1,43 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Backend.EntityFramework; // Make sure to add the appropriate namespace for your DbContext
 using Backend.Models;
 
 namespace Backend.Services
 {
     public class AddressesService
     {
-        private static List<Address> _addresses = new List<Address>()
-    {
-         new Address
-    {
-        AddressId = Guid.NewGuid(),
-        AddressLine = "456 Elm St",
-        City = "Townsville",
-        State = "Provinceville",
-        Country = "Countryland",
-        ZipCode = "67890",
-        UserId = Guid.NewGuid()
-    },
-    new Address
-    {
-        AddressId = Guid.NewGuid(),
-        AddressLine = "789 Oak St",
-        City = "Villageville",
-        State = "Countyville",
-        Country = "Countryland",
-        ZipCode = "54321",
-        UserId = Guid.NewGuid()
-    },
-    new Address
-    {
-        AddressId = Guid.NewGuid(),
-        AddressLine = "101 Pine St",
-        City = "Hamletville",
-        State = "Territoryville",
-        Country = "Countryland",
-        ZipCode = "98765",
-        UserId = Guid.NewGuid()
-    }, new Address
+        private readonly AppDbContext _dbContext;
+
+        public AddressesService(AppDbContext dbContext)
         {
-            AddressId = Guid.NewGuid(),
-            AddressLine = "123 Main St",
-            City = "Cityville",
-            State = "Stateville",
-            Country = "Countryland",
-            ZipCode = "12345",
-            UserId = Guid.NewGuid()
+            _dbContext = dbContext;
         }
-    };
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            await Task.CompletedTask;
-            return _addresses;
+            return await _dbContext.Addresses.ToListAsync();
         }
 
-        public Task<Address?> GetAddressByIdAsync(Guid addressId)
+        public async Task<Address?> GetAddressByIdAsync(Guid addressId)
         {
-            var address = _addresses.FirstOrDefault(address => address.AddressId == addressId);
-            return Task.FromResult<Address?>(address);
+            return await _dbContext.Addresses.FirstOrDefaultAsync(address => address.AddressId == addressId);
         }
 
-
-        public Task<Address> CreateAddressService(Address newAddress)
+        public async Task<Address> CreateAddressService(Address newAddress)
         {
-            newAddress.AddressId = Guid.NewGuid();
-            _addresses.Add(newAddress);
-            return Task.FromResult(newAddress);
+            newAddress.AddressId = Guid.NewGuid(); // Generate a new GUID for the address
+            _dbContext.Addresses.Add(newAddress);
+            await _dbContext.SaveChangesAsync();
+            return newAddress;
         }
 
-        public Task<Address> UpdateAddressService(Guid addressId, Address updateAddress)
+        public async Task<Address> UpdateAddressService(Guid addressId, Address updateAddress)
         {
-            var existingAddress = _addresses.FirstOrDefault(a => a.AddressId == addressId);
+            var existingAddress = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (existingAddress != null)
             {
                 existingAddress.AddressLine = updateAddress.AddressLine;
@@ -78,22 +46,22 @@ namespace Backend.Services
                 existingAddress.Country = updateAddress.Country;
                 existingAddress.ZipCode = updateAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
+
+                await _dbContext.SaveChangesAsync();
             }
-            return Task.FromResult(existingAddress);
+            return existingAddress;
         }
 
-        public Task<bool> DeleteAddressService(Guid addressId)
+        public async Task<bool> DeleteAddressService(Guid addressId)
         {
-            var addressToRemove = _addresses.FirstOrDefault(a => a.AddressId == addressId);
+            var addressToRemove = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (addressToRemove != null)
             {
-                _addresses.Remove(addressToRemove);
-                return Task.FromResult(true);
+                _dbContext.Addresses.Remove(addressToRemove);
+                await _dbContext.SaveChangesAsync();
+                return true;
             }
-            return Task.FromResult(false);
+            return false;
         }
     }
-
-
 }
-
