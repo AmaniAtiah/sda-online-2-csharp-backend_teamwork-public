@@ -8,14 +8,14 @@ namespace Backend.EntityFramework
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-       public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public DbSet<Address> Addresses { get; set; }
-//       public DbSet<Categories> Categories { get; set; }
+        // public DbSet<Categories> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
 
         //public DbSet<Address> Addresses { get; set; }
-        public DbSet<CategoryTable> Categories { get; set; }
+        // public DbSet<CategoryTable> Categories { get; set; }
         //public DbSet<Product> Products { get; set; }
 
         //public DbSet<Order> Orders { get; set; }
@@ -27,52 +27,52 @@ namespace Backend.EntityFramework
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
         {
-         modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(e => e.UserId);
+            modelBuilder.Entity<User>(entity =>
+               {
+                   entity.HasKey(e => e.UserId);
 
-                entity.Property(e => e.UserName)
-                .IsRequired()
-                .HasMaxLength(32);
+                   entity.Property(e => e.UserName)
+                   .IsRequired()
+                   .HasMaxLength(32);
 
-                entity.Property(e => e.FirstName)
-                .IsRequired()
-                .HasMaxLength(32);
+                   entity.Property(e => e.FirstName)
+                   .IsRequired()
+                   .HasMaxLength(32);
 
-                entity.Property(e => e.LastName)
-                .IsRequired()
-                .HasMaxLength(32);
+                   entity.Property(e => e.LastName)
+                   .IsRequired()
+                   .HasMaxLength(32);
 
-                entity.Property(user => user.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                   entity.Property(user => user.CreatedAt)
+                   .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                entity.Property(user => user.UpdatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-
-
-                entity.Property(e => e.Email)
-                .IsRequired()
-                .HasMaxLength(255);
-
-                 entity.HasIndex(e => e.Email).IsUnique();
-
-                 entity.HasIndex(e => e.UserName).IsUnique();
-                 entity.HasIndex(e => e.PhoneNumber).IsUnique();
+                   entity.Property(user => user.UpdatedAt)
+                   .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
 
 
-                entity.Property(e => e.Password)
-                    .IsRequired()
-                    .HasMaxLength(255);
+                   entity.Property(e => e.Email)
+                   .IsRequired()
+                   .HasMaxLength(255);
 
-                entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+                   entity.HasIndex(e => e.Email).IsUnique();
 
-                entity.Property(e => e.IsAdmin)
-                .HasDefaultValue(false);
+                   entity.HasIndex(e => e.UserName).IsUnique();
+                   entity.HasIndex(e => e.PhoneNumber).IsUnique();
 
 
-            });
+
+                   entity.Property(e => e.Password)
+                       .IsRequired()
+                       .HasMaxLength(255);
+
+                   entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+
+                   entity.Property(e => e.IsAdmin)
+                   .HasDefaultValue(false);
+
+
+               });
 
             //Fluent API for Categories: 
             modelBuilder.Entity<Categories>()
@@ -88,17 +88,17 @@ namespace Backend.EntityFramework
             //1 to 1:
             //modelBuilder.Entity<Product>().HasOne(product => product.Categories).WithOne(categories => categories.product).HasForeingKey(categories => categories.productId);
 
-    {
-        base.OnModelCreating(modelBuilder);
+            // {
+            //     base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+            //     modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
 
-        modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
-        modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
+            //     modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
+            //     modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
+            // }
+
+
+
         }
-
-     
-
     }
-}
 }

@@ -7,7 +7,7 @@ namespace Backend.EntityFramework
   [Table("Categories")]
   public class CategoryTable
   {
-    [Key] 
+    [Key]
     [Column("category_id")]
     public Guid category_id { get; set; }
 

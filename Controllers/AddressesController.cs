@@ -47,7 +47,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("{addressId}")]
+        [HttpGet("{AddressId}")]
         public async Task<IActionResult> GetAddressById(string AddressId)
         {
             try
@@ -79,7 +79,7 @@ namespace Backend.Controllers
                     return BadRequest(ModelState);
                 }
                 var createdAddress = await _addressService.CreateAddressService(newAddress);
-                return CreatedAtAction(nameof(GetAddressById), new { addressId = createdAddress.AddressId }, createdAddress);
+                return CreatedAtAction(nameof(GetAddressById), new { AddressId = createdAddress.AddressId }, createdAddress);
             }
             catch (Exception ex)
             {
@@ -87,16 +87,16 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPut("{addressId}")]
-        public async Task<IActionResult> UpdateAddress(string addressId, Address updateAddress)
+        [HttpPut("{AddressId}")]
+        public async Task<IActionResult> UpdateAddress(string AddressId, Address updateAddress)
         {
             try
             {
-                if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+                if (!Guid.TryParse(AddressId, out Guid AddressIdGuid))
                 {
                     return BadRequest("Invalid address ID Format");
                 }
-                var address = await _addressService.UpdateAddressService(addressIdGuid, updateAddress);
+                var address = await _addressService.UpdateAddressService(AddressIdGuid, updateAddress);
                 if (address == null)
                 {
                     return NotFound();
@@ -109,16 +109,16 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpDelete("{addressId}")]
-        public async Task<IActionResult> DeleteAddress(string addressId)
+        [HttpDelete("{AddressId}")]
+        public async Task<IActionResult> DeleteAddress(string AddressId)
         {
             try
             {
-                if (!Guid.TryParse(addressId, out Guid addressIdGuid))
+                if (!Guid.TryParse(AddressId, out Guid AddressIdGuid))
                 {
                     return BadRequest("Invalid address ID Format");
                 }
-                var result = await _addressService.DeleteAddressService(addressIdGuid);
+                var result = await _addressService.DeleteAddressService(AddressIdGuid);
                 if (!result)
                 {
                     return NotFound();
