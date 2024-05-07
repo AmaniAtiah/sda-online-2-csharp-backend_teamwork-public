@@ -11,10 +11,7 @@ namespace Backend.EntityFramework
         public DbSet<User> Users { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Product> Products { get; set; }
-
-        //public DbSet<Address> Addresses { get; set; }
         public DbSet<Categories> Categories { get; set; }
-        //public DbSet<Product> Products { get; set; }
 
         //public DbSet<Order> Orders { get; set; }
         //public DbSet<Order_Item> Order_Items { get; set; }
@@ -24,16 +21,16 @@ namespace Backend.EntityFramework
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Fluent API for Categories: 
-            //modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+            modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
             //modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
             //modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
             //Fluent API for Product:    
-            modelBuilder.Entity<Product>().HasKey(productId => productId.ProductId);//PK
-            modelBuilder.Entity<Product>().Property(product => product.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id
-            modelBuilder.Entity<Product>().Property(productName => productName.Name).IsRequired().HasMaxLength(100);
-            modelBuilder.Entity<Product>().Property(productDescription => productDescription.Description).IsRequired();
-            modelBuilder.Entity<Product>().Property(productPrice => productPrice.Price).IsRequired();
-            modelBuilder.Entity<Product>().Property(productQuanttity => productQuanttity.Quantity).IsRequired();
+            modelBuilder.Entity<Product>().HasKey(p => p.ProductId);//PK
+            modelBuilder.Entity<Product>().Property(p => p.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id
+            modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired().HasMaxLength(150);
+            modelBuilder.Entity<Product>().Property(p => p.Price).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.Quantity).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.CreateAt).HasDefaultValue(DateTime.UtcNow);//Generate date
 
             //Relations:
             //1 to 1:

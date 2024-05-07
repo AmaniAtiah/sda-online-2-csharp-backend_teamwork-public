@@ -70,7 +70,7 @@ namespace Backend.Services
                     await _dbContext.SaveChangesAsync();
                     return existingProduct;
                 }
-                throw new Exception("product not found");
+                throw new Exception("Product not found");
             }
             catch (Exception e)
             {

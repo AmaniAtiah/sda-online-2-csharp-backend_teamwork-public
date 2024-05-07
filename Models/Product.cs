@@ -11,16 +11,15 @@ namespace Backend.Models
                 [MaxLength(150, ErrorMessage = "Product Name must be less than 150 character")]
                 [MinLength(2, ErrorMessage = "Product Name must be at least 2 character")]
                 public string Name { get; set; } = string.Empty;
-                [Required]
                 public string Description { get; set; } = string.Empty;
-                [Required]
+                [Required(ErrorMessage = "Price is required")]
                 public decimal? Price { get; set; }
                 public string Color { get; set; } = string.Empty;
                 public string Size { get; set; } = string.Empty;
                 public string Brand { get; set; } = string.Empty;
-                [Required]
+                [Required(ErrorMessage = "Quantity is required")]
                 public int? Quantity { get; set; }
-                public DateTime CreateAt { get; set; }
+                public DateTime CreateAt { get; set; } = DateTime.UtcNow;
                 // public Guid CategoriesId { get; set; }
                 // [ForeignKey("CategoriesId")]
                 // public virtual Categories? Categories { get; set; }
