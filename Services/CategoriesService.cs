@@ -3,118 +3,67 @@
 // using Backend.Helpers;
 // using Backend.Models;
 
-// namespace Backend.Services
-// {
-//   public class CategoriesService
-//   {
-//     private readonly AppDbContext _dbContext;
-//     public CategoriesService(AppDbContext dbContext)
-//     {
-//       _dbContext = dbContext;
-//     }
-// namespace Backend.Services
-// {
-//   public class CategoriesService
-//   {
-//     private readonly AppDbContext _dbContext;
-//     public CategoriesService(AppDbContext dbContext)
-//     {
-//       _dbContext = dbContext;
-//     }
 
-//     public async Task<IEnumerable<CategoryTable>> GetAllCategoryService()
-//     {
-//       return await _dbContext.Categories.ToListAsync();
-//     }
-//     public async Task<IEnumerable<CategoryTable>> GetAllCategoryService()
-//     {
-//       return await _dbContext.Categories.ToListAsync();
-//     }
+namespace Backend.Services
+{
+  public class CategoriesService
+  {
+    private readonly AppDbContext _appDbContext;
+    public CategoriesService(AppDbContext appDbContext)
+    {
+      _appDbContext = appDbContext;
+    }
 
-//     public async Task<CategoryTable?> GetCategoryById(Guid category_id)
-//     {
-//       return await _dbContext.Categories.FindAsync(category_id);
-//     }
-//     public async Task<CategoryTable?> GetCategoryById(Guid category_id)
-//     {
-//       return await _dbContext.Categories.FindAsync(category_id);
-//     }
+    public async Task<IEnumerable<Categories>> GetAllCategoryService()
+    {
+      return await _appDbContext.Categories.ToListAsync();
+    }
 
-//     public async Task<CategoryTable> CreateCategoryService(Categories newCategory)
-//     {
-//       newCategory.category_id = Guid.NewGuid();
-//       newCategory.Slug = SlugResponse.GenerateSlug(newCategory.category_name);
-//     public async Task<CategoryTable> CreateCategoryService(Categories newCategory)
-//     {
-//       newCategory.category_id = Guid.NewGuid();
-//       newCategory.Slug = SlugResponse.GenerateSlug(newCategory.category_name);
+    public async Task<Categories?> GetCategoryById(Guid category_id)
+    {
+      return await _appDbContext.Categories.FindAsync(category_id);
+    }
 
-//       var categoryTable = new CategoryTable
-//       {
-//         category_id = newCategory.category_id,
-//       };
-//       var categoryTable = new CategoryTable
-//       {
-//         category_id = newCategory.category_id,
-//       };
+    public async Task<Categories> CreateCategoryService(Categories newCategory)
+{
+    var categories = new Categories
+    {
+        category_id = Guid.NewGuid(),
+        category_name = newCategory.category_name,
+        Slug = SlugResponse.GenerateSlug(newCategory.category_name),
+        description = newCategory.description
+    };
 
-//       _dbContext.Categories.Add(categoryTable);
-//       await _dbContext.SaveChangesAsync();
+    _appDbContext.Categories.Add(newCategory);
+    await _appDbContext.SaveChangesAsync();
 
-//       return categoryTable;
-//     }
-//       _dbContext.Categories.Add(categoryTable);
-//       await _dbContext.SaveChangesAsync();
+    return newCategory;
+}
 
-//       return categoryTable;
-//     }
 
-//     public async Task<CategoryTable?> UpdateCategoryService(Guid category_id, Categories updateCategory)
-//     {
-//       var existingCategory = await _dbContext.Categories.FindAsync(category_id);
-//       if (existingCategory != null)
-//       {
-//         existingCategory.category_name = updateCategory.category_name ?? existingCategory.category_name;
-//         existingCategory.description = updateCategory.description ?? existingCategory.category_name;
-//         await _dbContext.SaveChangesAsync();
-//       }
-//       return existingCategory;
-//     }
-//     public async Task<CategoryTable?> UpdateCategoryService(Guid category_id, Categories updateCategory)
-//     {
-//       var existingCategory = await _dbContext.Categories.FindAsync(category_id);
-//       if (existingCategory != null)
-//       {
-//         existingCategory.category_name = updateCategory.category_name ?? existingCategory.category_name;
-//         existingCategory.description = updateCategory.description ?? existingCategory.category_name;
-//         await _dbContext.SaveChangesAsync();
-//       }
-//       return existingCategory;
-//     }
+    public async Task<Categories?> UpdateCategoryService(Guid category_id, Categories updateCategory)
+    {
+      var existingCategory = await _appDbContext.Categories.FindAsync(category_id);
+      if (existingCategory != null)
+      {
+        existingCategory.category_name = updateCategory.category_name ?? existingCategory.category_name;
+        existingCategory.description = updateCategory.description ?? existingCategory.category_name;
+        await _appDbContext.SaveChangesAsync();
+      }
+      return existingCategory;
+    }
 
-//     public async Task<bool> DeleteCategoryService(Guid category_id)
-//     {
-//       var categoryToRemove = await _dbContext.Categories.FindAsync(category_id);
-//       if (categoryToRemove != null)
-//       {
-//         _dbContext.Categories.Remove(categoryToRemove);
-//         await _dbContext.SaveChangesAsync();
-//         return true;
-//       }
-//       return false;
-//     }
-//   }
-// }
-//     public async Task<bool> DeleteCategoryService(Guid category_id)
-//     {
-//       var categoryToRemove = await _dbContext.Categories.FindAsync(category_id);
-//       if (categoryToRemove != null)
-//       {
-//         _dbContext.Categories.Remove(categoryToRemove);
-//         await _dbContext.SaveChangesAsync();
-//         return true;
-//       }
-//       return false;
-//     }
-//   }
-// }
+    public async Task<bool> DeleteCategoryService(Guid category_id)
+    {
+      var categoryToRemove = await _appDbContext.Categories.FindAsync(category_id);
+      if (categoryToRemove != null)
+      {
+        _appDbContext.Categories.Remove(categoryToRemove);
+        await _appDbContext.SaveChangesAsync();
+        return true;
+      }
+      return false;
+    }
+  }
+}
+

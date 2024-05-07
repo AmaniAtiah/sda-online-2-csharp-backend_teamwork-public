@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+/* using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Backend.Models;
 
@@ -24,4 +24,4 @@ namespace Backend.EntityFramework
 
     // public ICollection<Product> Products { get; } = new List<Product>();
   }
-}
+} */

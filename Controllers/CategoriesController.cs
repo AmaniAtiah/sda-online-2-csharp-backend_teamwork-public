@@ -30,26 +30,28 @@ using Backend.EntityFramework;
 //             }
 //         }
 
-//         [HttpGet("{category_id:guid}")]
-//         public async Task<IActionResult> GetCategory(Guid category_id)
-//         {
-//             try
-//             {
-//                 var category = await _categoriesService.GetCategoryById(category_id);
-//                 if (category != null)
-//                 {
-//                     return ApiResponse.Created(category);
-//                 }
-//                 else
-//                 {
-//                     return ApiResponse.NotFound("Category was not found");
-//                 }
-//             }
-//             catch (Exception ex)
-//             {
-//                 return ApiResponse.ServerError(ex.Message);
-//             }
-//         }
+        [HttpGet("{category_id:guid}")]
+        public async Task<IActionResult> GetCategory(Guid category_id)
+        {
+            try
+            {
+                var category = await _categoriesService.GetCategoryById(category_id);
+                if (category != null)
+                {
+                    return ApiResponse.Success(category, "Category is retrieved successfully");
+                }
+                else
+                {
+                    return ApiResponse.NotFound("Category was not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
+
+
 
 //         [HttpPost]
 //         public async Task<IActionResult> CreateCategory(Categories newCategory)
