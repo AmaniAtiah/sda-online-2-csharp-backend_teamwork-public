@@ -19,7 +19,7 @@ namespace Backend.Services
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            return await _dbContext.Addresses.Include(a => a.User).ToListAsync();
+            return await _dbContext.Addresses.ToListAsync();
 
         }
 

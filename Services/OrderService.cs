@@ -19,7 +19,7 @@ namespace Backend.Services
         {
             try
             {
-                return await _dbContext.Orders.Include(o => o.User).ToListAsync();
+                return await _dbContext.Orders.Include(p => p.Products).ToListAsync();
             }
 
             catch (Exception e)
