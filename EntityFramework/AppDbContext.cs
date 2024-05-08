@@ -1,8 +1,6 @@
-
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
-
 namespace Backend.EntityFramework
 {
     public class AppDbContext : DbContext
@@ -13,14 +11,10 @@ namespace Backend.EntityFramework
         public DbSet<Product> Products { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<Order> Orders { get; set; }
-        //public DbSet<Order_Item> Order_Items { get; set; }
-        //public DbSet<Wishlist> Wishlists { get; set; }
-        //public DbSet<Cart> Carts { get; set; }
-        //public DbSet<Payment> Payments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Fluent API for Categories: 
-            modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+            //modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
             //modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
             //modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
             //Fluent API:
@@ -59,18 +53,21 @@ namespace Backend.EntityFramework
             .WithOne(o => o.User)
             .HasForeignKey(o => o.UserId);
             //Addresses And Order:
-            modelBuilder.Entity<Address>()
-            .HasMany(a => a.Orders)
-            .WithOne(o => o.Addresses)
-            .HasForeignKey(o => o.AddresseId);
+            // modelBuilder.Entity<Address>()
+            // .HasMany(a => a.Orders)
+            // .WithOne(o => o.Addresses)
+            // .HasForeignKey(o => o.AddresseId);
             //Category And Product:
             modelBuilder.Entity<Categories>()
             .HasMany(c => c.Products)
             .WithOne(p => p.Category)
             .HasForeignKey(p => p.CategoriesId);
+            //Order And Product:
+            modelBuilder.Entity<Order>()
+            .HasMany(o => o.Products)
+            .WithOne(p => p.Orders)
+            .HasForeignKey(p => p.OrderId);
             //1 to 1:
-            //modelBuilder.Entity<Product>().HasOne(product => product.Categories).WithOne(categories => categories.product).HasForeingKey(categories => categories.productId);
-
             // {
             //     base.OnModelCreating(modelBuilder);
 
@@ -79,9 +76,6 @@ namespace Backend.EntityFramework
             //     modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
             //     modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
             // }
-
-
-
         }
     }
 }

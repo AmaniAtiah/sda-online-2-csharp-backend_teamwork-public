@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
+    [Table("Address")]
     public class Address
 
     {
@@ -29,8 +31,8 @@ namespace Backend.Models
         //Relations:
         [Required(ErrorMessage = "UserId is required")]
         public Guid UserId { get; set; }
-        public User User { get; set; }
-        public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
+        public User? User { get; set; }
+        //public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
     }
 
 }

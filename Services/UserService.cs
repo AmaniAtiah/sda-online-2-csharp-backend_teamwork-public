@@ -45,10 +45,22 @@ namespace Backend.Services
         {
             try
             {
-                _appDbContext.Users.Add(newUser);
+                User user = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    UserName = newUser.UserName,
+                    FirstName = newUser.FirstName,
+                    LastName = newUser.LastName,
+                    Email = newUser.Email,
+                    Password = newUser.Password,
+                    PhoneNumber = newUser.PhoneNumber,
+                    IsAdmin = newUser.IsAdmin,
+                    CreatedAt = newUser.CreatedAt,
+                    UpdatedAt = newUser.UpdatedAt,
+                };
+                await _appDbContext.Users.AddAsync(user);
                 await _appDbContext.SaveChangesAsync();
-
-                return newUser;
+                return user;
             }
             catch (Exception e)
             {

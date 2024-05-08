@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240508070701_edit")]
-    partial class edit
+    [Migration("20240508152444_create")]
+    partial class create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,7 +63,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("Backend.Models.Categories", b =>
@@ -88,7 +88,7 @@ namespace Backend.Migrations
 
                     b.HasKey("category_id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("Backend.Models.Order", b =>
@@ -100,7 +100,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 7, 7, 0, 833, DateTimeKind.Utc).AddTicks(9773));
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 15, 24, 43, 946, DateTimeKind.Utc).AddTicks(1221));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -139,7 +139,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 7, 7, 0, 833, DateTimeKind.Utc).AddTicks(8835));
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 15, 24, 43, 946, DateTimeKind.Utc).AddTicks(277));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -149,6 +149,9 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
@@ -163,6 +166,8 @@ namespace Backend.Migrations
                     b.HasKey("ProductId");
 
                     b.HasIndex("CategoriesId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Product");
                 });
@@ -211,7 +216,7 @@ namespace Backend.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Backend.Models.Address", b =>
@@ -239,12 +244,30 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Product", b =>
                 {
                     b.HasOne("Backend.Models.Categories", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Backend.Models.Order", "Orders")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Backend.Models.Categories", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Backend.Models.Order", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>

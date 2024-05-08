@@ -19,7 +19,8 @@ namespace Backend.Services
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            return await _dbContext.Addresses.Include(a => a.Orders).ToListAsync();
+            return await _dbContext.Addresses.Include(a => a.User).ToListAsync();
+
         }
 
         public async Task<Address?> GetAddressByIdAsync(Guid addressId)
@@ -29,10 +30,19 @@ namespace Backend.Services
 
         public async Task<Address> CreateAddressService(Address newAddress)
         {
-            newAddress.AddressId = Guid.NewGuid(); // Generate a new GUID for the address
-            _dbContext.Addresses.Add(newAddress);
+            Address address = new Address
+            {
+                AddressId = Guid.NewGuid(),
+                AddressLine = newAddress.AddressLine,
+                City = newAddress.City,
+                State = newAddress.State,
+                Country = newAddress.Country,
+                ZipCode = newAddress.ZipCode,
+                UserId = newAddress.UserId
+            };
+            await _dbContext.Addresses.AddAsync(address);
             await _dbContext.SaveChangesAsync();
-            return newAddress;
+            return address;
         }
 
         public async Task<Address> UpdateAddressService(Guid addressId, Address updateAddress)
@@ -46,12 +56,10 @@ namespace Backend.Services
                 existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
                 existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
-
                 await _dbContext.SaveChangesAsync();
             }
             return existingAddress;
         }
-
         public async Task<bool> DeleteAddressService(Guid addressId)
         {
             var addressToRemove = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);

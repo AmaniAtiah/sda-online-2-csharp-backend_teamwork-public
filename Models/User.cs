@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
+    [Table("User")]
     public class User
     {
         public Guid UserId { get; set; }

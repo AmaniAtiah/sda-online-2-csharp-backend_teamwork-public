@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
-{
+{      
         [Table("Product")]
         public class Product
         {
@@ -23,16 +23,10 @@ namespace Backend.Models
                 //Relations:
                 [Required(ErrorMessage = "CategoryId is required")]
                 public Guid CategoriesId { get; set; }
-                public Categories Category { get; set; }
-                // public virtual Categories? Categories { get; set; }
-
-                /*     public Guid WishListId { get; set; }
-                    [ForeignKey("WishListId")]
-                    public virtual WishLis? WishList { get; set; }
-
-                    public Guid CartId { get; set; }
-                    [ForeignKey("CartId")]
-                    public virtual Cart? Cart { get; set; } */
+                public Categories? Category { get; set; }
+                [Required(ErrorMessage = "OrderId is required")]
+                public Guid OrderId { get; set; }
+                public Order? Orders { get; set; }
         }
 }
 // using System.ComponentModel.DataAnnotations;

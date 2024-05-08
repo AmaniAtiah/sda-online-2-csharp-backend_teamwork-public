@@ -19,7 +19,7 @@ namespace Backend.Services
         {
             try
             {
-                return await _dbContext.Orders.ToArrayAsync();
+                return await _dbContext.Orders.Include(o => o.User).ToListAsync();
             }
 
             catch (Exception e)
@@ -43,9 +43,18 @@ namespace Backend.Services
         {
             try
             {
-                _dbContext.Orders.Add(newOrder);
+                Order order = new Order
+                {
+                    OrderId = Guid.NewGuid(),
+                    OrderDate = DateTime.UtcNow,
+                    TotalPrice = newOrder.TotalPrice,
+                    Status = newOrder.Status,
+                    UserId = newOrder.UserId
+                    //AddresseId = newOrder.AddresseId
+                };
+                await _dbContext.Orders.AddAsync(order);
                 await _dbContext.SaveChangesAsync();
-                return newOrder;
+                return order;
             }
             catch (Exception e)
             {
@@ -60,9 +69,10 @@ namespace Backend.Services
                 var existingOrder = await _dbContext.Orders.FindAsync(orderId);
                 if (existingOrder != null)
                 {
-                    //existingOrder.OrderDate = updateOrder.OrderDate ?? existingOrder.OrderDate;
+                    existingOrder.OrderDate = updateOrder.OrderDate;
                     existingOrder.TotalPrice = updateOrder.TotalPrice ?? existingOrder.TotalPrice;
                     existingOrder.Status = updateOrder.Status ?? existingOrder.Status;
+                    existingOrder.UserId = updateOrder.UserId;
 
                     await _dbContext.SaveChangesAsync();
                     return existingOrder;

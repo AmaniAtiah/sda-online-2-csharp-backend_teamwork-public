@@ -19,7 +19,7 @@ namespace Backend.Services
         {
             try
             {
-                return await _dbContext.Products.ToArrayAsync();
+                return await _dbContext.Products.Include(c => c.Category).Include(o => o.Orders).ToListAsync();
             }
 
             catch (Exception e)
@@ -43,9 +43,20 @@ namespace Backend.Services
         {
             try
             {
-                _dbContext.Products.Add(newProduct);
+                Product product = new Product
+                {
+                    ProductId = Guid.NewGuid(),
+                    Name = newProduct.Name,
+                    Description = newProduct.Description,
+                    Quantity = newProduct.Quantity,
+                    Price = newProduct.Price,
+                    CategoriesId = newProduct.CategoriesId,
+                    OrderId = newProduct.OrderId,
+                    CreateAt = DateTime.UtcNow
+                };
+                await _dbContext.Products.AddAsync(product);
                 await _dbContext.SaveChangesAsync();
-                return newProduct;
+                return product;
             }
             catch (Exception e)
             {
@@ -67,6 +78,8 @@ namespace Backend.Services
                     existingProduct.Size = updateProduct.Size ?? existingProduct.Size;
                     existingProduct.Brand = updateProduct.Brand ?? existingProduct.Brand;
                     existingProduct.Quantity = updateProduct.Quantity ?? existingProduct.Quantity;
+                    existingProduct.CategoriesId = updateProduct.CategoriesId;
+                    existingProduct.OrderId = updateProduct.OrderId;
                     await _dbContext.SaveChangesAsync();
                     return existingProduct;
                 }
