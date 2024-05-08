@@ -26,8 +26,11 @@ namespace Backend.Models
         [Required(ErrorMessage = "Zip code is required.")]
         [MaxLength(20, ErrorMessage = "Zip code cannot exceed 20 characters.")]
         public string? ZipCode { get; set; }
-
+        //Relations:
+        [Required(ErrorMessage = "UserId is required")]
         public Guid UserId { get; set; }
+        public User User { get; set; }
+        public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
     }
 
 }

@@ -3,6 +3,7 @@ using System;
 using Backend.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508072844_edit2")]
+    partial class edit2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,13 +97,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AddresseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 8, 29, 53, 631, DateTimeKind.Utc).AddTicks(394));
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 7, 28, 42, 753, DateTimeKind.Utc).AddTicks(7798));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -113,8 +113,6 @@ namespace Backend.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("AddresseId");
 
                     b.HasIndex("UserId");
 
@@ -141,7 +139,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 8, 29, 53, 630, DateTimeKind.Utc).AddTicks(8852));
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 7, 28, 42, 753, DateTimeKind.Utc).AddTicks(4596));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -229,19 +227,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Order", b =>
                 {
-                    b.HasOne("Backend.Models.Address", "Addresses")
-                        .WithMany("Orders")
-                        .HasForeignKey("AddresseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Backend.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Addresses");
 
                     b.Navigation("User");
                 });
@@ -249,22 +239,12 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Product", b =>
                 {
                     b.HasOne("Backend.Models.Categories", "Category")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("CategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Backend.Models.Address", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("Backend.Models.Categories", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>

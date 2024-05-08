@@ -19,7 +19,7 @@ namespace Backend.Services
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            return await _dbContext.Addresses.ToListAsync();
+            return await _dbContext.Addresses.Include(a => a.Orders).ToListAsync();
         }
 
         public async Task<Address?> GetAddressByIdAsync(Guid addressId)
@@ -40,11 +40,11 @@ namespace Backend.Services
             var existingAddress = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (existingAddress != null)
             {
-                existingAddress.AddressLine = updateAddress.AddressLine;
-                existingAddress.City = updateAddress.City;
-                existingAddress.State = updateAddress.State;
-                existingAddress.Country = updateAddress.Country;
-                existingAddress.ZipCode = updateAddress.ZipCode;
+                existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
+                existingAddress.City = updateAddress.City ?? existingAddress.City;
+                existingAddress.State = updateAddress.State ?? existingAddress.State;
+                existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
+                existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
 
                 await _dbContext.SaveChangesAsync();

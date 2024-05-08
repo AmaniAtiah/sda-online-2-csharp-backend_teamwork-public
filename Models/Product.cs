@@ -20,8 +20,10 @@ namespace Backend.Models
                 [Required(ErrorMessage = "Quantity is required")]
                 public int? Quantity { get; set; }
                 public DateTime CreateAt { get; set; } = DateTime.UtcNow;
-                // public Guid CategoriesId { get; set; }
-                // [ForeignKey("CategoriesId")]
+                //Relations:
+                [Required(ErrorMessage = "CategoryId is required")]
+                public Guid CategoriesId { get; set; }
+                public Categories Category { get; set; }
                 // public virtual Categories? Categories { get; set; }
 
                 /*     public Guid WishListId { get; set; }

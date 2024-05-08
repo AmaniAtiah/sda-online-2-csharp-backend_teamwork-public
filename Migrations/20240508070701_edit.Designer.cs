@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240507170319_edit")]
+    [Migration("20240508070701_edit")]
     partial class edit
     {
         /// <inheritdoc />
@@ -61,6 +61,8 @@ namespace Backend.Migrations
 
                     b.HasKey("AddressId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Addresses");
                 });
 
@@ -89,6 +91,34 @@ namespace Backend.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Backend.Models.Order", b =>
+                {
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("OrderDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 7, 7, 0, 833, DateTimeKind.Utc).AddTicks(9773));
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Order");
+                });
+
             modelBuilder.Entity("Backend.Models.Product", b =>
                 {
                     b.Property<Guid>("ProductId")
@@ -99,12 +129,17 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("CategoriesId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 7, 7, 0, 833, DateTimeKind.Utc).AddTicks(8835));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -112,8 +147,8 @@ namespace Backend.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
@@ -126,6 +161,8 @@ namespace Backend.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("ProductId");
+
+                    b.HasIndex("CategoriesId");
 
                     b.ToTable("Product");
                 });
@@ -175,6 +212,46 @@ namespace Backend.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Backend.Models.Address", b =>
+                {
+                    b.HasOne("Backend.Models.User", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Order", b =>
+                {
+                    b.HasOne("Backend.Models.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Product", b =>
+                {
+                    b.HasOne("Backend.Models.Categories", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Backend.Models.User", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }
