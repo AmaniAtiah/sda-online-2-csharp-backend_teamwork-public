@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240508152444_create")]
+    [Migration("20240508214232_create")]
     partial class create
     {
         /// <inheritdoc />
@@ -100,7 +100,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 15, 24, 43, 946, DateTimeKind.Utc).AddTicks(1221));
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(5469));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -139,7 +139,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 15, 24, 43, 946, DateTimeKind.Utc).AddTicks(277));
+                        .HasDefaultValue(new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(3896));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -149,9 +149,6 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
@@ -166,8 +163,6 @@ namespace Backend.Migrations
                     b.HasKey("ProductId");
 
                     b.HasIndex("CategoriesId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("Product");
                 });
@@ -219,6 +214,21 @@ namespace Backend.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("OrderProduct", b =>
+                {
+                    b.Property<Guid>("OrdersOrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductsProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("OrdersOrderId", "ProductsProductId");
+
+                    b.HasIndex("ProductsProductId");
+
+                    b.ToTable("OrderDetails", (string)null);
+                });
+
             modelBuilder.Entity("Backend.Models.Address", b =>
                 {
                     b.HasOne("Backend.Models.User", "User")
@@ -249,23 +259,25 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Models.Order", "Orders")
-                        .WithMany("Products")
-                        .HasForeignKey("OrderId")
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("OrderProduct", b =>
+                {
+                    b.HasOne("Backend.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
-
-                    b.Navigation("Orders");
+                    b.HasOne("Backend.Models.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Backend.Models.Categories", b =>
-                {
-                    b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Backend.Models.Order", b =>
                 {
                     b.Navigation("Products");
                 });

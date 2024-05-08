@@ -16,9 +16,9 @@ namespace Backend.Models
         [Required(ErrorMessage = "UserId is required")]
         public Guid UserId { get; set; }//FK
         public User? User { get; set; }
-        //[Required(ErrorMessage = "AddresseId is required")]
-        //public Guid AddresseId { get; set; }
-        //public Address? Addresses { get; set; }//FK
+        [Required(ErrorMessage = "AddresseId is required")]
+        // public Guid AddresseId { get; set; }
+        // public Address? Addresses { get; set; }//FK
         public List<Product> Products { get; set; } = new List<Product>();
     }
 }

@@ -51,7 +51,6 @@ namespace Backend.Services
                     Quantity = newProduct.Quantity,
                     Price = newProduct.Price,
                     CategoriesId = newProduct.CategoriesId,
-                    OrderId = newProduct.OrderId,
                     CreateAt = DateTime.UtcNow
                 };
                 await _dbContext.Products.AddAsync(product);
@@ -79,7 +78,6 @@ namespace Backend.Services
                     existingProduct.Brand = updateProduct.Brand ?? existingProduct.Brand;
                     existingProduct.Quantity = updateProduct.Quantity ?? existingProduct.Quantity;
                     existingProduct.CategoriesId = updateProduct.CategoriesId;
-                    existingProduct.OrderId = updateProduct.OrderId;
                     await _dbContext.SaveChangesAsync();
                     return existingProduct;
                 }

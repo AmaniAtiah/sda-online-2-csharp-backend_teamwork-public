@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
-{      
+{
         [Table("Product")]
         public class Product
         {
@@ -24,9 +24,12 @@ namespace Backend.Models
                 [Required(ErrorMessage = "CategoryId is required")]
                 public Guid CategoriesId { get; set; }
                 public Categories? Category { get; set; }
-                [Required(ErrorMessage = "OrderId is required")]
-                public Guid OrderId { get; set; }
-                public Order? Orders { get; set; }
+                // [Required(ErrorMessage = "OrderId is required")]
+                // public Guid OrderId { get; set; }
+                // public Order? Orders { get; set; }
+                public List<Order> Orders { get; set; } = new List<Order>();
+
+
         }
 }
 // using System.ComponentModel.DataAnnotations;

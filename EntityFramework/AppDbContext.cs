@@ -53,10 +53,10 @@ namespace Backend.EntityFramework
             .WithOne(o => o.User)
             .HasForeignKey(o => o.UserId);
             //Addresses And Order:
-            // modelBuilder.Entity<Address>()
-            // .HasMany(a => a.Orders)
-            // .WithOne(o => o.Addresses)
-            // .HasForeignKey(o => o.AddresseId);
+            /* modelBuilder.Entity<Address>()
+            .HasMany(a => a.Orders)
+            .WithOne(o => o.Addresses)
+            .HasForeignKey(o => o.AddresseId); */
             //Category And Product:
             modelBuilder.Entity<Categories>()
             .HasMany(c => c.Products)
@@ -64,9 +64,9 @@ namespace Backend.EntityFramework
             .HasForeignKey(p => p.CategoriesId);
             //Order And Product:
             modelBuilder.Entity<Order>()
-            .HasMany(o => o.Products)
-            .WithOne(p => p.Orders)
-            .HasForeignKey(p => p.OrderId);
+           .HasMany(o => o.Products)
+           .WithMany(p => p.Orders)
+           .UsingEntity(j => j.ToTable("OrderDetails"));
             //1 to 1:
             // {
             //     base.OnModelCreating(modelBuilder);

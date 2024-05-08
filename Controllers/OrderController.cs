@@ -62,6 +62,19 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+        [HttpPost("{orderId}")]
+        public async Task<IActionResult> AddProductToOrder(Guid orderId, Guid productId)
+        {
+            try
+            {
+                await _orderServices.AddProductToOrder(orderId, productId);
+                return ApiResponse.Created("Products Added to the order successfully");
+            }
+            catch (Exception e)
+            {
+                return ApiResponse.ServerError(e.Message);
+            }
+        }
 
         [HttpPut("{orderId:guid}")]
         public async Task<IActionResult> UpdateOrder(Guid orderId, Order updateOrder)

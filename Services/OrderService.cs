@@ -62,6 +62,20 @@ namespace Backend.Services
             }
 
         }
+        public async Task AddProductToOrder(Guid orderId, Guid productId)
+        {
+            var order = await _dbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var product = await _dbContext.Products.FindAsync(productId);
+            if (order != null && product != null)
+            {
+                order.Products.Add(product);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new InvalidOperationException("The Product has already added");
+            }
+        }
         public async Task<Order?> UpdateOrdertAsync(Guid orderId, Order updateOrder)
         {
             try
@@ -85,7 +99,6 @@ namespace Backend.Services
 
             }
         }
-
         public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
             try
