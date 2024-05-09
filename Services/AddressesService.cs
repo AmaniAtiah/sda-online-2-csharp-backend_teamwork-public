@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Backend.EntityFramework; // Make sure to add the appropriate namespace for your DbContext
+using Backend.EntityFramework;
+using Backend.Helpers;
 using Backend.Models;
 
 namespace Backend.Services
@@ -22,29 +19,29 @@ namespace Backend.Services
             return await _dbContext.Addresses.ToListAsync();
         }
 
-        public async Task<Address?> GetAddressByIdAsync(Guid addressId)
+        public async Task<Address?> GetAddressById(Guid addressId)
         {
-            return await _dbContext.Addresses.FirstOrDefaultAsync(address => address.AddressId == addressId);
+            return await _dbContext.Addresses.FindAsync(addressId);
         }
 
         public async Task<Address> CreateAddressService(Address newAddress)
         {
-            newAddress.AddressId = Guid.NewGuid(); // Generate a new GUID for the address
+            newAddress.AddressId = Guid.NewGuid();
             _dbContext.Addresses.Add(newAddress);
             await _dbContext.SaveChangesAsync();
             return newAddress;
         }
 
-        public async Task<Address> UpdateAddressService(Guid addressId, Address updateAddress)
+        public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress)
         {
             var existingAddress = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (existingAddress != null)
             {
-                existingAddress.AddressLine = updateAddress.AddressLine;
-                existingAddress.City = updateAddress.City;
-                existingAddress.State = updateAddress.State;
-                existingAddress.Country = updateAddress.Country;
-                existingAddress.ZipCode = updateAddress.ZipCode;
+                existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
+                existingAddress.City = updateAddress.City ?? existingAddress.City;
+                existingAddress.State = updateAddress.State ?? existingAddress.State;
+                existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
+                existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
 
                 await _dbContext.SaveChangesAsync();

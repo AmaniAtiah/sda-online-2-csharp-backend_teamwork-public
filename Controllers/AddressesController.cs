@@ -2,6 +2,8 @@ using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
@@ -22,50 +24,33 @@ namespace Backend.Controllers
             try
             {
                 var addresses = await _addressService.GetAllAddressesAsync();
-
-                Console.WriteLine($"{addresses.ToList()}.Count");
-
-                if (addresses.ToList().Count < 1)
-                {
-                    return NotFound(new ErrorResponse
-                    {
-                        Success = false,
-                        Message = "No address"
-                    });
-                }
-
-                return Ok(new SuccessResponse<IEnumerable<Address>>()
-                {
-                    Success = true,
-                    Data = addresses,
-                    Message = "Addresses returned successfully."
-                });
+                return ApiResponse.Success(addresses, "All addresses retrieved successfully");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
+
         }
 
-        [HttpGet("{AddressId}")]
-        public async Task<IActionResult> GetAddressById(string AddressId)
+        [HttpGet("{address_id:guid}")]
+        public async Task<IActionResult> GetAddressById(Guid addressId)
         {
             try
             {
-                if (!Guid.TryParse(AddressId, out Guid AddressIdGuid))
+                var address = await _addressService.GetAddressById(addressId);
+                if (address != null)
                 {
-                    return BadRequest("Invalid address ID Format");
+                    return ApiResponse.Success(address, "Address retrieved successfully");
                 }
-                var address = await _addressService.GetAddressByIdAsync(AddressIdGuid);
-                if (address == null)
+                else
                 {
-                    return NotFound();
+                    return ApiResponse.NotFound("Address was not found");
                 }
-                return Ok(new SuccessResponse<Address>() { Data = address, Message = "Address retrieved successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
         }
 
@@ -78,56 +63,66 @@ namespace Backend.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+
                 var createdAddress = await _addressService.CreateAddressService(newAddress);
-                return CreatedAtAction(nameof(GetAddressById), new { AddressId = createdAddress.AddressId }, createdAddress);
+
+                if (createdAddress != null)
+                {
+                    return CreatedAtAction(nameof(GetAddressById), new { address_id = createdAddress.AddressId }, createdAddress);
+                }
+                else
+                {
+                    return ApiResponse.ServerError("Failed to create the address.");
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
         }
 
-        [HttpPut("{AddressId}")]
-        public async Task<IActionResult> UpdateAddress(string AddressId, Address updateAddress)
+
+
+
+        [HttpPut("{addressId}")]
+        public async Task<IActionResult> UpdateAddress(Guid addressId, Address updateAddress)
         {
             try
             {
-                if (!Guid.TryParse(AddressId, out Guid AddressIdGuid))
+                var address = await _addressService.UpdateAddressService(addressId, updateAddress);
+                if (address != null)
                 {
-                    return BadRequest("Invalid address ID Format");
+                    return ApiResponse.Success(address, "Address updated successfully");
                 }
-                var address = await _addressService.UpdateAddressService(AddressIdGuid, updateAddress);
-                if (address == null)
+                else
                 {
-                    return NotFound();
+                    return ApiResponse.NotFound("Address was not found");
                 }
-                return Ok(new SuccessResponse<Address>() { Data = address, Message = "Address updated successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
         }
 
-        [HttpDelete("{AddressId}")]
-        public async Task<IActionResult> DeleteAddress(string AddressId)
+        [HttpDelete("{addressId}")]
+        public async Task<IActionResult> DeleteAddress(Guid addressId)
         {
             try
             {
-                if (!Guid.TryParse(AddressId, out Guid AddressIdGuid))
+                var result = await _addressService.DeleteAddressService(addressId);
+                if (result)
                 {
-                    return BadRequest("Invalid address ID Format");
+                    return NoContent();
                 }
-                var result = await _addressService.DeleteAddressService(AddressIdGuid);
-                if (!result)
+                else
                 {
-                    return NotFound();
+                    return ApiResponse.NotFound("Address was not found");
                 }
-                return NoContent();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse() { Message = ex.Message });
+                return ApiResponse.ServerError(ex.Message);
             }
         }
     }
