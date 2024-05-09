@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.EntityFramework
 {
-    [Table("Addresses")]
+    [Table("Address")]
     public class AddressTable
     {
         [Key, Required]

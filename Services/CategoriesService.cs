@@ -14,24 +14,24 @@ namespace Backend.Services
       _appDbContext = appDbContext;
     }
 
-    public async Task<IEnumerable<Categories>> GetAllCategoryService()
+    public async Task<IEnumerable<Category>> GetAllCategoryService()
     {
       return await _appDbContext.Categories.Include(c => c.Products).ToListAsync();
     }
 
-    public async Task<Categories?> GetCategoryById(Guid category_id)
+    public async Task<Category?> GetCategoryById(Guid categoryId)
     {
-      return await _appDbContext.Categories.FindAsync(category_id);
+      return await _appDbContext.Categories.FindAsync(categoryId);
     }
 
-    public async Task<Categories> CreateCategoryService(Categories newCategory)
+    public async Task<Category> AddCategoryService(Category newCategory)
     {
-      var categories = new Categories
+      var categories = new Category
       {
-        category_id = Guid.NewGuid(),
+        CategoryId = Guid.NewGuid(),
         category_name = newCategory.category_name,
         Slug = SlugResponse.GenerateSlug(newCategory.category_name),
-        description = newCategory.description
+        Description = newCategory.Description
       };
 
       _appDbContext.Categories.Add(newCategory);
@@ -41,21 +41,21 @@ namespace Backend.Services
     }
 
 
-    public async Task<Categories?> UpdateCategoryService(Guid category_id, Categories updateCategory)
+    public async Task<Category?> UpdateCategoryService(Guid categoryId, Category updateCategory)
     {
-      var existingCategory = await _appDbContext.Categories.FindAsync(category_id);
+      var existingCategory = await _appDbContext.Categories.FindAsync(categoryId);
       if (existingCategory != null)
       {
         existingCategory.category_name = updateCategory.category_name ?? existingCategory.category_name;
-        existingCategory.description = updateCategory.description ?? existingCategory.category_name;
+        existingCategory.Description = updateCategory.Description ?? existingCategory.category_name;
         await _appDbContext.SaveChangesAsync();
       }
       return existingCategory;
     }
 
-    public async Task<bool> DeleteCategoryService(Guid category_id)
+    public async Task<bool> DeleteCategoryService(Guid categoryId)
     {
-      var categoryToRemove = await _appDbContext.Categories.FindAsync(category_id);
+      var categoryToRemove = await _appDbContext.Categories.FindAsync(categoryId);
       if (categoryToRemove != null)
       {
         _appDbContext.Categories.Remove(categoryToRemove);

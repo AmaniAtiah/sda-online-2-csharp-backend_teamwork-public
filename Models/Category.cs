@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 namespace Backend.Models
 {
   [Table("Category")]
-  public class Categories
+  public class Category
   {
-    public Guid category_id { get; set; }
+    public Guid CategoryId { get; set; }
 
     [Required(ErrorMessage = "Category name is requierd")]
     [MinLength(2, ErrorMessage = "Category name must be at least 2 characters long.")]
@@ -16,7 +16,7 @@ namespace Backend.Models
     public string Slug { get; set; } = string.Empty;
 
     [MaxLength(300, ErrorMessage = "Description cannot exceed 300 characters long. Please shorten it and try again..")]
-    public string description { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 
     //Relations:
     public List<Product> Products { get; set; } = new List<Product>();

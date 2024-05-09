@@ -8,8 +8,8 @@ namespace Backend.EntityFramework
   public class CategoryTable
   {
     [Key]
-    [Column("category_id")]
-    public Guid category_id { get; set; }
+    [Column("categoryId")]
+    public Guid categoryId { get; set; }
 
     [Required]
     [MinLength(2)]

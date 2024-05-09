@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240508214232_create")]
-    partial class create
+    [Migration("20240509081142_MigrationAddresses")]
+    partial class MigrationAddresses
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,11 +66,16 @@ namespace Backend.Migrations
                     b.ToTable("Address");
                 });
 
-            modelBuilder.Entity("Backend.Models.Categories", b =>
+            modelBuilder.Entity("Backend.Models.Category", b =>
                 {
-                    b.Property<Guid>("category_id")
+                    b.Property<Guid>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
@@ -81,12 +86,7 @@ namespace Backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.HasKey("category_id");
+                    b.HasKey("CategoryId");
 
                     b.ToTable("Category");
                 });
@@ -100,7 +100,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(5469));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 8, 11, 42, 485, DateTimeKind.Utc).AddTicks(6070));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -139,7 +139,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(3896));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 8, 11, 42, 485, DateTimeKind.Utc).AddTicks(5670));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -232,7 +232,7 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Address", b =>
                 {
                     b.HasOne("Backend.Models.User", "User")
-                        .WithMany("Addresses")
+                        .WithMany("Address")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -253,7 +253,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Product", b =>
                 {
-                    b.HasOne("Backend.Models.Categories", "Category")
+                    b.HasOne("Backend.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -277,14 +277,14 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Backend.Models.Categories", b =>
+            modelBuilder.Entity("Backend.Models.Category", b =>
                 {
                     b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("Address");
 
                     b.Navigation("Orders");
                 });

@@ -20,7 +20,7 @@ namespace Backend.Services
         {
             try
             {
-                return await _appDbContext.Users.Include(user => user.Addresses).Include(u => u.Orders).ToListAsync();
+                return await _appDbContext.Users.Include(user => user.Address).Include(u => u.Orders).ToListAsync();
             }
             catch (Exception e)
             {

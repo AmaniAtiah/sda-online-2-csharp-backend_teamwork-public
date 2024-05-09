@@ -8,7 +8,7 @@ using Backend.Models;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/Backend/categories")]
+    [Route("/api/categories")]
     public class CategoriesController : ControllerBase
     {
         private readonly CategoriesService _categoriesService;
@@ -31,12 +31,12 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("{category_id:guid}")]
-        public async Task<IActionResult> GetCategory(Guid category_id)
+        [HttpGet("{categoryId:guid}")]
+        public async Task<IActionResult> GetCategory(Guid categoryId)
         {
             try
             {
-                var category = await _categoriesService.GetCategoryById(category_id);
+                var category = await _categoriesService.GetCategoryById(categoryId);
                 if (category != null)
                 {
                     return ApiResponse.Success(category, "Category is retrieved successfully");
@@ -55,13 +55,13 @@ namespace Backend.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(Categories newCategory)
+        public async Task<IActionResult> AddCategory(Category newCategory)
         {
             try
             {
                 newCategory.Slug = SlugResponse.GenerateSlug(newCategory.category_name);
-                var createdCategory = await _categoriesService.CreateCategoryService(newCategory);
-                return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.category_id }, createdCategory);
+                var createdCategory = await _categoriesService.AddCategoryService(newCategory);
+                return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.CategoryId }, createdCategory);
             }
             catch (Exception ex)
             {
@@ -69,12 +69,12 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPut("{category_id:guid}")]
-        public async Task<IActionResult> UpdateCategory(Guid category_id, Categories updateCategory)
+        [HttpPut("{categoryId:guid}")]
+        public async Task<IActionResult> UpdateCategory(Guid categoryId, Category updateCategory)
         {
             try
             {
-                var category = await _categoriesService.UpdateCategoryService(category_id, updateCategory);
+                var category = await _categoriesService.UpdateCategoryService(categoryId, updateCategory);
                 if (category == null)
                 {
                     return ApiResponse.NotFound("Category was not found");
@@ -90,12 +90,12 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpDelete("{category_id:guid}")]
-        public async Task<IActionResult> DeleteCategory(Guid category_id)
+        [HttpDelete("{categoryId:guid}")]
+        public async Task<IActionResult> DeleteCategory(Guid categoryId)
         {
             try
             {
-                var result = await _categoriesService.DeleteCategoryService(category_id);
+                var result = await _categoriesService.DeleteCategoryService(categoryId);
                 if (result)
                 {
                     return NoContent();
