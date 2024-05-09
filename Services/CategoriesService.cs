@@ -16,7 +16,7 @@ namespace Backend.Services
 
     public async Task<IEnumerable<Categories>> GetAllCategoryService()
     {
-      return await _appDbContext.Categories.ToListAsync();
+      return await _appDbContext.Categories.Include(c => c.Products).ToListAsync();
     }
 
     public async Task<Categories?> GetCategoryById(Guid category_id)

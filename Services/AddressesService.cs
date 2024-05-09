@@ -17,6 +17,7 @@ namespace Backend.Services
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
             return await _dbContext.Addresses.ToListAsync();
+
         }
 
         public async Task<Address?> GetAddressById(Guid addressId)
@@ -29,7 +30,7 @@ namespace Backend.Services
             newAddress.AddressId = Guid.NewGuid();
             _dbContext.Addresses.Add(newAddress);
             await _dbContext.SaveChangesAsync();
-            return newAddress;
+            return address;
         }
 
         public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress)
@@ -42,13 +43,16 @@ namespace Backend.Services
                 existingAddress.State = updateAddress.State ?? existingAddress.State;
                 existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
                 existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
+                existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
+                existingAddress.City = updateAddress.City ?? existingAddress.City;
+                existingAddress.State = updateAddress.State ?? existingAddress.State;
+                existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
+                existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
-
                 await _dbContext.SaveChangesAsync();
             }
             return existingAddress;
         }
-
         public async Task<bool> DeleteAddressService(Guid addressId)
         {
             var addressToRemove = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);

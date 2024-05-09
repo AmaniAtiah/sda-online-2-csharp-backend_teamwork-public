@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
+  [Table("Category")]
   public class Categories
   {
     public Guid category_id { get; set; }
@@ -16,6 +18,7 @@ namespace Backend.Models
     [MaxLength(300, ErrorMessage = "Description cannot exceed 300 characters long. Please shorten it and try again..")]
     public string description { get; set; } = string.Empty;
 
-    // public ICollection<Product> Products { get; } = new List<Product>();
+    //Relations:
+    public List<Product> Products { get; set; } = new List<Product>();
   }
 }

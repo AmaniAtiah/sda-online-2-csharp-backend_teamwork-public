@@ -16,6 +16,7 @@ builder.Services.AddScoped<CategoriesService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AddressesService>();
+builder.Services.AddScoped<OrderService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;

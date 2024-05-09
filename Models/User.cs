@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
+    [Table("User")]
     public class User
     {
         public Guid UserId { get; set; }
@@ -33,5 +35,8 @@ namespace Backend.Models
         public bool IsAdmin { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        //Relations:
+        public List<Address> Addresses { get; set; } = new List<Address>();//1-many relation
+        public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
     }
 }
