@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class create : Migration
+    public partial class CreateTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,13 +26,13 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Users",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    FirstName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    LastName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: false),
@@ -42,7 +42,7 @@ namespace Backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -57,7 +57,7 @@ namespace Backend.Migrations
                     Size = table.Column<string>(type: "text", nullable: false),
                     Brand = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(3896)),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 9, 12, 29, 37, 428, DateTimeKind.Utc).AddTicks(5460)),
                     CategoriesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -87,9 +87,9 @@ namespace Backend.Migrations
                 {
                     table.PrimaryKey("PK_Address", x => x.AddressId);
                     table.ForeignKey(
-                        name: "FK_Address_User_UserId",
+                        name: "FK_Address_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -99,7 +99,7 @@ namespace Backend.Migrations
                 columns: table => new
                 {
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(5469)),
+                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 9, 12, 29, 37, 428, DateTimeKind.Utc).AddTicks(7740)),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -108,9 +108,9 @@ namespace Backend.Migrations
                 {
                     table.PrimaryKey("PK_Order", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Order_User_UserId",
+                        name: "FK_Order_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -176,7 +176,7 @@ namespace Backend.Migrations
                 name: "Product");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Category");
