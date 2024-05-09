@@ -10,16 +10,25 @@ namespace Backend.Services
     public class OrderService
     {
         List<Order> orders = new List<Order>();
-        private readonly AppDbContext _dbContext;
-        public OrderService(AppDbContext appcontext)
+        private readonly AppDbContext _appDbContext;
+        public OrderService(AppDbContext appDpContext)
         {
-            _dbContext = appcontext;
+            _appDbContext = appDpContext;
         }
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             try
             {
-                return await _dbContext.Orders.Include(p => p.Products).ToListAsync();
+                return await _appDbContext.Orders
+                 .Select(o => new Order
+                 {
+                     OrderId = o.OrderId,
+                     OrderDate = o.OrderDate,
+                     TotalPrice = o.TotalPrice,
+                     Status = o.Status,
+                     UserId = o.UserId
+                 })
+                .ToListAsync();
             }
 
             catch (Exception e)
@@ -31,7 +40,7 @@ namespace Backend.Services
         {
             try
             {
-                return await _dbContext.Orders.FindAsync(ProductId);
+                return await _appDbContext.Orders.FindAsync(ProductId);
             }
             catch (Exception e)
             {
@@ -52,8 +61,8 @@ namespace Backend.Services
                     UserId = newOrder.UserId
                     //AddresseId = newOrder.AddresseId
                 };
-                await _dbContext.Orders.AddAsync(order);
-                await _dbContext.SaveChangesAsync();
+                await _appDbContext.Orders.AddAsync(order);
+                await _appDbContext.SaveChangesAsync();
                 return order;
             }
             catch (Exception e)
@@ -64,12 +73,12 @@ namespace Backend.Services
         }
         public async Task AddProductToOrder(Guid orderId, Guid productId)
         {
-            var order = await _dbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId);
-            var product = await _dbContext.Products.FindAsync(productId);
+            var order = await _appDbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var product = await _appDbContext.Products.FindAsync(productId);
             if (order != null && product != null)
             {
                 order.Products.Add(product);
-                await _dbContext.SaveChangesAsync();
+                await _appDbContext.SaveChangesAsync();
             }
             else
             {
@@ -80,15 +89,14 @@ namespace Backend.Services
         {
             try
             {
-                var existingOrder = await _dbContext.Orders.FindAsync(orderId);
+                var existingOrder = await _appDbContext.Orders.FindAsync(orderId);
                 if (existingOrder != null)
                 {
                     existingOrder.OrderDate = updateOrder.OrderDate;
                     existingOrder.TotalPrice = updateOrder.TotalPrice ?? existingOrder.TotalPrice;
                     existingOrder.Status = updateOrder.Status ?? existingOrder.Status;
                     existingOrder.UserId = updateOrder.UserId;
-
-                    await _dbContext.SaveChangesAsync();
+                    await _appDbContext.SaveChangesAsync();
                     return existingOrder;
                 }
                 throw new Exception("Order not found");
@@ -103,11 +111,11 @@ namespace Backend.Services
         {
             try
             {
-                var orderToRemove = await _dbContext.Orders.FindAsync(orderId);
+                var orderToRemove = await _appDbContext.Orders.FindAsync(orderId);
                 if (orderToRemove != null)
                 {
-                    _dbContext.Orders.Remove(orderToRemove);
-                    await _dbContext.SaveChangesAsync();
+                    _appDbContext.Orders.Remove(orderToRemove);
+                    await _appDbContext.SaveChangesAsync();
                     return true;
                 }
                 throw new Exception("Order not found");

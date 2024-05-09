@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
-    [Table("Order")]
+    [Table("Orders")]
     public class Order
     {
         public Guid OrderId { get; set; }//PK

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240508214232_create")]
-    partial class create
+    [Migration("20240509124323_e1")]
+    partial class e1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -100,7 +100,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(5469));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 12, 43, 22, 534, DateTimeKind.Utc).AddTicks(9406));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -116,7 +116,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Backend.Models.Product", b =>
@@ -139,7 +139,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 21, 42, 31, 391, DateTimeKind.Utc).AddTicks(3896));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 12, 43, 22, 534, DateTimeKind.Utc).AddTicks(8441));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -164,7 +164,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("CategoriesId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>

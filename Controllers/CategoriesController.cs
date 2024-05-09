@@ -61,7 +61,7 @@ namespace Backend.Controllers
             {
                 newCategory.Slug = SlugResponse.GenerateSlug(newCategory.category_name);
                 var createdCategory = await _categoriesService.CreateCategoryService(newCategory);
-                return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.category_id }, createdCategory);
+                return CreatedAtAction(nameof(GetCategory), new { category_id = createdCategory.category_id }, createdCategory);
             }
             catch (Exception ex)
             {

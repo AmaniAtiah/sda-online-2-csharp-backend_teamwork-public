@@ -16,7 +16,7 @@ namespace Backend.Controllers
             _orderServices = new OrderService(appDbContext);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllOrdersControllers()
+        public async Task<IActionResult> GetAllOrders()
         {
             try
             {
@@ -25,7 +25,7 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.NotFound("No order found");
                 }
-                return ApiResponse.Success(orders, "All order are returned");
+                return ApiResponse.Success(orders, "all orders retrieved successfully");
             }
             catch (Exception ex)
             {

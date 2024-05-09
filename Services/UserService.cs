@@ -5,15 +5,18 @@ using Backend.Helpers;
 using Backend.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Services
 {
     public class UserService
     {
         private readonly AppDbContext _appDbContext;
-        public UserService(AppDbContext appDbContext)
+        private readonly IPasswordHasher<User> _passwordHasher;
+        public UserService(AppDbContext appDbContext, IPasswordHasher<User> passwordHasher)
         {
             _appDbContext = appDbContext;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -52,7 +55,7 @@ namespace Backend.Services
                     FirstName = newUser.FirstName,
                     LastName = newUser.LastName,
                     Email = newUser.Email,
-                    Password = newUser.Password,
+                    Password = _passwordHasher.HashPassword(null, newUser.Password),
                     PhoneNumber = newUser.PhoneNumber,
                     IsAdmin = newUser.IsAdmin,
                     CreatedAt = newUser.CreatedAt,

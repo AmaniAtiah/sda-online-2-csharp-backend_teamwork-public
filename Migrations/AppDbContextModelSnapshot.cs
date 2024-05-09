@@ -94,13 +94,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AddresseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 22, 0, 18, 762, DateTimeKind.Utc).AddTicks(1444));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 12, 43, 22, 534, DateTimeKind.Utc).AddTicks(9406));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -114,11 +111,9 @@ namespace Backend.Migrations
 
                     b.HasKey("OrderId");
 
-                    b.HasIndex("AddresseId");
-
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Backend.Models.Product", b =>
@@ -141,7 +136,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 22, 0, 18, 762, DateTimeKind.Utc).AddTicks(65));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 12, 43, 22, 534, DateTimeKind.Utc).AddTicks(8441));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -166,7 +161,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("CategoriesId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>
@@ -244,19 +239,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Order", b =>
                 {
-                    b.HasOne("Backend.Models.Address", "Addresses")
-                        .WithMany("Orders")
-                        .HasForeignKey("AddresseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Backend.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Addresses");
 
                     b.Navigation("User");
                 });
@@ -285,11 +272,6 @@ namespace Backend.Migrations
                         .HasForeignKey("ProductsProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Models.Address", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Backend.Models.Categories", b =>

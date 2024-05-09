@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Backend.EntityFramework;
+using Backend.Models;
 using Backend.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AddressesService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();//Hashing password
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;

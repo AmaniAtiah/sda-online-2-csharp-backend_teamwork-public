@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240508220019_addrese")]
-    partial class addrese
+    [Migration("20240509073545_create")]
+    partial class create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,13 +97,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AddresseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 22, 0, 18, 762, DateTimeKind.Utc).AddTicks(1444));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 7, 35, 44, 443, DateTimeKind.Utc).AddTicks(9287));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -116,8 +113,6 @@ namespace Backend.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("AddresseId");
 
                     b.HasIndex("UserId");
 
@@ -144,7 +139,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 22, 0, 18, 762, DateTimeKind.Utc).AddTicks(65));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 7, 35, 44, 443, DateTimeKind.Utc).AddTicks(8331));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -247,19 +242,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Order", b =>
                 {
-                    b.HasOne("Backend.Models.Address", "Addresses")
-                        .WithMany("Orders")
-                        .HasForeignKey("AddresseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Backend.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Addresses");
 
                     b.Navigation("User");
                 });
@@ -288,11 +275,6 @@ namespace Backend.Migrations
                         .HasForeignKey("ProductsProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Models.Address", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Backend.Models.Categories", b =>

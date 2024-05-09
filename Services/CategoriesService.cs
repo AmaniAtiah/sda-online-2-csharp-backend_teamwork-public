@@ -39,8 +39,6 @@ namespace Backend.Services
 
       return newCategory;
     }
-
-
     public async Task<Categories?> UpdateCategoryService(Guid category_id, Categories updateCategory)
     {
       var existingCategory = await _appDbContext.Categories.FindAsync(category_id);
@@ -52,7 +50,6 @@ namespace Backend.Services
       }
       return existingCategory;
     }
-
     public async Task<bool> DeleteCategoryService(Guid category_id)
     {
       var categoryToRemove = await _appDbContext.Categories.FindAsync(category_id);
