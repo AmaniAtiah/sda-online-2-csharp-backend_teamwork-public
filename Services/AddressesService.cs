@@ -30,7 +30,7 @@ namespace Backend.Services
             newAddress.AddressId = Guid.NewGuid();
             _dbContext.Addresses.Add(newAddress);
             await _dbContext.SaveChangesAsync();
-            return address;
+            return newAddress;
         }
 
         public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress)

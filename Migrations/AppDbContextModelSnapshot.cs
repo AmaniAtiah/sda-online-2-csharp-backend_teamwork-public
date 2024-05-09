@@ -22,6 +22,50 @@ namespace Backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Backend.EntityFramework.User", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Backend.Models.Address", b =>
                 {
                     b.Property<Guid>("AddressId")
@@ -94,13 +138,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AddresseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 22, 0, 18, 762, DateTimeKind.Utc).AddTicks(1444));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 12, 29, 37, 428, DateTimeKind.Utc).AddTicks(7740));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -113,8 +154,6 @@ namespace Backend.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("AddresseId");
 
                     b.HasIndex("UserId");
 
@@ -141,7 +180,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 8, 22, 0, 18, 762, DateTimeKind.Utc).AddTicks(65));
+                        .HasDefaultValue(new DateTime(2024, 5, 9, 12, 29, 37, 428, DateTimeKind.Utc).AddTicks(5460));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -169,53 +208,6 @@ namespace Backend.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("Backend.Models.User", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("User");
-                });
-
             modelBuilder.Entity("OrderProduct", b =>
                 {
                     b.Property<Guid>("OrdersOrderId")
@@ -233,7 +225,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Address", b =>
                 {
-                    b.HasOne("Backend.Models.User", "User")
+                    b.HasOne("Backend.EntityFramework.User", "User")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -244,19 +236,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Order", b =>
                 {
-                    b.HasOne("Backend.Models.Address", "Addresses")
-                        .WithMany("Orders")
-                        .HasForeignKey("AddresseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Models.User", "User")
+                    b.HasOne("Backend.EntityFramework.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Addresses");
 
                     b.Navigation("User");
                 });
@@ -287,21 +271,16 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Backend.Models.Address", b =>
+            modelBuilder.Entity("Backend.EntityFramework.User", b =>
                 {
+                    b.Navigation("Addresses");
+
                     b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Backend.Models.Categories", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Backend.Models.User", b =>
-                {
-                    b.Navigation("Addresses");
-
-                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }
