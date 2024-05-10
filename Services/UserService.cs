@@ -1,4 +1,5 @@
 
+
 using Backend.Dtos;
 using Backend.Dtos.Pagination;
 using Backend.Dtos.User;
@@ -109,9 +110,6 @@ namespace Backend.Services
                 existingUser.PhoneNumber = userData.PhoneNumber;
                 existingUser.Email = userData.Email;
                 existingUser.Password = _passwordHasher.HashPassword(null, userData.Password);
-
-
-                // existingUser.IsAdmin = userData.IsAdmin;
 
                 await _appDbContext.SaveChangesAsync();
 

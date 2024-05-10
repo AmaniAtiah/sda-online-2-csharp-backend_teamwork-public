@@ -9,12 +9,12 @@ namespace Backend.EntityFramework
         public DbSet<User> Users { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Categories> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<Order> Orders { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Fluent API for Categories: 
-            //modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+            //modelBuilder.Entity<Categories>().HasKey(category => category.categoryId);
             //modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
             //modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
             //Fluent API:
@@ -34,8 +34,8 @@ namespace Backend.EntityFramework
             modelBuilder.Entity<User>().Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             modelBuilder.Entity<User>().Property(u => u.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             ////////////////////////*Category*////////////////////////
-            modelBuilder.Entity<Categories>().HasKey(c => c.category_id);//PK
-            modelBuilder.Entity<Categories>().Property(c => c.category_id).IsRequired().ValueGeneratedOnAdd();//Generate id
+            modelBuilder.Entity<Category>().HasKey(c => c.CategoryId);//PK
+            modelBuilder.Entity<Category>().Property(c => c.CategoryId).IsRequired().ValueGeneratedOnAdd();//Generate id
             ////////////////////////*Product*////////////////////////
             modelBuilder.Entity<Product>().HasKey(p => p.ProductId);//PK
             modelBuilder.Entity<Product>().Property(p => p.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id
@@ -56,7 +56,7 @@ namespace Backend.EntityFramework
             //1 to many
             //User And Addresses:
             modelBuilder.Entity<User>()
-            .HasMany(u => u.Addresses)
+            .HasMany(u => u.Address)
             .WithOne(a => a.User)
             .HasForeignKey(a => a.UserId);
             //User And Order:
@@ -70,7 +70,7 @@ namespace Backend.EntityFramework
             .WithOne(o => o.Addresses)
             .HasForeignKey(o => o.AddresseId); */
             //Category And Product:
-            modelBuilder.Entity<Categories>()
+            modelBuilder.Entity<Category>()
             .HasMany(c => c.Products)
             .WithOne(p => p.Category)
             .HasForeignKey(p => p.CategoriesId);
@@ -83,7 +83,7 @@ namespace Backend.EntityFramework
             // {
             //     base.OnModelCreating(modelBuilder);
 
-            //     modelBuilder.Entity<Categories>().HasKey(category => category.category_id);
+            //     modelBuilder.Entity<Categories>().HasKey(category => category.categoryId);
 
             //     modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
             //     modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();

@@ -7,35 +7,35 @@ namespace Backend.Services
 {
     public class AddressesService
     {
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _appDbContext;
 
-        public AddressesService(AppDbContext dbContext)
+        public AddressesService(AppDbContext appDbContext)
         {
-            _dbContext = dbContext;
+            _appDbContext = appDbContext;
         }
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            return await _dbContext.Addresses.ToListAsync();
+            return await _appDbContext.Addresses.ToListAsync();
 
         }
 
         public async Task<Address?> GetAddressById(Guid addressId)
         {
-            return await _dbContext.Addresses.FindAsync(addressId);
+            return await _appDbContext.Addresses.FindAsync(addressId);
         }
 
-        public async Task<Address> CreateAddressService(Address newAddress)
+        public async Task<Address> AddAddressService(Address newAddress)
         {
             newAddress.AddressId = Guid.NewGuid();
-            _dbContext.Addresses.Add(newAddress);
-            await _dbContext.SaveChangesAsync();
+            _appDbContext.Addresses.Add(newAddress);
+            await _appDbContext.SaveChangesAsync();
             return newAddress;
         }
 
         public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress)
         {
-            var existingAddress = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
+            var existingAddress = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (existingAddress != null)
             {
                 existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
@@ -49,17 +49,17 @@ namespace Backend.Services
                 existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
                 existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
-                await _dbContext.SaveChangesAsync();
+                await _appDbContext.SaveChangesAsync();
             }
             return existingAddress;
         }
         public async Task<bool> DeleteAddressService(Guid addressId)
         {
-            var addressToRemove = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
+            var addressToRemove = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (addressToRemove != null)
             {
-                _dbContext.Addresses.Remove(addressToRemove);
-                await _dbContext.SaveChangesAsync();
+                _appDbContext.Addresses.Remove(addressToRemove);
+                await _appDbContext.SaveChangesAsync();
                 return true;
             }
             return false;

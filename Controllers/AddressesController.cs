@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/api/addresses")]
+    [Route("/api/address")]
     public class AddressController : ControllerBase
     {
         private readonly AddressesService _addressService;
@@ -33,7 +33,7 @@ namespace Backend.Controllers
 
         }
 
-        [HttpGet("{address_id:guid}")]
+        [HttpGet("{addressId}")]
         public async Task<IActionResult> GetAddressById(Guid addressId)
         {
             try
@@ -55,7 +55,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAddress(Address newAddress)
+        public async Task<IActionResult> AddAddressService(Address newAddress)
         {
             try
             {
@@ -64,11 +64,11 @@ namespace Backend.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var createdAddress = await _addressService.CreateAddressService(newAddress);
+                var createdAddress = await _addressService.AddAddressService(newAddress);
 
                 if (createdAddress != null)
                 {
-                    return CreatedAtAction(nameof(GetAddressById), new { address_id = createdAddress.AddressId }, createdAddress);
+                    return CreatedAtAction(nameof(GetAddressById), new { addressId = createdAddress.AddressId }, createdAddress);
                 }
                 else
                 {
