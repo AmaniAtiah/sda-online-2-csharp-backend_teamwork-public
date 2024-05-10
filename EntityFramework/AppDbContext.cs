@@ -1,6 +1,5 @@
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
-using Backend.Models;
 namespace Backend.EntityFramework
 {
     public class AppDbContext : DbContext
@@ -44,7 +43,7 @@ namespace Backend.EntityFramework
             //1 to many
             //User And Addresses:
             modelBuilder.Entity<User>()
-            .HasMany(u => u.Address)
+            .HasMany(u => u.Addresses)
             .WithOne(a => a.User)
             .HasForeignKey(a => a.UserId);
             //User And Order:
@@ -53,10 +52,10 @@ namespace Backend.EntityFramework
             .WithOne(o => o.User)
             .HasForeignKey(o => o.UserId);
             //Addresses And Order:
-            /* modelBuilder.Entity<Address>()
-            .HasMany(a => a.Orders)
-            .WithOne(o => o.Addresses)
-            .HasForeignKey(o => o.AddresseId); */
+            modelBuilder.Entity<Address>()
+           .HasMany(a => a.Orders)
+           .WithOne(o => o.Addresses)
+           .HasForeignKey(o => o.AddressId);
             //Category And Product:
             modelBuilder.Entity<Category>()
             .HasMany(c => c.Products)

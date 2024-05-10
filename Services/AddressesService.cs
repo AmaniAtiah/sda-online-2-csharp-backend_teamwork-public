@@ -16,7 +16,18 @@ namespace Backend.Services
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            return await _appDbContext.Addresses.ToListAsync();
+
+            return await _appDbContext.Addresses
+             .Select(p => new Address
+             {
+                 AddressId = p.AddressId,
+                 AddressLine = p.AddressLine,
+                 City = p.City,
+                 State = p.State,
+                 Country = p.Country,
+                 ZipCode = p.ZipCode,
+                 UserId = p.UserId
+             }).ToListAsync();
 
         }
 
