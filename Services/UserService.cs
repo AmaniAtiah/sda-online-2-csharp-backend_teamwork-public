@@ -1,11 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
-using Backend.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Backend.Helpers;
+
+using Backend.Dtos;
+using Backend.Dtos.Pagination;
+using Backend.Dtos.User;
 using Backend.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
 using Backend.Models;
 using Microsoft.AspNetCore.Identity;
+=======
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
 
 namespace Backend.Services
 {
@@ -13,43 +17,29 @@ namespace Backend.Services
     {
         private readonly AppDbContext _appDbContext;
         private readonly IPasswordHasher<User> _passwordHasher;
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
         public UserService(AppDbContext appDbContext, IPasswordHasher<User> passwordHasher)
         {
             _appDbContext = appDbContext;
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+
+
+        public async Task<PaginationResult<UserDto>> GetAllUsersAsync(int pageNumber, int pageSize)
         {
             try
             {
-                return await _appDbContext.Users.Include(user => user.Addresses).Include(u => u.Orders).ToListAsync();
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while retrieving users.", e);
-            }
-        }
-
-        public async Task<User?> GetUserAsync(Guid UserId)
-        {
-            try
-            {
-                return await _appDbContext.Users.FindAsync(UserId);
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while retrieving users.", e);
-            }
-
-        }
-
-        public async Task<User> AddUserAsync(User newUser)
-        {
-            try
-            {
-                User user = new User
+                var totalUserAccount = await _appDbContext.Users.CountAsync();
+                var users = await _appDbContext.Users
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(user => new UserDto
                 {
+<<<<<<< HEAD
                     UserId = Guid.NewGuid(),
                     UserName = newUser.UserName,
                     FirstName = newUser.FirstName,
@@ -60,69 +50,143 @@ namespace Backend.Services
                     IsAdmin = newUser.IsAdmin,
                     CreatedAt = newUser.CreatedAt,
                     UpdatedAt = newUser.UpdatedAt,
+=======
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
+                }).ToListAsync();
+
+                return new PaginationResult<UserDto>
+                {
+                    Items = users,
+                    TotalCount = totalUserAccount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
                 };
-                await _appDbContext.Users.AddAsync(user);
-                await _appDbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("An error occured");
+
+            }
+        }
+
+        public async Task<UserDto?> GetUserByIdAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _appDbContext.Users
+                .Where(user => user.UserId == userId)
+                .Select(user => new UserDto
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
+
+
+
+                }).FirstOrDefaultAsync();
                 return user;
+
             }
             catch (Exception e)
             {
-                throw new ApplicationException("An error occurred while adding user.", e);
+                throw new Exception("An error occured");
             }
         }
-
-        public async Task<User> UpdateUserAsync(Guid UserId, User newUser)
+        public async Task<UserDto> CreateUserAsync(CreateUserDto newUserData)
         {
             try
             {
-                var existingUser = await _appDbContext.Users.FindAsync(UserId);
-
-                if (existingUser == null)
+                var user = new User
                 {
-                    throw new Exception("User not found");
-                }
+                    UserName = newUserData.UserName,
+                    FirstName = newUserData.FirstName,
+                    LastName = newUserData.LastName,
+                    PhoneNumber = newUserData.PhoneNumber,
+                    Email = newUserData.Email,
+                    Password = _passwordHasher.HashPassword(null, newUserData.Password),
+                    IsAdmin = newUserData.IsAdmin,
 
-                existingUser.UserName = newUser.UserName;
-                existingUser.FirstName = newUser.FirstName;
-                existingUser.LastName = newUser.LastName;
-                existingUser.Email = newUser.Email;
-                existingUser.Password = newUser.Password;
-                existingUser.PhoneNumber = newUser.PhoneNumber;
-                existingUser.IsAdmin = newUser.IsAdmin;
-                existingUser.UpdatedAt = DateTime.UtcNow;
 
+                };
+                _appDbContext.Users.Add(user);
                 await _appDbContext.SaveChangesAsync();
+                var newUserDto = new UserDto
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
 
-                return existingUser;
+
+                };
+                return newUserDto;
+
+
+
             }
-            catch (Exception e)
+            catch (DbUpdateException e)
             {
-                throw new ApplicationException("An error occurred while updating user.", e);
-
+                throw new InvalidOperationException("could not save the user to daatabase", e);
             }
         }
 
-        public async Task<bool> DeleteUserAsync(Guid UserId)
+        public async Task<UserDto?> LoginUserAsync(LoginDto loginDto)
         {
             try
             {
-                var existingUser = await _appDbContext.Users.FindAsync(UserId);
-
-                if (existingUser == null)
+                var user = await _appDbContext.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
+                if (user == null)
                 {
-                    throw new Exception("User not found");
+                    return null;
                 }
+                var result = _passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
+                if (result == PasswordVerificationResult.Failed)
+                {
+                    return null;
 
-                _appDbContext.Users.Remove(existingUser);
-                await _appDbContext.SaveChangesAsync();
+                }
+                var userDto = new UserDto
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt,
 
-                return true;
+
+                };
+                return userDto;
+
             }
             catch (Exception e)
             {
-                throw new ApplicationException("An error occurred while deleting user.", e);
-
+                throw new Exception("An error occured");
             }
         }
+
     }
 }

@@ -1,53 +1,41 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Backend.EntityFramework; // Make sure to add the appropriate namespace for your DbContext
+using Backend.EntityFramework;
+using Backend.Helpers;
 using Backend.Models;
 
 namespace Backend.Services
 {
     public class AddressesService
     {
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _appDbContext;
 
-        public AddressesService(AppDbContext dbContext)
+        public AddressesService(AppDbContext appDbContext)
         {
-            _dbContext = dbContext;
+            _appDbContext = appDbContext;
         }
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-            return await _dbContext.Addresses.ToListAsync();
+            return await _appDbContext.Addresses.ToListAsync();
 
         }
 
-        public async Task<Address?> GetAddressByIdAsync(Guid addressId)
+        public async Task<Address?> GetAddressById(Guid addressId)
         {
-            return await _dbContext.Addresses.FirstOrDefaultAsync(address => address.AddressId == addressId);
+            return await _appDbContext.Addresses.FindAsync(addressId);
         }
 
-        public async Task<Address> CreateAddressService(Address newAddress)
+        public async Task<Address> AddAddressService(Address newAddress)
         {
-            Address address = new Address
-            {
-                AddressId = Guid.NewGuid(),
-                AddressLine = newAddress.AddressLine,
-                City = newAddress.City,
-                State = newAddress.State,
-                Country = newAddress.Country,
-                ZipCode = newAddress.ZipCode,
-                UserId = newAddress.UserId
-            };
-            await _dbContext.Addresses.AddAsync(address);
-            await _dbContext.SaveChangesAsync();
-            return address;
+            newAddress.AddressId = Guid.NewGuid();
+            _appDbContext.Addresses.Add(newAddress);
+            await _appDbContext.SaveChangesAsync();
+            return newAddress;
         }
 
-        public async Task<Address> UpdateAddressService(Guid addressId, Address updateAddress)
+        public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress)
         {
-            var existingAddress = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
+            var existingAddress = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (existingAddress != null)
             {
                 existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
@@ -55,18 +43,23 @@ namespace Backend.Services
                 existingAddress.State = updateAddress.State ?? existingAddress.State;
                 existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
                 existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
+                existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
+                existingAddress.City = updateAddress.City ?? existingAddress.City;
+                existingAddress.State = updateAddress.State ?? existingAddress.State;
+                existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
+                existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
                 existingAddress.UserId = updateAddress.UserId;
-                await _dbContext.SaveChangesAsync();
+                await _appDbContext.SaveChangesAsync();
             }
             return existingAddress;
         }
         public async Task<bool> DeleteAddressService(Guid addressId)
         {
-            var addressToRemove = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
+            var addressToRemove = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (addressToRemove != null)
             {
-                _dbContext.Addresses.Remove(addressToRemove);
-                await _dbContext.SaveChangesAsync();
+                _appDbContext.Addresses.Remove(addressToRemove);
+                await _appDbContext.SaveChangesAsync();
                 return true;
             }
             return false;

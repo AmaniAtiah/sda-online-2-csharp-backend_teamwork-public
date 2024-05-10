@@ -36,7 +36,7 @@ namespace Backend.Models
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         //Relations:
-        public List<Address> Addresses { get; set; } = new List<Address>();//1-many relation
+        public List<Address> Address { get; set; } = new List<Address>();//1-many relation
         public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
     }
 }

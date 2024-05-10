@@ -1,6 +1,6 @@
-using Backend.Controllers;
-using Backend.EntityFramework;
-using Backend.Models;
+
+using Backend.Dtos;
+using Backend.Dtos.User;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,100 +10,81 @@ namespace Backend.Controllers
     [Route("/api/users")]
     public class UserController : ControllerBase
     {
+
         private readonly UserService _userService;
+<<<<<<< HEAD
         public UserController(UserService userService)
         {
             _userService = userService;
+=======
+        private readonly AuthService _authService;
+
+
+        public UserController(UserService userService, AuthService authService)
+        {
+            _userService = userService;
+            _authService = authService;
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
         }
 
+   
+
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
-            try
-            {
-                var users = await _userService.GetAllUsersAsync();
-                if (users.ToList().Count < 1)
-                {
-                    return ApiResponse.NotFound("No users found");
-                }
-                return ApiResponse.Success(users, "All users are returned");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
+            var users = await _userService.GetAllUsersAsync(pageNumber, pageSize);
+            return ApiResponse.Success(users, "All users are returned successfully");
+
         }
 
         [HttpGet("{userId:guid}")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            try
-            {
-                var user = await _userService.GetUserAsync(userId);
-                if (user == null)
-                {
-                    return ApiResponse.NotFound("User was not found");
+            
+                var user = await _userService.GetUserByIdAsync(userId);
+                if(user == null){
+                    return ApiResponse.NotFound("user not found");
                 }
-                return ApiResponse.Created(user);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-
-            }
+                return ApiResponse.Success(user, " user is returned successfully");
+           
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser(User user)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto newUserData)
         {
-            try
+
+            if (!ModelState.IsValid)
             {
-                var response = await _userService.AddUserAsync(user);
-                return ApiResponse.Created(response);
+                return ApiResponse.BadRequest("Invalid user data");
             }
-            catch (Exception ex)
+            if (newUserData == null)
             {
-                return ApiResponse.ServerError(ex.Message);
+                return ApiResponse.BadRequest("Invalid user data");
             }
+            var newUser = _userService.CreateUserAsync(newUserData);
+            return ApiResponse.Created(newUser, "User is created successfully");
+
         }
 
-        [HttpPut("{userId:guid}")]
-        public async Task<IActionResult> UpdateUser(Guid UserId, User user)
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
         {
-            try
+
+            if (!ModelState.IsValid)
             {
-                var updateUser = await _userService.UpdateUserAsync(UserId, user);
-                if (updateUser == null)
-                {
-                    return ApiResponse.NotFound("User was not found");
-                }
-                return ApiResponse.Success(updateUser, "User updated successfully");
+                return ApiResponse.BadRequest("Invalid user data");
             }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
+            var loggedInUser = await _userService.LoginUserAsync(loginDto);
+            var token = _authService.GenerateJwt(loggedInUser);
+            Console.WriteLine($"{token}");
+
+
+            return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
+
+
         }
 
-        [HttpDelete("{userId:guid}")]
-        public async Task<IActionResult> DeleteUser(Guid userId)
-        {
-            try
-            {
-                var result = await _userService.DeleteUserAsync(userId);
-                if (!result)
-                {
-                    return ApiResponse.NotFound("User was not found");
-                }
-                else
-                {
-                    return NoContent();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
+
     }
 }

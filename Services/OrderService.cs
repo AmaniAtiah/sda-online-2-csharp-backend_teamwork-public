@@ -11,14 +11,21 @@ namespace Backend.Services
     {
         List<Order> orders = new List<Order>();
         private readonly AppDbContext _appDbContext;
+<<<<<<< HEAD
         public OrderService(AppDbContext appDpContext)
         {
             _appDbContext = appDpContext;
+=======
+        public OrderService(AppDbContext appDbContext)
+        {
+            _appDbContext = appDbContext;
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
         }
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             try
             {
+<<<<<<< HEAD
                 return await _appDbContext.Orders
                  .Select(o => new Order
                  {
@@ -29,6 +36,9 @@ namespace Backend.Services
                      UserId = o.UserId
                  })
                 .ToListAsync();
+=======
+                return await _appDbContext.Orders.Include(p => p.Products).ToListAsync();
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
             }
 
             catch (Exception e)
@@ -96,6 +106,10 @@ namespace Backend.Services
                     existingOrder.TotalPrice = updateOrder.TotalPrice ?? existingOrder.TotalPrice;
                     existingOrder.Status = updateOrder.Status ?? existingOrder.Status;
                     existingOrder.UserId = updateOrder.UserId;
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
                     await _appDbContext.SaveChangesAsync();
                     return existingOrder;
                 }

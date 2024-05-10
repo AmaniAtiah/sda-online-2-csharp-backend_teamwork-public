@@ -10,29 +10,16 @@ namespace Backend.Services
     public class ProductService
     {
         List<Product> products = new List<Product>();
-        private readonly AppDbContext _appDbContext;
-        public ProductService(AppDbContext appDbcontext)
+        private readonly AppDbContext _dbContext;
+        public ProductService(AppDbContext appcontext)
         {
-            _appDbContext = appDbcontext;
+            _dbContext = appcontext;
         }
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
             try
             {
-                return await _appDbContext.Products
-                // .Select(p => new Product
-                // {
-                //     ProductId = p.ProductId,
-                //     Name = p.Name,
-                //     Description = p.Description,
-                //     Price = p.Price,
-                //     Color = p.Color,
-                //     Size = p.Size,
-                //     Brand = p.Brand,
-                //     Quantity = p.Quantity,
-                //     CategoriesId = p.CategoriesId
-                // })
-                .ToListAsync();
+                return await _dbContext.Products.Include(o => o.Orders).ToListAsync();
             }
 
             catch (Exception e)

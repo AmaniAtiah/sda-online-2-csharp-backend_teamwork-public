@@ -23,10 +23,7 @@ namespace Backend.Models
                 //Relations:
                 [Required(ErrorMessage = "CategoryId is required")]
                 public Guid CategoriesId { get; set; }
-                public Categories? Category { get; set; }
-                // [Required(ErrorMessage = "OrderId is required")]
-                // public Guid OrderId { get; set; }
-                // public Order? Orders { get; set; }
+                public Category? Category { get; set; }
                 public List<Order> Orders { get; set; } = new List<Order>();
         }
 }

@@ -1,9 +1,15 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using Backend.EntityFramework;
 using Backend.Models;
 using Backend.Services;
+<<<<<<< HEAD
+=======
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +22,36 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<CategoriesService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AddressesService>();
 builder.Services.AddScoped<OrderService>();
+<<<<<<< HEAD
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();//Hashing password
+=======
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+var Configuration = builder.Configuration;
+var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // set this one as a true in production
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = Configuration["Jwt:Issuer"],
+        ValidAudience = Configuration["Jwt:Audience"],
+        ClockSkew = TimeSpan.Zero
+    };
+});
+>>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
