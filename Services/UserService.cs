@@ -1,8 +1,10 @@
 
+
 using Backend.Dtos;
 using Backend.Dtos.Pagination;
 using Backend.Dtos.User;
 using Backend.EntityFramework;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,84 +14,49 @@ namespace Backend.Services
     {
         private readonly AppDbContext _appDbContext;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IMapper _mapper;
 
-        public UserService(AppDbContext appDbContext, IPasswordHasher<User> passwordHasher)
+        public UserService(AppDbContext appDbContext, IPasswordHasher<User> passwordHasher, IMapper mapper)
         {
             _appDbContext = appDbContext;
             _passwordHasher = passwordHasher;
+             _mapper = mapper;
         }
 
 
 
         public async Task<PaginationResult<UserDto>> GetAllUsersAsync(int pageNumber, int pageSize)
         {
-            try
-            {
                 var totalUserAccount = await _appDbContext.Users.CountAsync();
                 var users = await _appDbContext.Users
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(user => new UserDto
-                {
-                    UserId = user.UserId,
-                    UserName = user.UserName,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    PhoneNumber = user.PhoneNumber,
-                    Email = user.Email,
-                    IsAdmin = user.IsAdmin,
-                    CreatedAt = user.CreatedAt,
-                    UpdatedAt = user.UpdatedAt,
-                }).ToListAsync();
+                .ToListAsync();
+
+                var userDtos = _mapper.Map<List<UserDto>>(users);
 
                 return new PaginationResult<UserDto>
                 {
-                    Items = users,
+                    Items = userDtos,
                     TotalCount = totalUserAccount,
                     PageNumber = pageNumber,
                     PageSize = pageSize
                 };
-            }
-            catch (Exception e)
-            {
-                throw new Exception("An error occured");
-
-            }
+            
         }
 
         public async Task<UserDto?> GetUserByIdAsync(Guid userId)
         {
-            try
-            {
-                var user = await _appDbContext.Users
-                .Where(user => user.UserId == userId)
-                .Select(user => new UserDto
-                {
-                    UserId = user.UserId,
-                    UserName = user.UserName,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    PhoneNumber = user.PhoneNumber,
-                    Email = user.Email,
-                    IsAdmin = user.IsAdmin,
-                    CreatedAt = user.CreatedAt,
-                    UpdatedAt = user.UpdatedAt,
+            
+            var user = await _appDbContext.Users.FindAsync(userId);
+            var userDto = _mapper.Map<UserDto>(user);
+            return userDto;
 
-
-
-                }).FirstOrDefaultAsync();
-                return user;
-
-            }
-            catch (Exception e)
-            {
-                throw new Exception("An error occured");
-            }
+         
         }
         public async Task<UserDto> CreateUserAsync(CreateUserDto newUserData)
         {
-            try
-            {
+            
                 var user = new User
                 {
                     UserName = newUserData.UserName,
@@ -115,6 +82,8 @@ namespace Backend.Services
                     IsAdmin = user.IsAdmin,
                     CreatedAt = user.CreatedAt,
                     UpdatedAt = user.UpdatedAt,
+                    Addresses = user.Addresses,
+                    Orders = user.Orders
 
 
                 };
@@ -122,17 +91,51 @@ namespace Backend.Services
 
 
 
-            }
-            catch (DbUpdateException e)
-            {
-                throw new InvalidOperationException("could not save the user to daatabase", e);
-            }
+           
+        }
+
+        public async Task<UserDto> UpdateUserAsync(Guid userId, UpdateUserDto userData)
+        {
+            
+
+                var existingUser = await _appDbContext.Users.FindAsync(userId);
+
+                if (existingUser == null)
+                {
+                    throw new Exception("User not found");
+                }
+                existingUser.UserName = userData.UserName;
+                existingUser.FirstName = userData.FirstName;
+                existingUser.LastName = userData.LastName;
+                existingUser.PhoneNumber = userData.PhoneNumber;
+                existingUser.Email = userData.Email;
+                existingUser.Password = _passwordHasher.HashPassword(null, userData.Password);
+
+                await _appDbContext.SaveChangesAsync();
+
+                var updatedUserDto = new UserDto
+                {
+                    UserId = existingUser.UserId,
+                    UserName = existingUser.UserName,
+                    FirstName = existingUser.FirstName,
+                    LastName = existingUser.LastName,
+                    PhoneNumber = existingUser.PhoneNumber,
+                    Email = existingUser.Email,
+                    IsAdmin = existingUser.IsAdmin,
+                    CreatedAt = existingUser.CreatedAt,
+                    UpdatedAt = existingUser.UpdatedAt,
+                    Addresses = existingUser.Addresses,
+                    Orders = existingUser.Orders
+                };
+                return updatedUserDto;
+
+
+
         }
 
         public async Task<UserDto?> LoginUserAsync(LoginDto loginDto)
         {
-            try
-            {
+            
                 var user = await _appDbContext.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
                 if (user == null)
                 {
@@ -160,11 +163,7 @@ namespace Backend.Services
                 };
                 return userDto;
 
-            }
-            catch (Exception e)
-            {
-                throw new Exception("An error occured");
-            }
+           
         }
 
     }
