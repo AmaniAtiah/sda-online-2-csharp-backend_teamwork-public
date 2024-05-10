@@ -6,10 +6,10 @@ using Backend.Models;
 
 namespace Backend.Services
 {
-  public class CategoriesService
+  public class CategoryService
   {
     private readonly AppDbContext _appDbContext;
-    public CategoriesService(AppDbContext appDbContext)
+    public CategoryService(AppDbContext appDbContext)
     {
       _appDbContext = appDbContext;
     }
@@ -40,7 +40,6 @@ namespace Backend.Services
       return newCategory;
     }
 
-
     public async Task<Category?> UpdateCategoryService(Guid categoryId, Category updateCategory)
     {
       var existingCategory = await _appDbContext.Categories.FindAsync(categoryId);
@@ -66,4 +65,3 @@ namespace Backend.Services
     }
   }
 }
-

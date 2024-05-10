@@ -1,18 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Backend.Helpers;
-using Backend.EntityFramework;
 using Backend.Models;
 
 namespace Backend.Controllers
 {
     [ApiController]
     [Route("/api/categories")]
-    public class CategoriesController : ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly CategoriesService _categoriesService;
-        public CategoriesController(CategoriesService categoriesService)
+        private readonly CategoryService _categoriesService;
+        public CategoryController(CategoryService categoriesService)
         {
             _categoriesService = categoriesService;
         }
@@ -51,8 +49,6 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-
-
 
         [HttpPost]
         public async Task<IActionResult> AddCategory(Category newCategory)

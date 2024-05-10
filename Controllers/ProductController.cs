@@ -1,14 +1,12 @@
-
 using Backend.EntityFramework;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
-    [ApiController]//api controllers
-    [Route("/api/products")] // for httpget
+    [ApiController]
+    [Route("/api/products")] 
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productServices;
@@ -16,6 +14,7 @@ namespace Backend.Controllers
         {
             _productServices = new ProductService(appDbContext);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAllProduct()
         {
@@ -33,6 +32,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpGet("{productId:guid}")]
         public async Task<IActionResult> GetProductById(Guid proudectId)
         {
@@ -50,6 +50,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> AddProduct(Product newProduct)
         {
@@ -99,7 +100,6 @@ namespace Backend.Controllers
             {
                 return ApiResponse.ServerError(ex.Message);
             }
-
         }
     }
 }

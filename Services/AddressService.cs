@@ -5,18 +5,16 @@ using Backend.Models;
 
 namespace Backend.Services
 {
-    public class AddressesService
+    public class AddressService
     {
         private readonly AppDbContext _appDbContext;
-
-        public AddressesService(AppDbContext appDbContext)
+        public AddressService(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }
 
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {
-
             return await _appDbContext.Addresses
              .Select(p => new Address
              {
@@ -28,7 +26,6 @@ namespace Backend.Services
                  ZipCode = p.ZipCode,
                  UserId = p.UserId
              }).ToListAsync();
-
         }
 
         public async Task<Address?> GetAddressById(Guid addressId)
