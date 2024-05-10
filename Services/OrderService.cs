@@ -4,6 +4,7 @@ using Backend.Services;
 using Backend.Helpers;
 using Backend.Models;
 using Backend.EntityFramework;
+using Backend.Dtos;
 
 namespace Backend.Services
 {
@@ -11,34 +12,26 @@ namespace Backend.Services
     {
         List<Order> orders = new List<Order>();
         private readonly AppDbContext _appDbContext;
-<<<<<<< HEAD
-        public OrderService(AppDbContext appDpContext)
-        {
-            _appDbContext = appDpContext;
-=======
         public OrderService(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
         }
-        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        public async Task<IEnumerable<OrderDtos>> GetAllOrdersAsync()
         {
             try
             {
-<<<<<<< HEAD
-                return await _appDbContext.Orders
-                 .Select(o => new Order
-                 {
-                     OrderId = o.OrderId,
-                     OrderDate = o.OrderDate,
-                     TotalPrice = o.TotalPrice,
-                     Status = o.Status,
-                     UserId = o.UserId
-                 })
-                .ToListAsync();
-=======
-                return await _appDbContext.Orders.Include(p => p.Products).ToListAsync();
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
+                //return await _appDbContext.Orders.ToListAsync();
+                var orders = await _appDbContext.Orders
+               .Select(order => new OrderDtos
+               {
+                   OrderId = order.OrderId,
+                   OrderDate = order.OrderDate,
+                   TotalPrice = order.TotalPrice,
+                   Status = order.Status,
+                   UserId = order.UserId
+               })
+               .ToListAsync();
+                return orders;
             }
 
             catch (Exception e)
@@ -46,11 +39,12 @@ namespace Backend.Services
                 throw new ApplicationException("An error occurred while retrieving order.", e);
             }
         }
-        public async Task<Order?> GetOrderAsync(Guid ProductId)
+        public async Task<Order?> GetOrderAsync(Guid OrderId)
         {
             try
             {
-                return await _appDbContext.Orders.FindAsync(ProductId);
+                return await _appDbContext.Orders.FindAsync(OrderId);
+
             }
             catch (Exception e)
             {
@@ -106,10 +100,6 @@ namespace Backend.Services
                     existingOrder.TotalPrice = updateOrder.TotalPrice ?? existingOrder.TotalPrice;
                     existingOrder.Status = updateOrder.Status ?? existingOrder.Status;
                     existingOrder.UserId = updateOrder.UserId;
-<<<<<<< HEAD
-=======
-
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
                     await _appDbContext.SaveChangesAsync();
                     return existingOrder;
                 }

@@ -12,11 +12,6 @@ namespace Backend.Controllers
     {
 
         private readonly UserService _userService;
-<<<<<<< HEAD
-        public UserController(UserService userService)
-        {
-            _userService = userService;
-=======
         private readonly AuthService _authService;
 
 
@@ -24,10 +19,9 @@ namespace Backend.Controllers
         {
             _userService = userService;
             _authService = authService;
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
         }
 
-   
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
@@ -40,13 +34,14 @@ namespace Backend.Controllers
         [HttpGet("{userId:guid}")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            
-                var user = await _userService.GetUserByIdAsync(userId);
-                if(user == null){
-                    return ApiResponse.NotFound("user not found");
-                }
-                return ApiResponse.Success(user, " user is returned successfully");
-           
+
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return ApiResponse.NotFound("user not found");
+            }
+            return ApiResponse.Success(user, " user is returned successfully");
+
         }
 
         [HttpPost]

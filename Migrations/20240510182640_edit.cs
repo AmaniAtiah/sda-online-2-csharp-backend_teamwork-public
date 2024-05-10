@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class create : Migration
+    public partial class edit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,24 +15,24 @@ namespace Backend.Migrations
                 name: "Category",
                 columns: table => new
                 {
-                    category_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     category_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Slug = table.Column<string>(type: "text", nullable: false),
-                    description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false)
+                    Description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Category", x => x.category_id);
+                    table.PrimaryKey("PK_Category", x => x.CategoryId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Users",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    FirstName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    LastName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: false),
@@ -42,11 +42,11 @@ namespace Backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Products",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -57,17 +57,17 @@ namespace Backend.Migrations
                     Size = table.Column<string>(type: "text", nullable: false),
                     Brand = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 9, 7, 35, 44, 443, DateTimeKind.Utc).AddTicks(8331)),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 10, 18, 26, 39, 485, DateTimeKind.Utc).AddTicks(1082)),
                     CategoriesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.ProductId);
+                    table.PrimaryKey("PK_Products", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_Product_Category_CategoriesId",
+                        name: "FK_Products_Category_CategoriesId",
                         column: x => x.CategoriesId,
                         principalTable: "Category",
-                        principalColumn: "category_id",
+                        principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -87,30 +87,30 @@ namespace Backend.Migrations
                 {
                     table.PrimaryKey("PK_Address", x => x.AddressId);
                     table.ForeignKey(
-                        name: "FK_Address_User_UserId",
+                        name: "FK_Address_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Orders",
                 columns: table => new
                 {
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 9, 7, 35, 44, 443, DateTimeKind.Utc).AddTicks(9287)),
+                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 10, 18, 26, 39, 485, DateTimeKind.Utc).AddTicks(2210)),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.OrderId);
+                    table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Order_User_UserId",
+                        name: "FK_Orders_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -126,15 +126,15 @@ namespace Backend.Migrations
                 {
                     table.PrimaryKey("PK_OrderDetails", x => new { x.OrdersOrderId, x.ProductsProductId });
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Order_OrdersOrderId",
+                        name: "FK_OrderDetails_Orders_OrdersOrderId",
                         column: x => x.OrdersOrderId,
-                        principalTable: "Order",
+                        principalTable: "Orders",
                         principalColumn: "OrderId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Product_ProductsProductId",
+                        name: "FK_OrderDetails_Products_ProductsProductId",
                         column: x => x.ProductsProductId,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -145,18 +145,18 @@ namespace Backend.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_UserId",
-                table: "Order",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ProductsProductId",
                 table: "OrderDetails",
                 column: "ProductsProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_CategoriesId",
-                table: "Product",
+                name: "IX_Orders_UserId",
+                table: "Orders",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_CategoriesId",
+                table: "Products",
                 column: "CategoriesId");
         }
 
@@ -170,13 +170,13 @@ namespace Backend.Migrations
                 name: "OrderDetails");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Category");

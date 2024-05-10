@@ -16,7 +16,7 @@ namespace Backend.Services
 
     public async Task<IEnumerable<Category>> GetAllCategoryService()
     {
-      return await _appDbContext.Categories.Include(c => c.Products).ToListAsync();
+      return await _appDbContext.Categories.ToListAsync();
     }
 
     public async Task<Category?> GetCategoryById(Guid categoryId)
@@ -39,13 +39,9 @@ namespace Backend.Services
 
       return newCategory;
     }
-<<<<<<< HEAD
-    public async Task<Categories?> UpdateCategoryService(Guid category_id, Categories updateCategory)
-=======
 
 
     public async Task<Category?> UpdateCategoryService(Guid categoryId, Category updateCategory)
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
     {
       var existingCategory = await _appDbContext.Categories.FindAsync(categoryId);
       if (existingCategory != null)
@@ -56,12 +52,8 @@ namespace Backend.Services
       }
       return existingCategory;
     }
-<<<<<<< HEAD
-    public async Task<bool> DeleteCategoryService(Guid category_id)
-=======
 
     public async Task<bool> DeleteCategoryService(Guid categoryId)
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
     {
       var categoryToRemove = await _appDbContext.Categories.FindAsync(categoryId);
       if (categoryToRemove != null)

@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Backend.Dtos.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
 using Backend.Helpers;
 using Backend.Models;
+using Backend.Dtos;
 using Backend.EntityFramework;
 
 namespace Backend.Services
@@ -10,16 +12,38 @@ namespace Backend.Services
     public class ProductService
     {
         List<Product> products = new List<Product>();
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _appDbContext;
         public ProductService(AppDbContext appcontext)
         {
-            _dbContext = appcontext;
+            _appDbContext = appcontext;
         }
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<PaginationResult<ProductDtos>> GetAllProductsAsync(int pageNumber, int pageSize)
         {
             try
             {
-                return await _dbContext.Products.Include(o => o.Orders).ToListAsync();
+                var totalProductAccount = await _appDbContext.Products.CountAsync();
+                var products = await _appDbContext.Products
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(product => new ProductDtos
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Color = product.Color,
+                    Size = product.Size,
+                    Brand = product.Brand,
+
+                })
+                .ToListAsync();
+                return new PaginationResult<ProductDtos>
+                {
+                    Items = products,
+                    TotalCount = totalProductAccount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
             }
 
             catch (Exception e)
@@ -85,7 +109,7 @@ namespace Backend.Services
             }
             catch (Exception e)
             {
-                throw new ApplicationException("An error occurred while updating user.", e);
+                throw new ApplicationException("An error occurred while updating product.", e);
 
             }
         }
@@ -107,6 +131,24 @@ namespace Backend.Services
                 throw new ApplicationException("An error occurred while deleting product.", e);
 
             }
+        }
+        public async Task<IEnumerable<Product?>> SearchProductByNameAsync(string searchKeyword)
+        {
+            try
+            {
+                if (_appDbContext.Products == null)
+                {
+                    throw new InvalidOperationException("Product not found");
+                }
+                var foundProducts = await _appDbContext.Products
+                .Where(product => product.Name.Contains(searchKeyword) || product.Name.Contains(searchKeyword)).ToListAsync();
+                return foundProducts;
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException("An error occurred while search for product.", e);
+            }
+
         }
     }
 }

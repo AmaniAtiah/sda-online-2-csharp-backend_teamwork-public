@@ -5,11 +5,6 @@ using Backend.Dtos.User;
 using Backend.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-using Backend.Models;
-using Microsoft.AspNetCore.Identity;
-=======
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
 
 namespace Backend.Services
 {
@@ -17,10 +12,6 @@ namespace Backend.Services
     {
         private readonly AppDbContext _appDbContext;
         private readonly IPasswordHasher<User> _passwordHasher;
-<<<<<<< HEAD
-=======
-
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
         public UserService(AppDbContext appDbContext, IPasswordHasher<User> passwordHasher)
         {
             _appDbContext = appDbContext;
@@ -39,18 +30,6 @@ namespace Backend.Services
                 .Take(pageSize)
                 .Select(user => new UserDto
                 {
-<<<<<<< HEAD
-                    UserId = Guid.NewGuid(),
-                    UserName = newUser.UserName,
-                    FirstName = newUser.FirstName,
-                    LastName = newUser.LastName,
-                    Email = newUser.Email,
-                    Password = _passwordHasher.HashPassword(null, newUser.Password),
-                    PhoneNumber = newUser.PhoneNumber,
-                    IsAdmin = newUser.IsAdmin,
-                    CreatedAt = newUser.CreatedAt,
-                    UpdatedAt = newUser.UpdatedAt,
-=======
                     UserId = user.UserId,
                     UserName = user.UserName,
                     FirstName = user.FirstName,
@@ -68,7 +47,6 @@ namespace Backend.Services
                     TotalCount = totalUserAccount,
                     PageNumber = pageNumber,
                     PageSize = pageSize
->>>>>>> a2f2879185d485590f8e73d13c7aded13d24c182
                 };
             }
             catch (Exception e)

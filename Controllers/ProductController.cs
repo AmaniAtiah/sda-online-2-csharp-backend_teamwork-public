@@ -1,4 +1,3 @@
-
 using Backend.EntityFramework;
 using Backend.Helpers;
 using Backend.Models;
@@ -17,16 +16,12 @@ namespace Backend.Controllers
             _productServices = new ProductService(appDbContext);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllProductControllers()
+        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
             try
             {
-                var products = await _productServices.GetAllProductsAsync();
-                if (products.ToList().Count < 1)
-                {
-                    return ApiResponse.NotFound("No product found");
-                }
-                return ApiResponse.Success(products, "all products retrieved successfully");
+                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize);
+                return ApiResponse.Success(products, "All Product are returned successfully");
             }
             catch (Exception ex)
             {
@@ -101,127 +96,19 @@ namespace Backend.Controllers
             }
 
         }
+        [HttpGet("searchkeyword")]
+        public async Task<IActionResult> SearchProducts(string searchkeyword)
+        {
+            try
+            {
+                var productsFounded = await _productServices.SearchProductByNameAsync(searchkeyword);
+                return ApiResponse.Success(productsFounded, "Products are returne successfully");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+
+        }
     }
 }
-
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
-// using Backend.EntityFramework;
-// using Backend.Helpers;
-// using Microsoft.AspNetCore.Mvc;
-
-// namespace api.Controllers
-// {
-//     [ApiController]//api controllers
-//     [Route("/api/products")] // for httpget
-//     public class ProductController : ControllerBase
-//     {
-//         private readonly ProductService _productServices;
-//         public ProductController(AppDbContext appDbContext)
-//         {
-//             _productServices = new ProductService(appDbContext);
-//         }
-//         [HttpGet]
-//         public async Task<IActionResult> GetAllProductControllers()
-//         {
-//             try
-//             {
-//                 var products = await _productServices.GetAllProductsAsync();
-//                 if (products.ToList().Count < 1)
-//                 {
-//                     return ApiResponse.NotFound("No Product found");
-//                 }
-//                 return ApiResponse.Success(products, "All products are returned");
-//             }
-//             catch (Exception ex)
-//             {
-//                 return ApiResponse.ServerError(ex.Message);
-//             }
-
-//         }
-//         [HttpGet("{productId:guid}")]
-//         public IActionResult GetAllProductByIdControllers(string proudectId)
-//         {
-//             try
-//             {
-//                 if (!Guid.TryParse(proudectId, out Guid productIdGuid))
-//                 {
-//                     return BadRequest("Invalid Product id try again ...");
-//                 }
-//                 var product = _productServices.FindProductById(productIdGuid);
-//                 return Ok(new SuccessResponse<Product>
-//                 {
-//                     Message = "Return Single Product Successfully.",
-//                     Data = product
-//                 });
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
-//             }
-//         }
-//         [HttpPost]
-//         public IActionResult CreateProduct(Product newProduct)
-//         {
-//             try
-//             {
-//                 var createdProduct = _productServices.CreateProductService(newProduct);
-//                 return CreatedAtAction(nameof(GetAllProductControllers), new { proudctId = createdProduct.ProductId }, createdProduct);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
-//             }
-//         }
-
-//         [HttpPut("{productId:guid}")]
-//         public IActionResult UpdateProduct(string proudectId, Product updateProudect)
-//         {
-//             try
-//             {
-//                 if (!Guid.TryParse(proudectId, out Guid proudectIdGuid))
-//                 {
-//                     return BadRequest("Invalid Product ID Format");
-//                 }
-//                 var productToUpdate = _productServices.UpdateProductService(proudectIdGuid, updateProudect);
-//                 if (productToUpdate == null)
-//                 {
-//                     return NotFound(new ErrorResponse { Message = "The Product Is Not Found To Update ..." });
-//                 }
-//                 return Ok(new SuccessResponse<Product>
-//                 {
-//                     Message = "Update User Successfully.",
-//                     Data = productToUpdate
-//                 });
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
-//             }
-//         }
-
-//         [HttpDelete("{productId:guid}")]
-//         public IActionResult DeleteProduct(string productId)
-//         {
-//             try
-//             {
-//                 if (!Guid.TryParse(productId, out Guid productIdGuid))
-//                 {
-//                     return BadRequest("Invalid Product ID Format");
-//                 }
-//                 var result = _productServices.DeleteProductService(productIdGuid);
-//                 if (!result)
-//                 {
-//                     return NotFound(new ErrorResponse { Message = "The Product Is Not Found To Delete ..." });
-//                 }
-//                 return NoContent();
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, new ErrorResponse { Message = ex.Message });
-//             }
-//         }
-//     }
-// }

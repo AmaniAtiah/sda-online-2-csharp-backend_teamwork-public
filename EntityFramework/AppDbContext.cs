@@ -44,7 +44,7 @@ namespace Backend.EntityFramework
             //1 to many
             //User And Addresses:
             modelBuilder.Entity<User>()
-            .HasMany(u => u.Address)
+            .HasMany(u => u.Addresses)
             .WithOne(a => a.User)
             .HasForeignKey(a => a.UserId);
             //User And Order:
