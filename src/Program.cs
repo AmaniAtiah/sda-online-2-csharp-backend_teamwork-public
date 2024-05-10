@@ -23,6 +23,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AddressesService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddAutoMapper(typeof(Program));
 var Configuration = builder.Configuration;
 var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>

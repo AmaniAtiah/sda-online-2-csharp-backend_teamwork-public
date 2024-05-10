@@ -30,15 +30,15 @@ namespace Backend.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserName = table.Column<string>(type: "text", nullable: false),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
-                    LastName = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UserName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Password = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -57,7 +57,7 @@ namespace Backend.Migrations
                     Size = table.Column<string>(type: "text", nullable: false),
                     Brand = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
-                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 9, 12, 29, 37, 428, DateTimeKind.Utc).AddTicks(5460)),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 10, 0, 8, 20, 914, DateTimeKind.Utc).AddTicks(7610)),
                     CategoriesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -99,7 +99,7 @@ namespace Backend.Migrations
                 columns: table => new
                 {
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 9, 12, 29, 37, 428, DateTimeKind.Utc).AddTicks(7740)),
+                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 5, 10, 0, 8, 20, 914, DateTimeKind.Utc).AddTicks(8940)),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -158,6 +158,18 @@ namespace Backend.Migrations
                 name: "IX_Product_CategoriesId",
                 table: "Product",
                 column: "CategoriesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_PhoneNumber",
+                table: "Users",
+                column: "PhoneNumber",
+                unique: true);
         }
 
         /// <inheritdoc />
