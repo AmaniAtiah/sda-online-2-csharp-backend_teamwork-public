@@ -103,11 +103,12 @@ namespace Backend.Services
 
  
 
-        public async Task<Order?> UpdateOrdertAsync(Guid orderId, Order updateOrder)
+        public async Task<Order?> UpdateOrdertAsync(Guid orderId, Order updateOrder, Guid userId)
         {
             try
             {
-                var existingOrder = await _appDbContext.Orders.FindAsync(orderId);
+
+                var existingOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == orderId  && order.UserId == userId);
                 if (existingOrder != null)
                 {
                     existingOrder.OrderDate = updateOrder.OrderDate;
@@ -125,11 +126,11 @@ namespace Backend.Services
 
             }
         }
-        public async Task<bool> DeleteOrderAsync(Guid orderId)
+        public async Task<bool> DeleteOrderAsync(Guid orderId, Guid userId)
         {
             try
             {
-                var orderToRemove = await _appDbContext.Orders.FindAsync(orderId);
+                var orderToRemove = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == orderId && order.UserId == userId); 
                 if (orderToRemove != null)
                 {
                     _appDbContext.Orders.Remove(orderToRemove);
