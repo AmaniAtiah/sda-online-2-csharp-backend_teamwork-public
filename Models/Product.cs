@@ -22,7 +22,7 @@ namespace Backend.Models
                 public DateTime CreateAt { get; set; } = DateTime.UtcNow;
                 //Relations:
                 [Required(ErrorMessage = "CategoryId is required")]
-                public Guid CategoriesId { get; set; }
+                public Guid? CategoriesId { get; set; }
                 public Category? Category { get; set; }
                 public List<Order> Orders { get; set; } = new List<Order>();
         }
