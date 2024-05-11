@@ -11,6 +11,7 @@ namespace Backend.Mapper
         {
             CreateMap<User, UserDto>();
             CreateMap<Category, CategoryDto>();
+            CreateMap<Product, ProductDtos>();
         }
     }
 }

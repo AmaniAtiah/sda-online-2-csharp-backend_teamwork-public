@@ -49,8 +49,8 @@ namespace Backend.Services
         public async Task<CategoryDto> GetCategoryByIdAsync(Guid categoryId)
         {
             var category = await _appDbContext.Categories.FindAsync(categoryId);
-            var categoryDtos = _mapper.Map<CategoryDto>(category);
-            return categoryDtos;
+            var categoryDto = _mapper.Map<CategoryDto>(category);
+            return categoryDto;
         }
 
         public async Task<CategoryDto> AddCategoryAsync(CategoryDto newCategory)

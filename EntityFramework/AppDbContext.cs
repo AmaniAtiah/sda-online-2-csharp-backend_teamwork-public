@@ -42,6 +42,9 @@ namespace Backend.EntityFramework
             modelBuilder.Entity<Product>().Property(p => p.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id
             modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired().HasMaxLength(150);
             modelBuilder.Entity<Product>().Property(p => p.Price).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.Color).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.Size).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.Brand).IsRequired();
             modelBuilder.Entity<Product>().Property(p => p.Quantity).IsRequired();
             modelBuilder.Entity<Product>().Property(p => p.CreateAt).HasDefaultValue(DateTime.UtcNow);//Generate date
             ////////////////////////*Order*////////////////////////
