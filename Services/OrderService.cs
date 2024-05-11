@@ -39,11 +39,11 @@ namespace Backend.Services
                 throw new ApplicationException("An error occurred while retrieving order.", e);
             }
         }
-        public async Task<Order?> GetOrderAsync(Guid OrderId)
+        public async Task<Order?> GetOrderAsync(Guid OrderId, Guid userId)
         {
             try
             {
-                return await _appDbContext.Orders.FindAsync(OrderId);
+                return await _appDbContext.Orders.FirstOrDefaultAsync(address => address.OrderId == OrderId && address.UserId == userId);
 
             }
             catch (Exception e)
@@ -52,17 +52,24 @@ namespace Backend.Services
             }
 
         }
-        public async Task<Order> AddOrderAsync(Order newOrder)
+        public async Task<Order> AddOrderAsync(Order newOrder, Guid userId)
         {
+
             try
             {
+                var address = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == newOrder.AddressId && a.UserId == userId);
+
+                if (address == null)
+                {
+                    throw new UnauthorizedAccessException("User is not authorized to use this address.");
+                }
                 Order order = new Order
                 {
                     OrderId = Guid.NewGuid(),
                     OrderDate = DateTime.UtcNow,
                     TotalPrice = newOrder.TotalPrice,
                     Status = newOrder.Status,
-                    UserId = newOrder.UserId,
+                    UserId = userId,
                     AddressId = newOrder.AddressId
                 };
                 await _appDbContext.Orders.AddAsync(order);
@@ -75,9 +82,12 @@ namespace Backend.Services
             }
 
         }
-        public async Task AddProductToOrder(Guid orderId, Guid productId)
+
+        public async Task AddProductToOrder(Guid orderId, Guid productId, Guid userId)
         {
-            var order = await _appDbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+
+            var order = await _appDbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId &&  o.UserId == userId);
             var product = await _appDbContext.Products.FindAsync(productId);
             if (order != null && product != null)
             {
@@ -89,6 +99,10 @@ namespace Backend.Services
                 throw new InvalidOperationException("The Product has already added");
             }
         }
+
+
+ 
+
         public async Task<Order?> UpdateOrdertAsync(Guid orderId, Order updateOrder)
         {
             try

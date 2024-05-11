@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240511054225_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240511115531_CreateTables")]
+    partial class CreateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,8 +139,8 @@ namespace Backend.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
+                        .HasMaxLength(0)
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -153,7 +153,7 @@ namespace Backend.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Backend.Models.Order", b =>
@@ -168,7 +168,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 5, 42, 25, 154, DateTimeKind.Utc).AddTicks(7968));
+                        .HasDefaultValue(new DateTime(2024, 5, 11, 11, 55, 31, 28, DateTimeKind.Utc).AddTicks(3790));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -209,7 +209,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 5, 42, 25, 154, DateTimeKind.Utc).AddTicks(7021));
+                        .HasDefaultValue(new DateTime(2024, 5, 11, 11, 55, 31, 28, DateTimeKind.Utc).AddTicks(2770));
 
                     b.Property<string>("Description")
                         .IsRequired()

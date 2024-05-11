@@ -5,6 +5,7 @@ using Backend.EntityFramework;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Backend.Models;
 
 namespace Backend.Services
 {
@@ -147,6 +148,23 @@ namespace Backend.Services
                 _appDbContext.Users.Remove(userToRemove);
                 await _appDbContext.SaveChangesAsync();
             }
+        }
+
+
+         public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
+        {
+            return await _appDbContext.Addresses
+             .Where(p => p.UserId == userId)
+             .Select(p => new Address
+             {
+                 AddressId = p.AddressId,
+                 AddressLine = p.AddressLine,
+                 City = p.City,
+                 State = p.State,
+                 Country = p.Country,
+                 ZipCode = p.ZipCode,
+                 UserId = p.UserId
+             }).ToListAsync();
         }
     }
 }
