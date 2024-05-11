@@ -62,8 +62,8 @@ namespace Backend.Services
                     OrderDate = DateTime.UtcNow,
                     TotalPrice = newOrder.TotalPrice,
                     Status = newOrder.Status,
-                    UserId = newOrder.UserId
-                    //AddresseId = newOrder.AddresseId
+                    UserId = newOrder.UserId,
+                    AddressId = newOrder.AddressId
                 };
                 await _appDbContext.Orders.AddAsync(order);
                 await _appDbContext.SaveChangesAsync();

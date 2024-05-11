@@ -10,9 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddDbContext<DbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -24,6 +21,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AddressesService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddAutoMapper(typeof(Program));
 var Configuration = builder.Configuration;
 var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>

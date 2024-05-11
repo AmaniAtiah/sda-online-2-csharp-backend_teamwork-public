@@ -33,7 +33,7 @@ namespace Backend.Models
         [Required(ErrorMessage = "UserId is required")]
         public Guid UserId { get; set; }
         public User? User { get; set; }
-        // public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
+        public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
     }
 
 }

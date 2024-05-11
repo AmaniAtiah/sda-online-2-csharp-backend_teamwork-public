@@ -1,6 +1,5 @@
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
-using Backend.Models;
 namespace Backend.EntityFramework
 {
     public class AppDbContext : DbContext
@@ -21,6 +20,18 @@ namespace Backend.EntityFramework
             ////////////////////////*User*////////////////////////
             modelBuilder.Entity<User>().HasKey(u => u.UserId);//PK
             modelBuilder.Entity<User>().Property(u => u.UserId).IsRequired().ValueGeneratedOnAdd();//Generate id
+            modelBuilder.Entity<User>().Property(u => u.UserName).IsRequired().HasMaxLength(32);
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
+            modelBuilder.Entity<User>().Property(u => u.FirstName).IsRequired().HasMaxLength(32);
+            modelBuilder.Entity<User>().Property(u => u.LastName).IsRequired().HasMaxLength(32);
+            modelBuilder.Entity<User>().Property(u => u.Email).IsRequired().HasMaxLength(255);
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<User>().Property(u => u.Password).IsRequired().HasMaxLength(255);
+            modelBuilder.Entity<User>().Property(u => u.PhoneNumber).IsRequired().HasMaxLength(20);
+            modelBuilder.Entity<User>().HasIndex(u => u.PhoneNumber).IsUnique();
+            modelBuilder.Entity<User>().Property(u => u.IsAdmin).HasDefaultValue(false);
+            modelBuilder.Entity<User>().Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            modelBuilder.Entity<User>().Property(u => u.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             ////////////////////////*Category*////////////////////////
             modelBuilder.Entity<Category>().HasKey(c => c.CategoryId);//PK
             modelBuilder.Entity<Category>().Property(c => c.CategoryId).IsRequired().ValueGeneratedOnAdd();//Generate id
@@ -53,10 +64,10 @@ namespace Backend.EntityFramework
             .WithOne(o => o.User)
             .HasForeignKey(o => o.UserId);
             //Addresses And Order:
-            /* modelBuilder.Entity<Address>()
-            .HasMany(a => a.Orders)
-            .WithOne(o => o.Addresses)
-            .HasForeignKey(o => o.AddresseId); */
+            modelBuilder.Entity<Address>()
+           .HasMany(a => a.Orders)
+           .WithOne(o => o.Addresses)
+           .HasForeignKey(o => o.AddressId);
             //Category And Product:
             modelBuilder.Entity<Category>()
             .HasMany(c => c.Products)

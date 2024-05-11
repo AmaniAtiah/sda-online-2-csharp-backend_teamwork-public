@@ -28,7 +28,7 @@ namespace Backend.Services
                 new Claim(ClaimTypes.Role, user.IsAdmin? "Admin" : "User"),//using role to specify user and admin
             }),
 
-                Expires = DateTime.UtcNow.AddMinutes(2),//how many hours token will be vaild
+                Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
 
                 Issuer = _configuration["Jwt:Issuer"],
