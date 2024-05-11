@@ -1,4 +1,3 @@
-
 namespace Backend.Dtos.Pagination
 {
     public class PaginationResult<T>
@@ -8,6 +7,5 @@ namespace Backend.Dtos.Pagination
         public int PageNumber {get; set;}
         public int PageSize {get; set;}
         public int TotalPages  => (int) Math.Ceiling((double)(TotalCount / PageSize));
-
     }
 }

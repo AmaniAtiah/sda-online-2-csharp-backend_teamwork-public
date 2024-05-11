@@ -23,14 +23,12 @@ namespace Backend.Services
             .Take(pageSize)
             .Select(product => new ProductDtos
             {
-                ProductId = product.ProductId,
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
                 Color = product.Color,
                 Size = product.Size,
                 Brand = product.Brand,
-
             })
             .ToListAsync();
             return new PaginationResult<ProductDtos>
@@ -40,7 +38,6 @@ namespace Backend.Services
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
-
         }
 
         public async Task<Product?> GetProductAsync(Guid ProductId)
@@ -57,6 +54,9 @@ namespace Backend.Services
                 Description = newProduct.Description,
                 Quantity = newProduct.Quantity,
                 Price = newProduct.Price,
+                Color = newProduct.Color,
+                Size = newProduct.Size,
+                Brand = newProduct.Brand,
                 CategoriesId = newProduct.CategoriesId,
                 CreateAt = DateTime.UtcNow
             };
@@ -86,7 +86,6 @@ namespace Backend.Services
 
         public async Task<bool> DeleteUserAsync(Guid productId)
         {
-
             var productToRemove = await _appDbContext.Products.FindAsync(productId);
             if (productToRemove != null)
             {
