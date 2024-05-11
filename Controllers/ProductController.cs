@@ -98,7 +98,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-        [HttpGet("searchkeyword")]
+        [HttpGet("search")]
         public async Task<IActionResult> SearchProducts(string searchkeyword)
         {
             try
