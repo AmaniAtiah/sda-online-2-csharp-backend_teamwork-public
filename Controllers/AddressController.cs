@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Backend.Models;
 using Backend.Services;
+using Backend.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,16 +21,15 @@ namespace Backend.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-
         public async Task<IActionResult> GetAllAddresses()
         {
             try
             {
                 var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-            if (!isAdmin)
-            {
-                return ApiResponse.Forbidden("Only admin can visit this route");
-            }
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var addresses = await _addressService.GetAllAddressesAsync();
                 return ApiResponse.Success(addresses, "All addresses retrieved successfully");
             }
@@ -37,12 +37,7 @@ namespace Backend.Controllers
             {
                 return ApiResponse.ServerError(ex.Message);
             }
-
         }
-
-     
-
-
 
         [Authorize]
         [HttpGet("{addressId}")]
@@ -50,20 +45,18 @@ namespace Backend.Controllers
         {
             try
             {
-                
                  var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out  userId))
                 {
                     return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
                 }
 
-                         var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-            if (!isAdmin)
-            {
-                return ApiResponse.Forbidden("Only admin can visit this route");
-            }
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 
-               
                 var address = await _addressService.GetAddressById(addressId, userId);
                 if (address != null)
                 {
@@ -80,12 +73,9 @@ namespace Backend.Controllers
             }
         }
 
-     
-
-
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddAddressService(Address newAddress)
+        public async Task<IActionResult> AddAddressService([FromBody] AddressDto newAddress)
         {
             try
             {
@@ -100,8 +90,16 @@ namespace Backend.Controllers
                     return BadRequest(ModelState);
                 }
 
-
-                var createdAddress = await _addressService.AddAddressService(newAddress, userId);
+                var createdAddress = await _addressService.AddAddressService(new Address
+                {
+                    AddressId = newAddress.AddressId,
+                    AddressLine = newAddress.AddressLine,
+                    City = newAddress.City,
+                    State = newAddress.State,
+                    Country = newAddress.Country,
+                    ZipCode = newAddress.ZipCode,
+                    UserId = newAddress.UserId
+                }, userId);
 
                 if (createdAddress != null)
                 {
@@ -112,7 +110,6 @@ namespace Backend.Controllers
                     return ApiResponse.ServerError("Failed to create the address.");
                 }
             }
-           
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
@@ -121,7 +118,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPut("{addressId}")]
-        public async Task<IActionResult> UpdateAddress(Guid addressId, Address updateAddress)
+        public async Task<IActionResult> UpdateAddress(Guid addressId, AddressDto updateAddressDto)
         {
             try
             {
@@ -134,14 +131,31 @@ namespace Backend.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var address = await _addressService.UpdateAddressService(addressId, updateAddress, userId);
-                if (address != null)
+
+                var existingAddress = await _addressService.GetAddressById(addressId, userId);
+
+                if (existingAddress == null)
                 {
-                    return ApiResponse.Success(address, "Address updated successfully");
+                    return ApiResponse.NotFound("Address was not found");
+                }
+
+                // Map the properties from the DTO to the existing address
+                existingAddress.AddressLine = updateAddressDto.AddressLine;
+                existingAddress.City = updateAddressDto.City;
+                existingAddress.State = updateAddressDto.State;
+                existingAddress.Country = updateAddressDto.Country;
+                existingAddress.ZipCode = updateAddressDto.ZipCode;
+
+                // Update the address
+                var updatedAddress = await _addressService.UpdateAddressService(addressId, existingAddress, userId);
+
+                if (updatedAddress != null)
+                {
+                    return ApiResponse.Success(updatedAddress, "Address updated successfully");
                 }
                 else
                 {
-                    return ApiResponse.NotFound("Address was not found");
+                    return ApiResponse.ServerError("Failed to update the address.");
                 }
             }
             catch (Exception ex)
@@ -160,7 +174,6 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
                 }
-
 
                 var result = await _addressService.DeleteAddressService(addressId, userId);
                 if (result)
