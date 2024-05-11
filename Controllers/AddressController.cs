@@ -1,6 +1,7 @@
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Dtos;
 
 namespace Backend.Controllers
 {
@@ -52,7 +53,8 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAddressService(Address newAddress)
+        [HttpPost]
+        public async Task<IActionResult> AddAddressService([FromBody] AddressDto newAddress)
         {
             try
             {
@@ -61,7 +63,16 @@ namespace Backend.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var createdAddress = await _addressService.AddAddressService(newAddress);
+                var createdAddress = await _addressService.AddAddressService(new Address
+                {
+                    AddressId = newAddress.AddressId,
+                    AddressLine = newAddress.AddressLine,
+                    City = newAddress.City,
+                    State = newAddress.State,
+                    Country = newAddress.Country,
+                    ZipCode = newAddress.ZipCode,
+                    UserId = newAddress.UserId
+                });
 
                 if (createdAddress != null)
                 {
@@ -81,19 +92,37 @@ namespace Backend.Controllers
 
 
 
+
         [HttpPut("{addressId}")]
-        public async Task<IActionResult> UpdateAddress(Guid addressId, Address updateAddress)
+        public async Task<IActionResult> UpdateAddress(Guid addressId, AddressDto updateAddressDto)
         {
             try
             {
-                var address = await _addressService.UpdateAddressService(addressId, updateAddress);
-                if (address != null)
+                // Retrieve the existing address
+                var existingAddress = await _addressService.GetAddressById(addressId);
+
+                if (existingAddress == null)
                 {
-                    return ApiResponse.Success(address, "Address updated successfully");
+                    return ApiResponse.NotFound("Address was not found");
+                }
+
+                // Map the properties from the DTO to the existing address
+                existingAddress.AddressLine = updateAddressDto.AddressLine;
+                existingAddress.City = updateAddressDto.City;
+                existingAddress.State = updateAddressDto.State;
+                existingAddress.Country = updateAddressDto.Country;
+                existingAddress.ZipCode = updateAddressDto.ZipCode;
+
+                // Update the address
+                var updatedAddress = await _addressService.UpdateAddressService(addressId, existingAddress);
+
+                if (updatedAddress != null)
+                {
+                    return ApiResponse.Success(updatedAddress, "Address updated successfully");
                 }
                 else
                 {
-                    return ApiResponse.NotFound("Address was not found");
+                    return ApiResponse.ServerError("Failed to update the address.");
                 }
             }
             catch (Exception ex)
@@ -101,6 +130,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
 
         [HttpDelete("{addressId}")]
         public async Task<IActionResult> DeleteAddress(Guid addressId)

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.EntityFramework;
-using Backend.Helpers;
 using Backend.Models;
+using Backend.Dtos;
 
 namespace Backend.Services
 {
@@ -13,9 +13,9 @@ namespace Backend.Services
             _appDbContext = appDbContext;
         }
 
-        public async Task<IEnumerable<Address>> GetAllAddressesAsync()
+        public async Task<IEnumerable<AddressDto>> GetAllAddressesAsync()
         {
-            return await _appDbContext.Addresses
+            return (IEnumerable<AddressDto>)await _appDbContext.Addresses
              .Select(p => new Address
              {
                  AddressId = p.AddressId,
@@ -46,11 +46,7 @@ namespace Backend.Services
             var existingAddress = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
             if (existingAddress != null)
             {
-                existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
-                existingAddress.City = updateAddress.City ?? existingAddress.City;
-                existingAddress.State = updateAddress.State ?? existingAddress.State;
-                existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
-                existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
+
                 existingAddress.AddressLine = updateAddress.AddressLine ?? existingAddress.AddressLine;
                 existingAddress.City = updateAddress.City ?? existingAddress.City;
                 existingAddress.State = updateAddress.State ?? existingAddress.State;
