@@ -1,14 +1,13 @@
-
+using Backend.Dtos;
 using Backend.EntityFramework;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
-    [ApiController]//api controllers
-    [Route("/api/products")] // for httpget
+    [ApiController]
+    [Route("/api/products")] 
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productServices;
@@ -16,23 +15,21 @@ namespace Backend.Controllers
         {
             _productServices = new ProductService(appDbContext);
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetAllProduct()
+        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
             try
             {
-                var products = await _productServices.GetAllProductsAsync();
-                if (products.ToList().Count < 1)
-                {
-                    return ApiResponse.NotFound("No product found");
-                }
-                return ApiResponse.Success(products, "All product are returned");
+                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize);
+                return ApiResponse.Success(products, "All Product are returned successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpGet("{productId:guid}")]
         public async Task<IActionResult> GetProductById(Guid proudectId)
         {
@@ -43,20 +40,21 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.NotFound("Product was not found");
                 }
-                return ApiResponse.Created(product);
+                return ApiResponse.Created(product, "Product is return successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> AddProduct(Product newProduct)
         {
             try
             {
                 var createdProduct = await _productServices.AddProductAsync(newProduct);
-                return ApiResponse.Created(createdProduct);
+                return ApiResponse.Created(createdProduct, "Product is added successfully");
             }
             catch (Exception ex)
             {
@@ -65,7 +63,7 @@ namespace Backend.Controllers
         }
 
         [HttpPut("{productId:guid}")]
-        public async Task<IActionResult> UpdateProduct(Guid proudectId, Product updateProudect)
+        public async Task<IActionResult> UpdateProduct(Guid proudectId, ProductDtos updateProudect)
         {
             try
             {
@@ -94,6 +92,19 @@ namespace Backend.Controllers
                 }
                 return NoContent();
 
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string searchkeyword)
+        {
+            try
+            {
+                var productsFounded = await _productServices.SearchProductByNameAsync(searchkeyword);
+                return ApiResponse.Success(productsFounded, "Products are returne successfully");
             }
             catch (Exception ex)
             {

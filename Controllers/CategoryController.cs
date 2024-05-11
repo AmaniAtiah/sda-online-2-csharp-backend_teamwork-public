@@ -1,28 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Backend.Helpers;
-using Backend.EntityFramework;
 using Backend.Models;
+using Backend.Dtos;
+using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Controllers
 {
     [ApiController]
     [Route("/api/categories")]
-    public class CategoriesController : ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly CategoriesService _categoriesService;
-        public CategoriesController(CategoriesService categoriesService)
+        private readonly CategoryService _categoryService;
+        public CategoryController(CategoryService categoryService)
         {
-            _categoriesService = categoriesService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCategories()
+        public async Task<IActionResult> GetAllCategories([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
             try
             {
-                var categories = await _categoriesService.GetAllCategoryService();
+                var categories = await _categoryService.GetAllCategoryAsync(pageNumber, pageSize);
                 return ApiResponse.Success(categories, "all categories retrieved successfully");
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace Backend.Controllers
         {
             try
             {
-                var category = await _categoriesService.GetCategoryById(categoryId);
+                var category = await _categoryService.GetCategoryByIdAsync(categoryId);
                 if (category != null)
                 {
                     return ApiResponse.Success(category, "Category is retrieved successfully");
@@ -52,29 +52,23 @@ namespace Backend.Controllers
             }
         }
 
-
-
         [HttpPost]
-        public async Task<IActionResult> AddCategory(Category newCategory)
+        public async Task<IActionResult> AddCategory([FromBody] CategoryDto newCategory)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                newCategory.Slug = SlugResponse.GenerateSlug(newCategory.category_name);
-                var createdCategory = await _categoriesService.AddCategoryService(newCategory);
-                return CreatedAtAction(nameof(GetCategory), new { categoryId = createdCategory.CategoryId }, createdCategory);
+                throw new ValidationException("Invalid  Data");
             }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
+            var category = await _categoryService.AddCategoryAsync(newCategory);
+            return ApiResponse.Created(category, "New Category is added successfully");
         }
 
         [HttpPut("{categoryId:guid}")]
-        public async Task<IActionResult> UpdateCategory(Guid categoryId, Category updateCategory)
+        public async Task<IActionResult> UpdateCategory(Guid categoryId, CategoryDto updateCategory)
         {
             try
             {
-                var category = await _categoriesService.UpdateCategoryService(categoryId, updateCategory);
+                var category = await _categoryService.UpdateCategoryAsync(categoryId, updateCategory);
                 if (category == null)
                 {
                     return ApiResponse.NotFound("Category was not found");
@@ -95,7 +89,7 @@ namespace Backend.Controllers
         {
             try
             {
-                var result = await _categoriesService.DeleteCategoryService(categoryId);
+                var result = await _categoryService.DeleteCategoryAsync(categoryId);
                 if (result)
                 {
                     return NoContent();

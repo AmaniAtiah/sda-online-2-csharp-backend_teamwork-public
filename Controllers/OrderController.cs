@@ -1,5 +1,5 @@
+using Backend.Dtos;
 using Backend.EntityFramework;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +16,7 @@ namespace Backend.Controllers
             _orderServices = new OrderService(appDbContext);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllOrdersControllers()
+        public async Task<IActionResult> GetAllOrders()
         {
             try
             {
@@ -25,13 +25,14 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.NotFound("No order found");
                 }
-                return ApiResponse.Success(orders, "All order are returned");
+                return ApiResponse.Success(orders, "all orders retrieved successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetOrderById(Guid orderId)
         {
@@ -49,20 +50,21 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> AddOrder(Order newOrder)
         {
             try
             {
                 var createdOrder = await _orderServices.AddOrderAsync(newOrder);
-                return ApiResponse.Created(createdOrder);
+                return ApiResponse.Created(createdOrder, "Order is added successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-        [HttpPost("{orderId}")]
+        [HttpPost("{orderId:guid}")]
         public async Task<IActionResult> AddProductToOrder(Guid orderId, Guid productId)
         {
             try
@@ -77,7 +79,7 @@ namespace Backend.Controllers
         }
 
         [HttpPut("{orderId:guid}")]
-        public async Task<IActionResult> UpdateOrder(Guid orderId, Order updateOrder)
+        public async Task<IActionResult> UpdateOrder(Guid orderId, OrderDtos updateOrder)
         {
             try
             {
@@ -111,7 +113,6 @@ namespace Backend.Controllers
             {
                 return ApiResponse.ServerError(ex.Message);
             }
-
         }
     }
 }

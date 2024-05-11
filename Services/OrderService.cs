@@ -4,6 +4,8 @@ using Backend.Services;
 using Backend.Helpers;
 using Backend.Models;
 using Backend.EntityFramework;
+using Backend.Dtos;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Services
 {
@@ -15,52 +17,40 @@ namespace Backend.Services
         {
             _appDbContext = appDbContext;
         }
-        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        public async Task<IEnumerable<OrderDtos>> GetAllOrdersAsync()
         {
-            try
-            {
-                return await _appDbContext.Orders.Include(p => p.Products).ToListAsync();
-            }
-
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while retrieving order.", e);
-            }
+            //return await _appDbContext.Orders.ToListAsync();
+            var orders = await _appDbContext.Orders
+           .Select(order => new OrderDtos
+           {
+               OrderId = order.OrderId,
+               OrderDate = order.OrderDate,
+               TotalPrice = order.TotalPrice,
+               Status = order.Status,
+               UserId = order.UserId
+           })
+           .ToListAsync();
+            return orders;
         }
-        public async Task<Order?> GetOrderAsync(Guid ProductId)
+        public async Task<Order?> GetOrderAsync(Guid OrderId)
         {
-            try
-            {
-                return await _appDbContext.Orders.FindAsync(ProductId);
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while retrieving order.", e);
-            }
+            return await _appDbContext.Orders.FindAsync(OrderId);
 
         }
         public async Task<Order> AddOrderAsync(Order newOrder)
         {
-            try
+            Order order = new Order
             {
-                Order order = new Order
-                {
-                    OrderId = Guid.NewGuid(),
-                    OrderDate = DateTime.UtcNow,
-                    TotalPrice = newOrder.TotalPrice,
-                    Status = newOrder.Status,
-                    UserId = newOrder.UserId,
-                    AddressId = newOrder.AddressId
-                };
-                await _appDbContext.Orders.AddAsync(order);
-                await _appDbContext.SaveChangesAsync();
-                return order;
-            }
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while adding order.", e);
-            }
-
+                OrderId = Guid.NewGuid(),
+                OrderDate = DateTime.UtcNow,
+                TotalPrice = newOrder.TotalPrice,
+                Status = newOrder.Status,
+                UserId = newOrder.UserId,
+                AddressId = newOrder.AddressId
+            };
+            await _appDbContext.Orders.AddAsync(order);
+            await _appDbContext.SaveChangesAsync();
+            return order;
         }
         public async Task AddProductToOrder(Guid orderId, Guid productId)
         {
@@ -73,50 +63,34 @@ namespace Backend.Services
             }
             else
             {
-                throw new InvalidOperationException("The Product has already added");
+                throw new InvalidOperationException("The Product Id or order Id is Not vaild");
             }
         }
-        public async Task<Order?> UpdateOrdertAsync(Guid orderId, Order updateOrder)
+        public async Task<Order?> UpdateOrdertAsync(Guid orderId, OrderDtos updateOrder)
         {
-            try
+            var existingOrder = await _appDbContext.Orders.FindAsync(orderId);
+            if (existingOrder != null)
             {
-                var existingOrder = await _appDbContext.Orders.FindAsync(orderId);
-                if (existingOrder != null)
-                {
-                    existingOrder.OrderDate = updateOrder.OrderDate;
-                    existingOrder.TotalPrice = updateOrder.TotalPrice ?? existingOrder.TotalPrice;
-                    existingOrder.Status = updateOrder.Status ?? existingOrder.Status;
-                    existingOrder.UserId = updateOrder.UserId;
-
-                    await _appDbContext.SaveChangesAsync();
-                    return existingOrder;
-                }
-                throw new Exception("Order not found");
+                existingOrder.OrderDate = existingOrder.OrderDate;
+                existingOrder.TotalPrice = updateOrder.TotalPrice ?? existingOrder.TotalPrice;
+                existingOrder.Status = updateOrder.Status.IsNullOrEmpty() ? existingOrder.Status : updateOrder.Status;
+                existingOrder.UserId = existingOrder.UserId;
+                await _appDbContext.SaveChangesAsync();
+                return existingOrder;
             }
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while updating order.", e);
-
-            }
+            throw new Exception("Order not found");
         }
         public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
-            try
+            var orderToRemove = await _appDbContext.Orders.FindAsync(orderId);
+            if (orderToRemove != null)
             {
-                var orderToRemove = await _appDbContext.Orders.FindAsync(orderId);
-                if (orderToRemove != null)
-                {
-                    _appDbContext.Orders.Remove(orderToRemove);
-                    await _appDbContext.SaveChangesAsync();
-                    return true;
-                }
-                throw new Exception("Order not found");
+                _appDbContext.Orders.Remove(orderToRemove);
+                await _appDbContext.SaveChangesAsync();
+                return true;
             }
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while deleting order.", e);
+            return false;
 
-            }
         }
     }
 }
