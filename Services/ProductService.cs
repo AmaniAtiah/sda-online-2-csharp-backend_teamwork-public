@@ -6,6 +6,7 @@ using Backend.Helpers;
 using Backend.Models;
 using Backend.Dtos;
 using Backend.EntityFramework;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Services
 {
@@ -87,21 +88,21 @@ namespace Backend.Services
             }
 
         }
-        public async Task<Product?> UpdateProductAsync(Guid productId, Product updateProduct)
+        public async Task<Product?> UpdateProductAsync(Guid productId, ProductDtos updateProduct)
         {
             try
             {
                 var existingProduct = await _appDbContext.Products.FindAsync(productId);
                 if (existingProduct != null)
                 {
-                    existingProduct.Name = updateProduct.Name ?? existingProduct.Name;
-                    existingProduct.Description = updateProduct.Description ?? existingProduct.Description;
+                    existingProduct.Name = updateProduct.Name.IsNullOrEmpty() ? existingProduct.Name : updateProduct.Name;
+                    existingProduct.Description = updateProduct.Description.IsNullOrEmpty() ? existingProduct.Description : updateProduct.Description;
                     existingProduct.Price = updateProduct.Price ?? existingProduct.Price;
-                    existingProduct.Color = updateProduct.Color ?? existingProduct.Color;
-                    existingProduct.Size = updateProduct.Size ?? existingProduct.Size;
-                    existingProduct.Brand = updateProduct.Brand ?? existingProduct.Brand;
-                    existingProduct.Quantity = updateProduct.Quantity ?? existingProduct.Quantity;
-                    existingProduct.CategoriesId = updateProduct.CategoriesId;
+                    existingProduct.Color = updateProduct.Color.IsNullOrEmpty() ? existingProduct.Color : updateProduct.Color;
+                    existingProduct.Size = updateProduct.Size.IsNullOrEmpty() ? existingProduct.Size : updateProduct.Size;
+                    existingProduct.Brand = updateProduct.Brand.IsNullOrEmpty() ? existingProduct.Brand : updateProduct.Brand;
+                    existingProduct.Quantity = existingProduct.Quantity;
+                    existingProduct.CategoriesId = existingProduct.CategoriesId;
                     await _appDbContext.SaveChangesAsync();
                     return existingProduct;
                 }

@@ -1,3 +1,4 @@
+using Backend.Dtos;
 using Backend.EntityFramework;
 using Backend.Helpers;
 using Backend.Models;
@@ -38,7 +39,7 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.NotFound("Product was not found");
                 }
-                return ApiResponse.Created(product);
+                return ApiResponse.Created(product, "Product is return successfully");
             }
             catch (Exception ex)
             {
@@ -51,7 +52,7 @@ namespace Backend.Controllers
             try
             {
                 var createdProduct = await _productServices.AddProductAsync(newProduct);
-                return ApiResponse.Created(createdProduct);
+                return ApiResponse.Created(createdProduct, "Product is added successfully");
             }
             catch (Exception ex)
             {
@@ -60,7 +61,7 @@ namespace Backend.Controllers
         }
 
         [HttpPut("{productId:guid}")]
-        public async Task<IActionResult> UpdateProduct(Guid proudectId, Product updateProudect)
+        public async Task<IActionResult> UpdateProduct(Guid proudectId, ProductDtos updateProudect)
         {
             try
             {
