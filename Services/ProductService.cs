@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Dtos.Pagination;
-using Microsoft.AspNetCore.Mvc;
-using Backend.Services;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Dtos;
 using Backend.EntityFramework;
@@ -34,7 +31,6 @@ namespace Backend.Services
                     Color = product.Color,
                     Size = product.Size,
                     Brand = product.Brand,
-
                 })
                 .ToListAsync();
                 return new PaginationResult<ProductDtos>
@@ -45,12 +41,12 @@ namespace Backend.Services
                     PageSize = pageSize
                 };
             }
-
             catch (Exception e)
             {
                 throw new ApplicationException("An error occurred while retrieving product.", e);
             }
         }
+
         public async Task<Product?> GetProductAsync(Guid ProductId)
         {
             try
@@ -63,6 +59,7 @@ namespace Backend.Services
             }
 
         }
+
         public async Task<Product> AddProductAsync(Product newProduct)
         {
             try
@@ -85,8 +82,8 @@ namespace Backend.Services
             {
                 throw new ApplicationException("An error occurred while adding product.", e);
             }
-
         }
+
         public async Task<Product?> UpdateProductAsync(Guid productId, Product updateProduct)
         {
             try
@@ -113,6 +110,7 @@ namespace Backend.Services
 
             }
         }
+
         public async Task<bool> DeleteUserAsync(Guid productId)
         {
             try
@@ -129,9 +127,9 @@ namespace Backend.Services
             catch (Exception e)
             {
                 throw new ApplicationException("An error occurred while deleting product.", e);
-
             }
         }
+
         public async Task<IEnumerable<Product?>> SearchProductByNameAsync(string searchKeyword)
         {
             try
@@ -148,7 +146,6 @@ namespace Backend.Services
             {
                 throw new ApplicationException("An error occurred while search for product.", e);
             }
-
         }
     }
 }

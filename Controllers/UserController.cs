@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Backend.Dtos;
@@ -14,18 +13,13 @@ namespace Backend.Controllers
     [Route("/api/users")]
     public class UserController : ControllerBase
     {
-
         private readonly UserService _userService;
         private readonly AuthService _authService;
-
-
         public UserController(UserService userService, AuthService authService)
         {
             _userService = userService;
             _authService = authService;
         }
-
-
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
@@ -38,18 +32,14 @@ namespace Backend.Controllers
             {
                 return ApiResponse.Forbidden("Only admin can visit this route");
             }
-
             return ApiResponse.Success(users, "All users are returned successfully");
-
         }
 
         [Authorize]
         [HttpGet("profile")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
 
             if (string.IsNullOrEmpty(userIdString))
             {
@@ -61,24 +51,18 @@ namespace Backend.Controllers
                 return ApiResponse.BadRequest("Invalid User Id");
             }
             var user = await _userService.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
-
             return ApiResponse.Success(user, "User profile is returned successfully");
-
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto newUserData)
         {
-
             if (!ModelState.IsValid)
             {
                 throw new ValidationException("Invalid User Data");
             }
-
-
-            var newUser = await _userService.CreateUserAsync(newUserData);
+            var newUser = await _userService.AddUserAsync(newUserData);
             return ApiResponse.Created(newUser, "User created successfully");
-
         }
 
         [Authorize]
@@ -86,7 +70,6 @@ namespace Backend.Controllers
         public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
 
             if (string.IsNullOrEmpty(userIdString))
             {
@@ -105,30 +88,21 @@ namespace Backend.Controllers
 
             var updateUser = await _userService.UpdateUserAsync(userId, updateUserDto) ?? throw new NotFoundException("User not found");
             return ApiResponse.Success(updateUser, "User updated successfully");
-
-
-
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
         {
-
             if (!ModelState.IsValid)
             {
                 return ApiResponse.BadRequest("Invalid user data");
             }
             var loggedInUser = await _userService.LoginUserAsync(loginDto);
             var token = _authService.GenerateJwt(loggedInUser);
-
-
-
             return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
-
-
         }
 
-            [Authorize]
+        [Authorize]
         [HttpDelete("profile")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
@@ -143,12 +117,6 @@ namespace Backend.Controllers
             }
             await _userService.DeleteUserAsync(userId);
             return NoContent();
-
         }
-
-
-
-
-
-    }
+    }   
 }

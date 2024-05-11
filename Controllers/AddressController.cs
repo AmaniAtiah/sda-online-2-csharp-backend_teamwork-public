@@ -1,9 +1,6 @@
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
@@ -11,9 +8,9 @@ namespace Backend.Controllers
     [Route("/api/address")]
     public class AddressController : ControllerBase
     {
-        private readonly AddressesService _addressService;
+        private readonly AddressService _addressService;
 
-        public AddressController(AddressesService addressService)
+        public AddressController(AddressService addressService)
         {
             _addressService = addressService;
         }
