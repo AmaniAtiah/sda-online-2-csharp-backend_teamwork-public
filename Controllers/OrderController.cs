@@ -1,3 +1,4 @@
+using Backend.Dtos;
 using Backend.EntityFramework;
 using Backend.Models;
 using Backend.Services;
@@ -56,15 +57,14 @@ namespace Backend.Controllers
             try
             {
                 var createdOrder = await _orderServices.AddOrderAsync(newOrder);
-                return ApiResponse.Created(createdOrder);
+                return ApiResponse.Created(createdOrder, "Order is added successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-
-        [HttpPost("{orderId}")]
+        [HttpPost("{orderId:guid}")]
         public async Task<IActionResult> AddProductToOrder(Guid orderId, Guid productId)
         {
             try
@@ -79,7 +79,7 @@ namespace Backend.Controllers
         }
 
         [HttpPut("{orderId:guid}")]
-        public async Task<IActionResult> UpdateOrder(Guid orderId, Order updateOrder)
+        public async Task<IActionResult> UpdateOrder(Guid orderId, OrderDtos updateOrder)
         {
             try
             {
