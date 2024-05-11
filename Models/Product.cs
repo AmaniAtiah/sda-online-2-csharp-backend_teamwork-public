@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
-        [Table("Product")]
+        [Table("Products")]
         public class Product
         {
                 public Guid ProductId { get; set; }
@@ -25,7 +25,5 @@ namespace Backend.Models
                 public Guid CategoriesId { get; set; }
                 public Category? Category { get; set; }
                 public List<Order> Orders { get; set; } = new List<Order>();
-
-
         }
 }

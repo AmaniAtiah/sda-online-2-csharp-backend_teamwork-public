@@ -26,7 +26,7 @@ namespace Backend.Controllers
         }
 
 
-        
+
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
@@ -38,7 +38,7 @@ namespace Backend.Controllers
             {
                 return ApiResponse.Forbidden("Only admin can visit this route");
             }
-            
+
             return ApiResponse.Success(users, "All users are returned successfully");
 
         }
@@ -47,10 +47,10 @@ namespace Backend.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            
+
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-          
-          
+
+
             if (string.IsNullOrEmpty(userIdString))
             {
                 return ApiResponse.UnAuthorized("User Id is misisng from token");
@@ -63,7 +63,7 @@ namespace Backend.Controllers
             var user = await _userService.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
 
             return ApiResponse.Success(user, "User profile is returned successfully");
-           
+
         }
 
         [HttpPost]
@@ -72,7 +72,7 @@ namespace Backend.Controllers
 
             if (!ModelState.IsValid)
             {
-             throw new ValidationException("Invalid User Data");
+                throw new ValidationException("Invalid User Data");
             }
 
 
@@ -83,11 +83,11 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPut("profile")]
-        public async Task<IActionResult> UpdateUser(Guid userId,UpdateUserDto updateUserDto)
+        public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-          
-          
+
+
             if (string.IsNullOrEmpty(userIdString))
             {
                 return ApiResponse.UnAuthorized("User Id is misisng from token");
@@ -100,14 +100,14 @@ namespace Backend.Controllers
 
             if (!ModelState.IsValid)
             {
-             throw new ValidationException("Invalid User Data");
+                throw new ValidationException("Invalid User Data");
             }
 
             var updateUser = await _userService.UpdateUserAsync(userId, updateUserDto) ?? throw new NotFoundException("User not found");
             return ApiResponse.Success(updateUser, "User updated successfully");
-            
 
-           
+
+
         }
 
         [HttpPost("login")]
@@ -120,7 +120,7 @@ namespace Backend.Controllers
             }
             var loggedInUser = await _userService.LoginUserAsync(loginDto);
             var token = _authService.GenerateJwt(loggedInUser);
-      
+
 
 
             return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
@@ -129,7 +129,7 @@ namespace Backend.Controllers
         }
 
 
-    
+
 
 
     }

@@ -1,4 +1,3 @@
-
 using Backend.EntityFramework;
 using Backend.Helpers;
 using Backend.Models;
@@ -17,16 +16,12 @@ namespace Backend.Controllers
             _productServices = new ProductService(appDbContext);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllProduct()
+        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
             try
             {
-                var products = await _productServices.GetAllProductsAsync();
-                if (products.ToList().Count < 1)
-                {
-                    return ApiResponse.NotFound("No product found");
-                }
-                return ApiResponse.Success(products, "All product are returned");
+                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize);
+                return ApiResponse.Success(products, "All Product are returned successfully");
             }
             catch (Exception ex)
             {
@@ -94,6 +89,20 @@ namespace Backend.Controllers
                 }
                 return NoContent();
 
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.ServerError(ex.Message);
+            }
+
+        }
+        [HttpGet("searchkeyword")]
+        public async Task<IActionResult> SearchProducts(string searchkeyword)
+        {
+            try
+            {
+                var productsFounded = await _productServices.SearchProductByNameAsync(searchkeyword);
+                return ApiResponse.Success(productsFounded, "Products are returne successfully");
             }
             catch (Exception ex)
             {
