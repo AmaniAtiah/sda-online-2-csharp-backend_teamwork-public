@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Backend.Dtos;
 using Backend.Dtos.User;
+using Backend.EntityFramework;
 using Backend.Middlewares;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,7 @@ namespace Backend.Controllers
     {
         private readonly UserService _userService;
         private readonly AuthService _authService;
+
         public UserController(UserService userService, AuthService authService)
         {
             _userService = userService;
@@ -117,6 +119,20 @@ namespace Backend.Controllers
             }
             await _userService.DeleteUserAsync(userId);
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("addresses")]
+        public async Task<IActionResult> GetAllAddressesByUserId()
+        {
+             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid  userId))
+                {
+                    return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+                }
+                var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
+                return ApiResponse.Success(addresses, "All addresses retrieved successfully");
+
         }
     }   
 }

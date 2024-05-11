@@ -1,13 +1,14 @@
-using Backend.Dtos;
+using System.Security.Claims;
 using Backend.EntityFramework;
 using Backend.Models;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
-    [ApiController]
-    [Route("/api/orders")] 
+    [ApiController]//api controllers
+    [Route("/api/orders")] // for httpget
     public class OrderController : ControllerBase
     {
         private readonly OrderService _orderServices;
@@ -15,12 +16,17 @@ namespace Backend.Controllers
         {
             _orderServices = new OrderService(appDbContext);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
             try
             {
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var orders = await _orderServices.GetAllOrdersAsync();
                 if (orders.ToList().Count < 1)
                 {
@@ -34,12 +40,23 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetOrderById(Guid orderId)
         {
             try
             {
-                var order = await _orderServices.GetOrderAsync(orderId);
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString))
+                {
+                    return ApiResponse.UnAuthorized("User Id is misisng from token");
+                }
+                if (!Guid.TryParse(userIdString, out Guid userId))
+                {
+                    return ApiResponse.BadRequest("Invalid User Id");
+                }
+
+                var order = await _orderServices.GetOrderAsync(orderId, userId);
                 if (order == null)
                 {
                     return ApiResponse.NotFound("Order was not found");
@@ -52,26 +69,45 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddOrder(Order newOrder)
         {
             try
             {
-                var createdOrder = await _orderServices.AddOrderAsync(newOrder);
-                return ApiResponse.Created(createdOrder, "Order is added successfully");
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString))
+                {
+                    return ApiResponse.UnAuthorized("User Id is misisng from token");
+                }
+                if (!Guid.TryParse(userIdString, out Guid userId))
+                {
+                    return ApiResponse.BadRequest("Invalid User Id");
+                }
+                var createdOrder = await _orderServices.AddOrderAsync(newOrder, userId);
+                return ApiResponse.Created(createdOrder);
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-        
+        [Authorize]
         [HttpPost("{orderId:guid}")]
         public async Task<IActionResult> AddProductToOrder(Guid orderId, Guid productId)
         {
             try
             {
-                await _orderServices.AddProductToOrder(orderId, productId);
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString))
+                {
+                    return ApiResponse.UnAuthorized("User Id is misisng from token");
+                }
+                if (!Guid.TryParse(userIdString, out Guid userId))
+                {
+                    return ApiResponse.BadRequest("Invalid User Id");
+                }
+                await _orderServices.AddProductToOrder(orderId, productId, userId);
                 return ApiResponse.Created("Products Added to the order successfully");
             }
             catch (Exception e)
@@ -80,12 +116,22 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{orderId:guid}")]
-        public async Task<IActionResult> UpdateOrder(Guid orderId, OrderDtos updateOrder)
+        public async Task<IActionResult> UpdateOrder(Guid orderId, Order updateOrder)
         {
             try
             {
-                var updateToOrder = await _orderServices.UpdateOrdertAsync(orderId, updateOrder);
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString))
+                {
+                    return ApiResponse.UnAuthorized("User Id is misisng from token");
+                }
+                if (!Guid.TryParse(userIdString, out Guid userId))
+                {
+                    return ApiResponse.BadRequest("Invalid User Id");
+                }
+                var updateToOrder = await _orderServices.UpdateOrdertAsync(orderId, updateOrder, userId);
                 if (updateToOrder == null)
                 {
                     return ApiResponse.NotFound("Order was not found");
@@ -98,12 +144,22 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{orderId:guid}")]
         public async Task<IActionResult> DeleteOrder(Guid orderId)
         {
             try
             {
-                var result = await _orderServices.DeleteOrderAsync(orderId);
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString))
+                {
+                    return ApiResponse.UnAuthorized("User Id is misisng from token");
+                }
+                if (!Guid.TryParse(userIdString, out Guid userId))
+                {
+                    return ApiResponse.BadRequest("Invalid User Id");
+                }
+                var result = await _orderServices.DeleteOrderAsync(orderId, userId);
                 if (!result)
                 {
                     return ApiResponse.NotFound("Order was not found");
