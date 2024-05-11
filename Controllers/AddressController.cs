@@ -27,7 +27,6 @@ namespace Backend.Controllers
             {
                 return ApiResponse.ServerError(ex.Message);
             }
-
         }
 
         [HttpGet("{addressId}")]
@@ -77,9 +76,6 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-
-
-
 
         [HttpPut("{addressId}")]
         public async Task<IActionResult> UpdateAddress(Guid addressId, Address updateAddress)

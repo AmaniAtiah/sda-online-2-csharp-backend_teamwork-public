@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
-    [ApiController]//api controllers
-    [Route("/api/orders")] // for httpget
+    [ApiController]
+    [Route("/api/orders")] 
     public class OrderController : ControllerBase
     {
         private readonly OrderService _orderServices;
@@ -15,6 +15,7 @@ namespace Backend.Controllers
         {
             _orderServices = new OrderService(appDbContext);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -64,6 +65,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+        
         [HttpPost("{orderId:guid}")]
         public async Task<IActionResult> AddProductToOrder(Guid orderId, Guid productId)
         {

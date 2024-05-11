@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using Backend.Services;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.EntityFramework;
 using Backend.Dtos;
@@ -90,7 +87,6 @@ namespace Backend.Services
                 return true;
             }
             return false;
-
         }
     }
 }
