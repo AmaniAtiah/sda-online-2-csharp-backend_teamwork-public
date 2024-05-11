@@ -39,6 +39,17 @@ namespace Backend.EntityFramework
             ////////////////////////*Address*////////////////////////
             modelBuilder.Entity<Address>().HasKey(a => a.AddressId);//PK
             modelBuilder.Entity<Address>().Property(a => a.AddressId).IsRequired().ValueGeneratedOnAdd();//Generate id
+            modelBuilder.Entity<Address>().Property(a => a.AddressLine).IsRequired();
+            modelBuilder.Entity<Address>().Property(a => a.City).IsRequired();
+            modelBuilder.Entity<Address>().Property(a => a.Country).IsRequired();
+            modelBuilder.Entity<Address>().Property(a => a.State).IsRequired();
+            modelBuilder.Entity<Address>().Property(a => a.ZipCode).IsRequired();
+            modelBuilder.Entity<Address>()
+            .HasOne(a => a.User)
+            .WithMany(u => u.Addresses)
+            .HasForeignKey(a => a.UserId)
+            .IsRequired();
+
             //Relations:
             //1 to many
             //User And Addresses:

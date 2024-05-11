@@ -31,7 +31,7 @@ namespace Backend.Models
         public string? ZipCode { get; set; }
         //Relations:
         [Required(ErrorMessage = "UserId is required")]
-        public Guid UserId { get; set; }
+        public Guid UserId { get; set; } //FK
         public User? User { get; set; }
         public List<Order> Orders { get; set; } = new List<Order>();//1-many relation
     }
