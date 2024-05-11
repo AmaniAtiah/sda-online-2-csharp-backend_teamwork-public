@@ -6,7 +6,6 @@ namespace Backend.Models
 {
     [Table("Address")]
     public class Address
-
     {
         public Guid AddressId { get; set; }
 

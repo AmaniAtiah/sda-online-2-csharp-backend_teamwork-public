@@ -1,14 +1,13 @@
 using Backend.Dtos;
 using Backend.EntityFramework;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
-    [ApiController]//api controllers
-    [Route("/api/products")] // for httpget
+    [ApiController]
+    [Route("/api/products")] 
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productServices;
@@ -16,6 +15,7 @@ namespace Backend.Controllers
         {
             _productServices = new ProductService(appDbContext);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
@@ -29,6 +29,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpGet("{productId:guid}")]
         public async Task<IActionResult> GetProductById(Guid proudectId)
         {
@@ -46,6 +47,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> AddProduct(Product newProduct)
         {
@@ -95,7 +97,6 @@ namespace Backend.Controllers
             {
                 return ApiResponse.ServerError(ex.Message);
             }
-
         }
         [HttpGet("searchkeyword")]
         public async Task<IActionResult> SearchProducts(string searchkeyword)

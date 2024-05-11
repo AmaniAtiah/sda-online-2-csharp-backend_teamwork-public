@@ -1,7 +1,7 @@
-
 using Backend.Dtos;
 using Backend.EntityFramework;
 using AutoMapper;
+using Backend.Models;
 
 namespace Backend.Mapper
 {
@@ -10,7 +10,7 @@ namespace Backend.Mapper
         public MappingProfile()
         {
             CreateMap<User, UserDto>();
+            CreateMap<Category, CategoryDto>();
         }
-        
     }
 }
