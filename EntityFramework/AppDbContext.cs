@@ -35,6 +35,8 @@ namespace Backend.EntityFramework
             ////////////////////////*Category*////////////////////////
             modelBuilder.Entity<Category>().HasKey(c => c.CategoryId);//PK
             modelBuilder.Entity<Category>().Property(c => c.CategoryId).IsRequired().ValueGeneratedOnAdd();//Generate id
+            modelBuilder.Entity<Category>().Property(c => c.Name).IsRequired().HasMaxLength(50);
+            modelBuilder.Entity<Category>().Property(c => c.Description).HasMaxLength(0);
             ////////////////////////*Product*////////////////////////
             modelBuilder.Entity<Product>().HasKey(p => p.ProductId);//PK
             modelBuilder.Entity<Product>().Property(p => p.ProductId).IsRequired().ValueGeneratedOnAdd();//Generate id

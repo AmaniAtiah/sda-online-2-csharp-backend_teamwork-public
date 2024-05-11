@@ -19,13 +19,13 @@ namespace Backend.Services
         public string GenerateJwt(UserDto user)
         {
 
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);//the key from configuration
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] {
+                Subject = new ClaimsIdentity(new[] { //Descripe the token through useing claim
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Role, user.IsAdmin? "Admin" : "User"),
+                new Claim(ClaimTypes.Role, user.IsAdmin? "Admin" : "User"),//using role to specify user and admin
             }),
 
                 Expires = DateTime.UtcNow.AddMinutes(10),
@@ -35,7 +35,7 @@ namespace Backend.Services
                 Audience = _configuration["Jwt:Audience"],
             };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler(); // create token
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);

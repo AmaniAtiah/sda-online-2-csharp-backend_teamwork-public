@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Models
 {
-  [Table("Category")]
+  [Table("Categories")]
   public class Category
   {
     public Guid CategoryId { get; set; }
@@ -11,7 +11,7 @@ namespace Backend.Models
     [Required(ErrorMessage = "Category name is requierd")]
     [MinLength(2, ErrorMessage = "Category name must be at least 2 characters.")]
     [MaxLength(50, ErrorMessage = "Category name must not exceed 50 characters.")]
-    public required string category_name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public string Slug { get; set; } = string.Empty;
 

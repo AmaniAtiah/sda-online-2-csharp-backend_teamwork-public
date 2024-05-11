@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Backend.Dtos;
@@ -41,7 +40,7 @@ namespace Backend.Controllers
         public async Task<IActionResult> GetUserById(Guid userId)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-          
+
             if (string.IsNullOrEmpty(userIdString))
             {
                 return ApiResponse.UnAuthorized("User Id is misisng from token");
@@ -60,15 +59,15 @@ namespace Backend.Controllers
         {
             if (!ModelState.IsValid)
             {
-             throw new ValidationException("Invalid User Data");
+                throw new ValidationException("Invalid User Data");
             }
-            var newUser = await _userService.CreateUserAsync(newUserData);
+            var newUser = await _userService.AddUserAsync(newUserData);
             return ApiResponse.Created(newUser, "User created successfully");
         }
 
         [Authorize]
         [HttpPut("profile")]
-        public async Task<IActionResult> UpdateUser(Guid userId,UpdateUserDto updateUserDto)
+        public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -84,7 +83,7 @@ namespace Backend.Controllers
 
             if (!ModelState.IsValid)
             {
-             throw new ValidationException("Invalid User Data");
+                throw new ValidationException("Invalid User Data");
             }
 
             var updateUser = await _userService.UpdateUserAsync(userId, updateUserDto) ?? throw new NotFoundException("User not found");
@@ -100,8 +99,24 @@ namespace Backend.Controllers
             }
             var loggedInUser = await _userService.LoginUserAsync(loginDto);
             var token = _authService.GenerateJwt(loggedInUser);
-    
             return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
         }
-    }
+
+        [Authorize]
+        [HttpDelete("profile")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return ApiResponse.UnAuthorized("User Id is misisng from token");
+            }
+            if (!Guid.TryParse(userIdString, out userId))
+            {
+                return ApiResponse.BadRequest("Invalid User Id");
+            }
+            await _userService.DeleteUserAsync(userId);
+            return NoContent();
+        }
+    }   
 }

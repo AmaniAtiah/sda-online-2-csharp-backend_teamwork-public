@@ -2,66 +2,98 @@ using Microsoft.EntityFrameworkCore;
 using Backend.EntityFramework;
 using Backend.Helpers;
 using Backend.Models;
-
+using Backend.Dtos;
+using Backend.Dtos.Pagination;
+using AutoMapper;
 
 namespace Backend.Services
 {
-  public class CategoryService
-  {
-    private readonly AppDbContext _appDbContext;
-    public CategoryService(AppDbContext appDbContext)
+    public class CategoryService
     {
-      _appDbContext = appDbContext;
+        private readonly AppDbContext _appDbContext;
+        private readonly IMapper _mapper;
+
+        public CategoryService(AppDbContext appDbContext, IMapper mapper)
+        {
+            _appDbContext = appDbContext;
+            _mapper = mapper;
+        }
+
+        public async Task<PaginationResult<CategoryDto>> GetAllCategoryAsync(int pageNumber, int pageSize)
+        {
+            try
+            {
+                var totalCategoryCount = await _appDbContext.Categories.CountAsync();
+
+                var categories = await _appDbContext.Categories
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var categoryDtos = _mapper.Map<List<CategoryDto>>(categories);
+
+                return new PaginationResult<CategoryDto>
+                {
+                    Items = categoryDtos,
+                    TotalCount = totalCategoryCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException("An error occurred while retrieving categories.", e);
+            }
+        }
+
+        public async Task<CategoryDto> GetCategoryByIdAsync(Guid categoryId)
+        {
+            var category = await _appDbContext.Categories.FindAsync(categoryId);
+            var categoryDtos = _mapper.Map<CategoryDto>(category);
+            return categoryDtos;
+        }
+
+        public async Task<CategoryDto> AddCategoryAsync(CategoryDto newCategory)
+        {
+            var category = new Category
+            {
+                Name = newCategory.Name,
+                Description = newCategory.Description,
+            };
+            _appDbContext.Categories.Add(category);
+            await _appDbContext.SaveChangesAsync();
+            var newCategoryDto = new CategoryDto
+            {
+                CategoryId = category.CategoryId,
+                Name = category.Name,
+                Description = category.Description,
+            };
+            return newCategoryDto;
+        }
+
+        public async Task<Category?> UpdateCategoryAsync(Guid categoryId, CategoryDto updateCategory)
+        {
+            var existingCategory = await _appDbContext.Categories.FindAsync(categoryId);
+            if (existingCategory != null)
+            {
+                existingCategory.Name = updateCategory.Name ?? existingCategory.Name;
+                existingCategory.Slug = SlugResponse.GenerateSlug(existingCategory.Name);
+                existingCategory.Description = updateCategory.Description ?? existingCategory.Description;
+                await _appDbContext.SaveChangesAsync();
+            }
+            return existingCategory;
+        }
+
+        public async Task<bool> DeleteCategoryAsync(Guid categoryId)
+        {
+            var categoryToRemove = await _appDbContext.Categories.FindAsync(categoryId);
+            if (categoryToRemove != null)
+            {
+                _appDbContext.Categories.Remove(categoryToRemove);
+                await _appDbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
-
-    public async Task<IEnumerable<Category>> GetAllCategoryService()
-    {
-      return await _appDbContext.Categories.Include(c => c.Products).ToListAsync();
-    }
-
-    public async Task<Category?> GetCategoryById(Guid categoryId)
-    {
-      return await _appDbContext.Categories.FindAsync(categoryId);
-    }
-
-    public async Task<Category> AddCategoryService(Category newCategory)
-    {
-      var categories = new Category
-      {
-        CategoryId = Guid.NewGuid(),
-        category_name = newCategory.category_name,
-        Slug = SlugResponse.GenerateSlug(newCategory.category_name),
-        Description = newCategory.Description
-      };
-
-      _appDbContext.Categories.Add(newCategory);
-      await _appDbContext.SaveChangesAsync();
-
-      return newCategory;
-    }
-
-    public async Task<Category?> UpdateCategoryService(Guid categoryId, Category updateCategory)
-    {
-      var existingCategory = await _appDbContext.Categories.FindAsync(categoryId);
-      if (existingCategory != null)
-      {
-        existingCategory.category_name = updateCategory.category_name ?? existingCategory.category_name;
-        existingCategory.Description = updateCategory.Description ?? existingCategory.category_name;
-        await _appDbContext.SaveChangesAsync();
-      }
-      return existingCategory;
-    }
-
-    public async Task<bool> DeleteCategoryService(Guid categoryId)
-    {
-      var categoryToRemove = await _appDbContext.Categories.FindAsync(categoryId);
-      if (categoryToRemove != null)
-      {
-        _appDbContext.Categories.Remove(categoryToRemove);
-        await _appDbContext.SaveChangesAsync();
-        return true;
-      }
-      return false;
-    }
-  }
 }
