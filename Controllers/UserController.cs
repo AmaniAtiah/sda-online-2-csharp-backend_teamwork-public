@@ -128,6 +128,24 @@ namespace Backend.Controllers
 
         }
 
+            [Authorize]
+        [HttpDelete("profile")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return ApiResponse.UnAuthorized("User Id is misisng from token");
+            }
+            if (!Guid.TryParse(userIdString, out userId))
+            {
+                return ApiResponse.BadRequest("Invalid User Id");
+            }
+            await _userService.DeleteUserAsync(userId);
+            return NoContent();
+
+        }
+
 
     
 

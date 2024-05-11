@@ -166,5 +166,16 @@ namespace Backend.Services
            
         }
 
+            public async Task DeleteUserAsync(Guid userId)
+        {
+            var userToRemove = await _appDbContext.Users.FindAsync(userId);
+            if (userToRemove!= null)
+            {
+                _appDbContext.Users.Remove(userToRemove);
+                await _appDbContext.SaveChangesAsync();
+            }
+        }
+
+
     }
 }
