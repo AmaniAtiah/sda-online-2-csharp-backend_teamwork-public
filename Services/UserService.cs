@@ -21,8 +21,6 @@ namespace Backend.Services
             _mapper = mapper;
         }
 
-
-
         public async Task<PaginationResult<UserDto>> GetAllUsersAsync(int pageNumber, int pageSize)
         {
             var totalUserAccount = await _appDbContext.Users.CountAsync();
@@ -40,21 +38,17 @@ namespace Backend.Services
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
-
         }
 
         public async Task<UserDto?> GetUserByIdAsync(Guid userId)
         {
-
             var user = await _appDbContext.Users.FindAsync(userId);
             var userDto = _mapper.Map<UserDto>(user);
             return userDto;
-
-
         }
-        public async Task<UserDto> CreateUserAsync(CreateUserDto newUserData)
-        {
 
+        public async Task<UserDto> AddUserAsync(CreateUserDto newUserData)
+        {
             var user = new User
             {
                 UserName = newUserData.UserName,
@@ -64,8 +58,6 @@ namespace Backend.Services
                 Email = newUserData.Email,
                 Password = _passwordHasher.HashPassword(null, newUserData.Password),
                 IsAdmin = newUserData.IsAdmin,
-
-
             };
             _appDbContext.Users.Add(user);
             await _appDbContext.SaveChangesAsync();
@@ -82,20 +74,12 @@ namespace Backend.Services
                 UpdatedAt = user.UpdatedAt,
                 Addresses = user.Addresses,
                 Orders = user.Orders
-
-
             };
             return newUserDto;
-
-
-
-
         }
 
         public async Task<UserDto> UpdateUserAsync(Guid userId, UpdateUserDto userData)
         {
-
-
             var existingUser = await _appDbContext.Users.FindAsync(userId);
 
             if (existingUser == null)
@@ -126,14 +110,10 @@ namespace Backend.Services
                 Orders = existingUser.Orders
             };
             return updatedUserDto;
-
-
-
         }
 
         public async Task<UserDto?> LoginUserAsync(LoginDto loginDto)
         {
-
             var user = await _appDbContext.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
             if (user == null)
             {
@@ -143,7 +123,6 @@ namespace Backend.Services
             if (result == PasswordVerificationResult.Failed)
             {
                 return null;
-
             }
             var userDto = new UserDto
             {
@@ -156,15 +135,11 @@ namespace Backend.Services
                 IsAdmin = user.IsAdmin,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
-
-
             };
             return userDto;
-
-
         }
 
-            public async Task DeleteUserAsync(Guid userId)
+        public async Task DeleteUserAsync(Guid userId)
         {
             var userToRemove = await _appDbContext.Users.FindAsync(userId);
             if (userToRemove!= null)
@@ -173,7 +148,5 @@ namespace Backend.Services
                 await _appDbContext.SaveChangesAsync();
             }
         }
-
-
     }
 }

@@ -1,53 +1,41 @@
-
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace Backend.Controllers
 {
     public static class ApiResponse
     {
-
         public static IActionResult Success<T>(T Data, string message = "Success")
         {
             return new ObjectResult(new ApiResponseTemplate<T>(true, Data, message, 200));
-
         }
-
         public static IActionResult Created<T>(T data, string message = "Resource Created")
         {
             return new ObjectResult(new ApiResponseTemplate<T>(true, data, message, 201));
         }
-
         public static IActionResult NotFound(string message = "Resource not found")
         {
             return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 404));
         }
-
         public static IActionResult Conflict(string message = "Conflict Detected")
         {
             return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 409));
         }
-
         public static IActionResult BadRequest(string message = "Bad request")
         {
             return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 400));
         }
-
         public static IActionResult UnAuthorized(string message = "Unauthorized access")
         {
             return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 401));
         }
-
         public static IActionResult Forbidden(string message = "Forbidden access")
         {
             return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 403));
         }
-
         public static IActionResult ServerError(string message = "Internal server error")
         {
             return new ObjectResult(new ApiResponseTemplate<object>(false, null, message, 500));
         }
-
     }
     public class ApiResponseTemplate<T>
     {
@@ -64,7 +52,5 @@ namespace Backend.Controllers
             StatusCode = statusCode;
 
         }
-
     }
-
 }

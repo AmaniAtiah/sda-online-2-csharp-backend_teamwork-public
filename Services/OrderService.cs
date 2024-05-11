@@ -19,26 +19,18 @@ namespace Backend.Services
         }
         public async Task<IEnumerable<OrderDtos>> GetAllOrdersAsync()
         {
-            try
-            {
-                //return await _appDbContext.Orders.ToListAsync();
-                var orders = await _appDbContext.Orders
-               .Select(order => new OrderDtos
-               {
-                   OrderId = order.OrderId,
-                   OrderDate = order.OrderDate,
-                   TotalPrice = order.TotalPrice,
-                   Status = order.Status,
-                   UserId = order.UserId
-               })
-               .ToListAsync();
-                return orders;
-            }
-
-            catch (Exception e)
-            {
-                throw new ApplicationException("An error occurred while retrieving order.", e);
-            }
+            //return await _appDbContext.Orders.ToListAsync();
+            var orders = await _appDbContext.Orders
+           .Select(order => new OrderDtos
+           {
+               OrderId = order.OrderId,
+               OrderDate = order.OrderDate,
+               TotalPrice = order.TotalPrice,
+               Status = order.Status,
+               UserId = order.UserId
+           })
+           .ToListAsync();
+            return orders;
         }
         public async Task<Order?> GetOrderAsync(Guid OrderId)
         {

@@ -3,6 +3,7 @@ using System;
 using Backend.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240511054225_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,34 +139,21 @@ namespace Backend.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
- main
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("category_name")
-                        .HasMaxLength(0)
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
- 
-                    b.HasKey("CategoryId");
-
-                    b.ToTable("Category");
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("Backend.Models.Order", b =>
@@ -178,8 +168,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 8, 53, 35, 686, DateTimeKind.Utc).AddTicks(9759));
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 6, 4, 54, 812, DateTimeKind.Utc).AddTicks(1967));
+                        .HasDefaultValue(new DateTime(2024, 5, 11, 5, 42, 25, 154, DateTimeKind.Utc).AddTicks(7968));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -220,11 +209,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
- 
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 8, 53, 35, 686, DateTimeKind.Utc).AddTicks(8993));
-
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 6, 4, 54, 812, DateTimeKind.Utc).AddTicks(1054));
- 
+                        .HasDefaultValue(new DateTime(2024, 5, 11, 5, 42, 25, 154, DateTimeKind.Utc).AddTicks(7021));
 
                     b.Property<string>("Description")
                         .IsRequired()

@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Dtos.Pagination;
-using Microsoft.AspNetCore.Mvc;
-using Backend.Services;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Dtos;
 using Backend.EntityFramework;
@@ -45,10 +42,12 @@ namespace Backend.Services
             };
 
         }
+
         public async Task<Product?> GetProductAsync(Guid ProductId)
         {
             return await _appDbContext.Products.FindAsync(ProductId);
         }
+
         public async Task<Product> AddProductAsync(Product newProduct)
         {
             Product product = new Product
@@ -84,6 +83,7 @@ namespace Backend.Services
             }
             throw new Exception("Product not found");
         }
+
         public async Task<bool> DeleteUserAsync(Guid productId)
         {
 

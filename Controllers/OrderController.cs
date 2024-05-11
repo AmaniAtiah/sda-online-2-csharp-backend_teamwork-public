@@ -1,6 +1,5 @@
 using Backend.Dtos;
 using Backend.EntityFramework;
-using Backend.Helpers;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +32,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetOrderById(Guid orderId)
         {
@@ -50,6 +50,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> AddOrder(Order newOrder)
         {
@@ -112,7 +113,6 @@ namespace Backend.Controllers
             {
                 return ApiResponse.ServerError(ex.Message);
             }
-
         }
     }
 }
