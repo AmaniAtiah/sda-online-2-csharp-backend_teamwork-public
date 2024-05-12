@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.Dtos
 {
-    public class CreateUserDto
+    public class RegisterDto
     {
+
         [Required(ErrorMessage = "User Name is required")]
         [MaxLength(32,ErrorMessage = "User Name must be less than 32 character")]
         [MinLength(2,ErrorMessage = "User Name must be at least 2 character")]

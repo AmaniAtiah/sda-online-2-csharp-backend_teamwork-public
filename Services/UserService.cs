@@ -32,6 +32,13 @@ namespace Backend.Services
 
             var userDtos = _mapper.Map<List<UserDto>>(users);
 
+            foreach(var userDto in userDtos) {
+                if(userDto.IsAdmin) {
+                    userDto.Addresses = null;
+                    userDto.Orders = null;
+                }
+            }
+
             return new PaginationResult<UserDto>
             {
                 Items = userDtos,
@@ -39,16 +46,22 @@ namespace Backend.Services
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+            
         }
 
         public async Task<UserDto?> GetUserByIdAsync(Guid userId)
         {
             var user = await _appDbContext.Users.FindAsync(userId);
             var userDto = _mapper.Map<UserDto>(user);
+            if (userDto.IsAdmin)
+            {
+                userDto.Addresses = null;
+                userDto.Orders = null;
+            }
             return userDto;
         }
 
-        public async Task<UserDto> AddUserAsync(CreateUserDto newUserData)
+        public async Task<UserDto> AddUserAsync(RegisterDto newUserData)
         {
             var user = new User
             {
@@ -62,21 +75,14 @@ namespace Backend.Services
             };
             _appDbContext.Users.Add(user);
             await _appDbContext.SaveChangesAsync();
-            var newUserDto = new UserDto
+         
+              var userDto = _mapper.Map<UserDto>(user);
+            if (userDto.IsAdmin)
             {
-                UserId = user.UserId,
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                IsAdmin = user.IsAdmin,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt,
-                Addresses = user.Addresses,
-                Orders = user.Orders
-            };
-            return newUserDto;
+                userDto.Addresses = null;
+                userDto.Orders = null;
+            }
+            return userDto;
         }
 
         public async Task<UserDto> UpdateUserAsync(Guid userId, UpdateUserDto userData)
@@ -96,21 +102,13 @@ namespace Backend.Services
 
             await _appDbContext.SaveChangesAsync();
 
-            var updatedUserDto = new UserDto
+               var userDto = _mapper.Map<UserDto>(existingUser);
+            if (userDto.IsAdmin)
             {
-                UserId = existingUser.UserId,
-                UserName = existingUser.UserName,
-                FirstName = existingUser.FirstName,
-                LastName = existingUser.LastName,
-                PhoneNumber = existingUser.PhoneNumber,
-                Email = existingUser.Email,
-                IsAdmin = existingUser.IsAdmin,
-                CreatedAt = existingUser.CreatedAt,
-                UpdatedAt = existingUser.UpdatedAt,
-                Addresses = existingUser.Addresses,
-                Orders = existingUser.Orders
-            };
-            return updatedUserDto;
+                userDto.Addresses = null;
+                userDto.Orders = null;
+            }
+            return userDto;
         }
 
         public async Task<UserDto?> LoginUserAsync(LoginDto loginDto)
@@ -125,18 +123,12 @@ namespace Backend.Services
             {
                 return null;
             }
-            var userDto = new UserDto
+               var userDto = _mapper.Map<UserDto>(user);
+            if (userDto.IsAdmin)
             {
-                UserId = user.UserId,
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                IsAdmin = user.IsAdmin,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt,
-            };
+                userDto.Addresses = null;
+                userDto.Orders = null;
+            }
             return userDto;
         }
 
@@ -151,20 +143,20 @@ namespace Backend.Services
         }
 
 
-         public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
-        {
-            return await _appDbContext.Addresses
-             .Where(p => p.UserId == userId)
-             .Select(p => new Address
-             {
-                 AddressId = p.AddressId,
-                 AddressLine = p.AddressLine,
-                 City = p.City,
-                 State = p.State,
-                 Country = p.Country,
-                 ZipCode = p.ZipCode,
-                 UserId = p.UserId
-             }).ToListAsync();
-        }
+        //  public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
+        // {
+        //     return await _appDbContext.Addresses
+        //      .Where(p => p.UserId == userId)
+        //      .Select(p => new Address
+        //      {
+        //          AddressId = p.AddressId,
+        //          AddressLine = p.AddressLine,
+        //          City = p.City,
+        //          State = p.State,
+        //          Country = p.Country,
+        //          ZipCode = p.ZipCode,
+        //          UserId = p.UserId
+        //      }).ToListAsync();
+        // }
     }
 }

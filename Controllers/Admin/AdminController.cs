@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Backend.Dtos;
 using Backend.Dtos.User;
-using Backend.EntityFramework;
 using Backend.Middlewares;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,20 +9,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
+
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("/api/admins")]
     public class AdminController : ControllerBase
     {
         private readonly UserService _userService;
-        private readonly AuthService _authService;
 
-        public AdminController(UserService userService, AuthService authService)
+        public AdminController(UserService userService)
         {
             _userService = userService;
-            _authService = authService;
         }
 
-        [Authorize(Roles = "Admin")]
+
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
         {
@@ -37,37 +36,53 @@ namespace Backend.Controllers
             return ApiResponse.Success(users, "All users are returned successfully");
         }
 
-        [Authorize]
+
         [HttpGet("profile")]
-        public async Task<IActionResult> GetUserById(Guid userId)
+        // display profile admin
+        public async Task<IActionResult> GetAdminProfile(Guid userId)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (string.IsNullOrEmpty(userIdString))
             {
                 return ApiResponse.UnAuthorized("User Id is misisng from token");
             }
-
             if (!Guid.TryParse(userIdString, out userId))
             {
                 return ApiResponse.BadRequest("Invalid User Id");
             }
+
+            var user = await _userService.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
+            return ApiResponse.Success(user, "User profile is returned successfully");
+        }
+
+
+        [HttpGet("users/{userId}")]
+
+        // admin can show any details user
+        public async Task<IActionResult> GetUserById(Guid userId)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+            if (!isAdmin)
+            {
+                return ApiResponse.Forbidden("Only admin can visit this route");
+            }
+
             var user = await _userService.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
             return ApiResponse.Success(user, "User profile is returned successfully");
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto newUserData)
+        public async Task<IActionResult> CreateUser([FromBody] RegisterDto registerDto)
         {
             if (!ModelState.IsValid)
             {
                 throw new ValidationException("Invalid User Data");
             }
-            var newUser = await _userService.AddUserAsync(newUserData);
+            var newUser = await _userService.AddUserAsync(registerDto);
             return ApiResponse.Created(newUser, "User created successfully");
         }
 
-        [Authorize]
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
         {
@@ -92,17 +107,7 @@ namespace Backend.Controllers
             return ApiResponse.Success(updateUser, "User updated successfully");
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return ApiResponse.BadRequest("Invalid user data");
-            }
-            var loggedInUser = await _userService.LoginUserAsync(loginDto);
-            var token = _authService.GenerateJwt(loggedInUser);
-            return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
-        }
+
 
         [Authorize]
         [HttpDelete("profile")]
@@ -121,18 +126,7 @@ namespace Backend.Controllers
             return NoContent();
         }
 
-        [Authorize]
-        [HttpGet("addresses")]
-        public async Task<IActionResult> GetAllAddressesByUserId()
-        {
-             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid  userId))
-                {
-                    return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
-                }
-                var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
-                return ApiResponse.Success(addresses, "All addresses retrieved successfully");
 
-        }
-    }   
+
+    }
 }

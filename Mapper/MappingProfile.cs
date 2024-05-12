@@ -5,11 +5,12 @@ using Backend.Models;
 
 namespace Backend.Mapper
 {
-    public class MappingProfile: Profile
+    public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             CreateMap<User, UserDto>();
+   
             CreateMap<Category, CategoryDto>();
             CreateMap<Product, ProductDtos>();
         }

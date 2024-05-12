@@ -1,11 +1,14 @@
+using System.Security.Claims;
 using Backend.Dtos;
 using Backend.EntityFramework;
 using Backend.Models;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("/api/admin/products")] 
     // admin can show all products and add or delete 
@@ -23,6 +26,11 @@ namespace Backend.Controllers
         {
             try
             {
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize);
                 return ApiResponse.Success(products, "All Product are returned successfully");
             }
@@ -37,6 +45,11 @@ namespace Backend.Controllers
         {
             try
             {
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var product = await _productServices.GetProductAsync(proudectId);
                 if (product == null)
                 {
@@ -55,6 +68,11 @@ namespace Backend.Controllers
         {
             try
             {
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var createdProduct = await _productServices.AddProductAsync(newProduct);
                 return ApiResponse.Created(createdProduct, "Product is added successfully");
             }
@@ -69,6 +87,11 @@ namespace Backend.Controllers
         {
             try
             {
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var productToUpdate = await _productServices.UpdateProductAsync(proudectId, updateProudect);
                 if (productToUpdate == null)
                 {
@@ -87,6 +110,11 @@ namespace Backend.Controllers
         {
             try
             {
+                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (!isAdmin)
+                {
+                    return ApiResponse.Forbidden("Only admin can visit this route");
+                }
                 var result = await _productServices.DeleteUserAsync(productId);
                 if (!result)
                 {
