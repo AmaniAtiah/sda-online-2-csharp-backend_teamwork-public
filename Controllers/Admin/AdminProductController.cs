@@ -22,7 +22,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
+        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3, [FromQuery] string sortBy = "price", [FromQuery] string sortDirection = "asc")
         {
             try
             {
@@ -31,7 +31,7 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.Forbidden("Only admin can visit this route");
                 }
-                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize);
+                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize, sortBy, sortDirection);
                 return ApiResponse.Success(products, "All Product are returned successfully");
             }
             catch (Exception ex)

@@ -15,29 +15,74 @@ namespace Backend.Services
         {
             _appDbContext = appcontext;
         }
-        public async Task<PaginationResult<ProductDtos>> GetAllProductsAsync(int pageNumber, int pageSize)
+        public async Task<PaginationResult<ProductDtos>> GetAllProductsAsync(int pageNumber, int pageSize, string sortBy, string sortDirection)
         {
-            var totalProductAccount = await _appDbContext.Products.CountAsync();
-            var products = await _appDbContext.Products
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .Select(product => new ProductDtos
+            try
             {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Color = product.Color,
-                Size = product.Size,
-                Brand = product.Brand,
-            })
-            .ToListAsync();
-            return new PaginationResult<ProductDtos>
+                // Validate sortBy and sortDirection parameters
+                if (!IsValidSortBy(sortBy) || !IsValidSortDirection(sortDirection))
+                {
+                    throw new ArgumentException("Invalid sortBy or sortDirection values.");
+                }
+
+                var query = _appDbContext.Products.AsQueryable();
+
+                // Sorting
+                switch (sortBy.ToLower())
+                {
+                    case "price":
+                        query = sortDirection.ToLower() == "desc" ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+                        break;
+                    case "date":
+                        query = sortDirection.ToLower() == "desc" ? query.OrderBy(p => p.CreateAt) : query.OrderByDescending(p => p.CreateAt);
+                        break;
+                    default:
+                        // Default sorting if sortBy parameter is not recognized
+                        query = query.OrderBy(p => p.ProductId);
+                        break;
+                }
+
+                var totalProductCount = await query.CountAsync();
+
+                // Pagination
+                var products = await query
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(product => new ProductDtos
+                    {
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = product.Price,
+                        Color = product.Color,
+                        Size = product.Size,
+                        Brand = product.Brand
+                    })
+                    .ToListAsync();
+
+                return new PaginationResult<ProductDtos>
+                {
+                    Items = products,
+                    TotalCount = totalProductCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+            }
+            catch (Exception ex)
             {
-                Items = products,
-                TotalCount = totalProductAccount,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
+                throw new Exception("An error occurred while fetching products. Please try again later.", ex);
+            }
+        }
+
+        // Helper method to validate sortBy parameter
+        private bool IsValidSortBy(string sortBy)
+        {
+            return sortBy != null && (sortBy.ToLower() == "price" || sortBy.ToLower() == "date");
+        }
+
+        // Helper method to validate sortDirection parameter
+        private bool IsValidSortDirection(string sortDirection)
+        {
+            return sortDirection != null && (sortDirection.ToLower() == "asc" || sortDirection.ToLower() == "desc");
         }
 
         public async Task<Product?> GetProductAsync(Guid ProductId)
