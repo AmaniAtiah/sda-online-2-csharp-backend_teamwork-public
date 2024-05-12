@@ -34,7 +34,7 @@ namespace Backend.Services
             return await _appDbContext.Addresses.Include(address => address.User).FirstOrDefaultAsync(address => address.AddressId == addressId && address.UserId == userId);
         }
 
-         public async Task<Address> AddAddressService(Address newAddress, Guid userId)
+        public async Task<Address> AddAddressService(Address newAddress, Guid userId)
         {
             newAddress.AddressId = Guid.NewGuid();
             newAddress.UserId = userId;
@@ -60,7 +60,7 @@ namespace Backend.Services
 
             // Return the updated address (or null if not found or not belonging to the user)
             return existingAddress;
-        } 
+                    }
 
         public async Task<bool> DeleteAddressService(Guid addressId, Guid userId)
         {
