@@ -52,6 +52,20 @@ namespace Backend.Services
             }
 
         }
+        
+         public async Task<Order?> ShowAddressByAdmin(Guid OrderId)
+        {
+            try
+            {
+                return await _appDbContext.Orders.FirstOrDefaultAsync(address => address.OrderId == OrderId);
+
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException("An error occurred while retrieving order.", e);
+            }
+
+        }
         public async Task<Order> AddOrderAsync(Order newOrder, Guid userId)
         {
 

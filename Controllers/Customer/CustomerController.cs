@@ -57,13 +57,13 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto newUserData)
+        public async Task<IActionResult> CreateUser([FromBody] RegisterDto registerDto)
         {
             if (!ModelState.IsValid)
             {
                 throw new ValidationException("Invalid User Data");
             }
-            var newUser = await _userService.AddUserAsync(newUserData);
+            var newUser = await _userService.AddUserAsync(registerDto);
             return ApiResponse.Created(newUser, "User created successfully");
         }
 
@@ -104,35 +104,35 @@ namespace Backend.Controllers
             return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
         }
 
-        [Authorize]
-        [HttpDelete("profile")]
-        public async Task<IActionResult> DeleteUser(Guid userId)
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return ApiResponse.UnAuthorized("User Id is misisng from token");
-            }
-            if (!Guid.TryParse(userIdString, out userId))
-            {
-                return ApiResponse.BadRequest("Invalid User Id");
-            }
-            await _userService.DeleteUserAsync(userId);
-            return NoContent();
-        }
+        // [Authorize]
+        // [HttpDelete("profile")]
+        // public async Task<IActionResult> DeleteUser(Guid userId)
+        // {
+        //     var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //     if (string.IsNullOrEmpty(userIdString))
+        //     {
+        //         return ApiResponse.UnAuthorized("User Id is misisng from token");
+        //     }
+        //     if (!Guid.TryParse(userIdString, out userId))
+        //     {
+        //         return ApiResponse.BadRequest("Invalid User Id");
+        //     }
+        //     await _userService.DeleteUserAsync(userId);
+        //     return NoContent();
+        // }
 
-        [Authorize]
-        [HttpGet("addresses")]
-        public async Task<IActionResult> GetAllAddressesByUserId()
-        {
-             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid  userId))
-                {
-                    return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
-                }
-                var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
-                return ApiResponse.Success(addresses, "All addresses retrieved successfully");
+        // [Authorize]
+        // [HttpGet("addresses")]
+        // public async Task<IActionResult> GetAllAddressesByUserId()
+        // {
+        //      var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid  userId))
+        //         {
+        //             return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+        //         }
+        //         var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
+        //         return ApiResponse.Success(addresses, "All addresses retrieved successfully");
 
-        }
+        // }
     }   
 }

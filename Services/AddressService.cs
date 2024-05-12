@@ -15,17 +15,18 @@ namespace Backend.Services
 
         public async Task<IEnumerable<AddressDto>> GetAllAddressesAsync()
         {
-            return (IEnumerable<AddressDto>)await _appDbContext.Addresses
-             .Select(p => new Address
-             {
-                 AddressId = p.AddressId,
-                 AddressLine = p.AddressLine,
-                 City = p.City,
-                 State = p.State,
-                 Country = p.Country,
-                 ZipCode = p.ZipCode,
-                 UserId = p.UserId
-             }).ToListAsync();
+            return await _appDbContext.Addresses
+        .Select(p => new AddressDto
+        {
+            AddressId = p.AddressId,
+            AddressLine = p.AddressLine,
+            City = p.City,
+            State = p.State,
+            Country = p.Country,
+            ZipCode = p.ZipCode,
+            UserId = p.UserId
+        })
+        .ToListAsync();
         }
 
         public async Task<Address?> GetAddressById(Guid addressId, Guid userId)
@@ -34,6 +35,11 @@ namespace Backend.Services
             return await _appDbContext.Addresses.Include(address => address.User).FirstOrDefaultAsync(address => address.AddressId == addressId && address.UserId == userId);
         }
 
+        // admin can show one address
+        public async Task<Address?> ShowAddressByAdmin(Guid addressId)
+        {
+            return await _appDbContext.Addresses.FirstOrDefaultAsync(address => address.AddressId == addressId);
+        }
         public async Task<Address> AddAddressService(Address newAddress, Guid userId)
         {
             newAddress.AddressId = Guid.NewGuid();

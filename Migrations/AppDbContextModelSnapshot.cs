@@ -165,7 +165,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 23, 52, 15, 31, DateTimeKind.Utc).AddTicks(1030));
+                        .HasDefaultValue(new DateTime(2024, 5, 12, 16, 44, 7, 823, DateTimeKind.Utc).AddTicks(570));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -206,7 +206,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 5, 11, 23, 52, 15, 31, DateTimeKind.Utc).AddTicks(770));
+                        .HasDefaultValue(new DateTime(2024, 5, 12, 16, 44, 7, 822, DateTimeKind.Utc).AddTicks(9560));
 
                     b.Property<string>("Description")
                         .IsRequired()
