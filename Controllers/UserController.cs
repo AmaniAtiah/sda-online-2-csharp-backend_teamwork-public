@@ -1,109 +1,138 @@
-using Backend.Controllers;
-using Backend.EntityFramework;
-using Backend.Models;
-using Backend.Services;
-using Microsoft.AspNetCore.Mvc;
+// using System.ComponentModel.DataAnnotations;
+// using System.Security.Claims;
+// using Backend.Dtos;
+// using Backend.Dtos.User;
+// using Backend.EntityFramework;
+// using Backend.Middlewares;
+// using Backend.Services;
+// using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Controllers
-{
-    [ApiController]
-    [Route("/api/users")]
-    public class UserController : ControllerBase
-    {
-        private readonly UserService _userService;
-        public UserController(AppDbContext appDbContext)
-        {
-            _userService = new UserService(appDbContext);
-        }
+// namespace Backend.Controllers
+// {
+//     [ApiController]
+//     [Route("/api/users")]
+//     public class UserController : ControllerBase
+//     {
+//         private readonly UserService _userService;
+//         private readonly AuthService _authService;
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            try
-            {
-                var users = await _userService.GetAllUsersAsync();
-                if (users.ToList().Count < 1)
-                {
-                    return ApiResponse.NotFound("No users found");
-                }
-                return ApiResponse.Success(users, "All users are returned");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
+//         public UserController(UserService userService, AuthService authService)
+//         {
+//             _userService = userService;
+//             _authService = authService;
+//         }
 
-        [HttpGet("{userId:guid}")]
-        public async Task<IActionResult> GetUserById(Guid userId)
-        {
-            try
-            {
-                var user = await _userService.GetUserAsync(userId);
-                if (user == null)
-                {
-                    return ApiResponse.NotFound("User was not found");
-                }
-                return ApiResponse.Created(user);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
+//         [Authorize(Roles = "Admin")]
+//         [HttpGet]
+//         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
+//         {
+//             var users = await _userService.GetAllUsersAsync(pageNumber, pageSize);
 
-            }
-        }
+//             var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+//             if (!isAdmin)
+//             {
+//                 return ApiResponse.Forbidden("Only admin can visit this route");
+//             }
+//             return ApiResponse.Success(users, "All users are returned successfully");
+//         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddUser(User user)
-        {
-            try
-            {
-                var response = await _userService.AddUserAsync(user);
-                return ApiResponse.Created(response);
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
+//         [Authorize]
+//         [HttpGet("profile")]
+//         public async Task<IActionResult> GetUserById(Guid userId)
+//         {
+//             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        [HttpPut("{userId:guid}")]
-        public async Task<IActionResult> UpdateUser(Guid UserId, User user)
-        {
-            try
-            {
-                var updateUser = await _userService.UpdateUserAsync(UserId, user);
-                if (updateUser == null)
-                {
-                    return ApiResponse.NotFound("User was not found");
-                }
-                return ApiResponse.Success(updateUser, "User updated successfully");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
+//             if (string.IsNullOrEmpty(userIdString))
+//             {
+//                 return ApiResponse.UnAuthorized("User Id is misisng from token");
+//             }
 
-        [HttpDelete("{userId:guid}")]
-        public async Task<IActionResult> DeleteUser(Guid userId)
-        {
-            try
-            {
-                var result = await _userService.DeleteUserAsync(userId);
-                if (!result)
-                {
-                    return ApiResponse.NotFound("User was not found");
-                }
-                else
-                {
-                    return NoContent();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
-    }
-}
+//             if (!Guid.TryParse(userIdString, out userId))
+//             {
+//                 return ApiResponse.BadRequest("Invalid User Id");
+//             }
+//             var user = await _userService.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
+//             return ApiResponse.Success(user, "User profile is returned successfully");
+//         }
+
+//         [HttpPost]
+//         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto newUserData)
+//         {
+//             if (!ModelState.IsValid)
+//             {
+//                 throw new ValidationException("Invalid User Data");
+//             }
+//             var newUser = await _userService.AddUserAsync(newUserData);
+//             return ApiResponse.Created(newUser, "User created successfully");
+//         }
+
+//         [Authorize]
+//         [HttpPut("profile")]
+//         public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
+//         {
+//             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+//             if (string.IsNullOrEmpty(userIdString))
+//             {
+//                 return ApiResponse.UnAuthorized("User Id is misisng from token");
+//             }
+
+//             if (!Guid.TryParse(userIdString, out userId))
+//             {
+//                 return ApiResponse.BadRequest("Invalid User Id");
+//             }
+
+//             if (!ModelState.IsValid)
+//             {
+//                 throw new ValidationException("Invalid User Data");
+//             }
+
+//             var updateUser = await _userService.UpdateUserAsync(userId, updateUserDto) ?? throw new NotFoundException("User not found");
+//             return ApiResponse.Success(updateUser, "User updated successfully");
+//         }
+
+//         [HttpPost("login")]
+//         public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
+//         {
+//             if (!ModelState.IsValid)
+//             {
+//                 return ApiResponse.BadRequest("Invalid user data");
+//             }
+//             var loggedInUser = await _userService.LoginUserAsync(loginDto);
+//             var token = _authService.GenerateJwt(loggedInUser);
+//             return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
+//         }
+
+//         [Authorize]
+//         [HttpDelete("profile")]
+//         public async Task<IActionResult> DeleteUser(Guid userId)
+//         {
+//             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+//             if (string.IsNullOrEmpty(userIdString))
+//             {
+//                 return ApiResponse.UnAuthorized("User Id is misisng from token");
+//             }
+//             if (!Guid.TryParse(userIdString, out userId))
+//             {
+//                 return ApiResponse.BadRequest("Invalid User Id");
+//             }
+//             await _userService.DeleteUserAsync(userId);
+//             return NoContent();
+//         }
+
+//         [Authorize]
+//         [HttpGet("addresses")]
+//         public async Task<IActionResult> GetAllAddressesByUserId()
+//         {
+//              var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+//                 if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid  userId))
+//                 {
+//                     return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+//                 }
+//                 var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
+//                 return ApiResponse.Success(addresses, "All addresses retrieved successfully");
+
+//         }
+//     }   
+// }

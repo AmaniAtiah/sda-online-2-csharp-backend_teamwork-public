@@ -1,97 +1,155 @@
 using Microsoft.EntityFrameworkCore;
-using Backend.Helpers;
-using Backend.EntityFramework;
+using Backend.Dtos.Pagination;
 using Backend.Models;
+using Backend.Dtos;
+using Backend.EntityFramework;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Services
 {
     public class ProductService
     {
         List<Product> products = new List<Product>();
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _appDbContext;
         public ProductService(AppDbContext appcontext)
         {
-            _dbContext = appcontext;
+            _appDbContext = appcontext;
         }
-        public IEnumerable<Product> GetAllProducts()
+        public async Task<PaginationResult<ProductDtos>> GetAllProductsAsync(int pageNumber, int pageSize, string sortBy, string sortDirection)
         {
-            var dataList = _dbContext.Products.ToList();
-            dataList.ForEach(row => products.Add(new Product
+            try
             {
-                Name = row.Name,
-                Description = row.Description,
-                Price = row.Price,
-                Color = row.Color,
-                Size = row.Size,
-                Brand = row.Brand,
-                Quantity = row.Quantity
-                //CategoriesId = row.CategoriesId
-                // Categories = new Categories
-                // {
+                // Validate sortBy and sortDirection parameters
+                if (!IsValidSortBy(sortBy) || !IsValidSortDirection(sortDirection))
+                {
+                    throw new ArgumentException("Invalid sortBy or sortDirection values.");
+                }
 
-                //     category_id = row.Categories.category_id,
-                //     category_name = row.Categories.category_name,
-                //     description = row.Categories.description
-                // }
+                var query = _appDbContext.Products.AsQueryable();
 
-            }));
-            return products;
+                // Sorting
+                switch (sortBy.ToLower())
+                {
+                    case "price":
+                        query = sortDirection.ToLower() == "desc" ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+                        break;
+                    case "date":
+                        query = sortDirection.ToLower() == "desc" ? query.OrderBy(p => p.CreateAt) : query.OrderByDescending(p => p.CreateAt);
+                        break;
+                    default:
+                        // Default sorting if sortBy parameter is not recognized
+                        query = query.OrderBy(p => p.ProductId);
+                        break;
+                }
+
+                var totalProductCount = await query.CountAsync();
+
+                // Pagination
+                var products = await query
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(product => new ProductDtos
+                    {
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = product.Price,
+                        Color = product.Color,
+                        Size = product.Size,
+                        Brand = product.Brand
+                    })
+                    .ToListAsync();
+
+                return new PaginationResult<ProductDtos>
+                {
+                    Items = products,
+                    TotalCount = totalProductCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while fetching products. Please try again later.", ex);
+            }
         }
-        public Product? FindProductById(Guid id)
+
+        // Helper method to validate sortBy parameter
+        private bool IsValidSortBy(string sortBy)
         {
-            return products.Find(product => product.ProductId == id);
+            return sortBy != null && (sortBy.ToLower() == "price" || sortBy.ToLower() == "date");
         }
-        public Product CreateProductService(Product newProduct)
+
+        // Helper method to validate sortDirection parameter
+        private bool IsValidSortDirection(string sortDirection)
         {
-            //Step1: create record:
+            return sortDirection != null && (sortDirection.ToLower() == "asc" || sortDirection.ToLower() == "desc");
+        }
+
+        public async Task<Product?> GetProductAsync(Guid ProductId)
+        {
+            return await _appDbContext.Products.FindAsync(ProductId);
+        }
+
+        public async Task<Product> AddProductAsync(Product newProduct)
+        {
             Product product = new Product
             {
                 ProductId = Guid.NewGuid(),
                 Name = newProduct.Name,
                 Description = newProduct.Description,
+                Quantity = newProduct.Quantity,
                 Price = newProduct.Price,
                 Color = newProduct.Color,
                 Size = newProduct.Size,
                 Brand = newProduct.Brand,
-                Quantity = newProduct.Quantity,
-                CreateAt = DateTime.UtcNow,
-                CategoriesId = newProduct.CategoriesId
-                // CategoriesId = newProduct.CategoriesId,
+                CategoriesId = newProduct.CategoriesId,
+                CreateAt = DateTime.UtcNow
             };
-            //Step2: Add the record to the context:
-            _dbContext.Products.Add(newProduct);
-            _dbContext.SaveChanges();
-            return newProduct;
+            await _appDbContext.Products.AddAsync(product);
+            await _appDbContext.SaveChangesAsync();
+            return product;
         }
-        public Product? UpdateProductService(Guid productId, Product updateProduct)
+
+        public async Task<Product?> UpdateProductAsync(Guid productId, ProductDtos updateProduct)
         {
-            var existingProduct = _dbContext.Products.FirstOrDefault(p => p.ProductId == productId);
+            var existingProduct = await _appDbContext.Products.FindAsync(productId);
             if (existingProduct != null)
             {
-                existingProduct.Name = updateProduct.Name ?? existingProduct.Name;
-                existingProduct.Description = updateProduct.Description ?? existingProduct.Description;
+                existingProduct.Name = updateProduct.Name.IsNullOrEmpty() ? existingProduct.Name : updateProduct.Name;
+                existingProduct.Description = updateProduct.Description.IsNullOrEmpty() ? existingProduct.Description : updateProduct.Description;
                 existingProduct.Price = updateProduct.Price ?? existingProduct.Price;
-                existingProduct.Color = updateProduct.Color ?? existingProduct.Color;
-                existingProduct.Size = updateProduct.Size ?? existingProduct.Size;
-                existingProduct.Brand = updateProduct.Brand ?? existingProduct.Brand;
-                existingProduct.Quantity = updateProduct.Quantity ?? existingProduct.Quantity;
-                _dbContext.Products.Add(updateProduct);
-                _dbContext.SaveChanges();
-
+                existingProduct.Color = updateProduct.Color.IsNullOrEmpty() ? existingProduct.Color : updateProduct.Color;
+                existingProduct.Size = updateProduct.Size.IsNullOrEmpty() ? existingProduct.Size : updateProduct.Size;
+                existingProduct.Brand = updateProduct.Brand.IsNullOrEmpty() ? existingProduct.Brand : updateProduct.Brand;
+                existingProduct.Quantity = existingProduct.Quantity;
+                existingProduct.CategoriesId = existingProduct.CategoriesId;
+                await _appDbContext.SaveChangesAsync();
+                return existingProduct;
             }
-            return existingProduct;
+            throw new Exception("Product not found");
         }
 
-        public bool DeleteProductService(Guid productId)
+        public async Task<bool> DeleteUserAsync(Guid productId)
         {
-            var productToRemove = _dbContext.Products.FirstOrDefault(p => p.ProductId == productId);
+            var productToRemove = await _appDbContext.Products.FindAsync(productId);
             if (productToRemove != null)
             {
-                _dbContext.Products.Remove(productToRemove);
-                _dbContext.SaveChanges();
+                _appDbContext.Products.Remove(productToRemove);
+                await _appDbContext.SaveChangesAsync();
                 return true;
             }
             return false;
+        }
+
+        public async Task<IEnumerable<Product?>> SearchProductByNameAsync(string searchKeyword)
+        {
+            if (_appDbContext.Products == null)
+            {
+                throw new InvalidOperationException("Product not found");
+            }
+            var foundProducts = await _appDbContext.Products
+            .Where(product => product.Name.Contains(searchKeyword) || product.Name.Contains(searchKeyword)).ToListAsync();
+            return foundProducts;
         }
     }
 }

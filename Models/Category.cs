@@ -1,0 +1,24 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace Backend.Models
+{
+  [Table("Categories")]
+  public class Category
+  {
+    public Guid CategoryId { get; set; }
+
+    [Required(ErrorMessage = "Category name is requierd")]
+    [MinLength(2, ErrorMessage = "Category name must be at least 2 characters.")]
+    [MaxLength(50, ErrorMessage = "Category name must not exceed 50 characters.")]
+    public string Name { get; set; } = string.Empty;
+
+    public string Slug { get; set; } = string.Empty;
+
+    [MaxLength(300, ErrorMessage = "Description cannot exceed 300 characters. Please shorten it and try again..")]
+    public string Description { get; set; } = string.Empty;
+
+    //Relations:
+    public List<Product> Products { get; set; } = new List<Product>();
+  }
+}
