@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [ApiController]//api controllers
-    [Route("/api/customers/orders")] // for httpget
+    [Route("/api/orders")] // for httpget
     // customer can create order and show one order or all orders if orders is created by customer
     public class CustomerOrderController : ControllerBase
     {

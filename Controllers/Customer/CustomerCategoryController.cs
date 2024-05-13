@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/api/customers/categories")]
+    [Route("/api/categories")]
     // customer can show all categories but not  add or delete categories
 
 
