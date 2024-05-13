@@ -84,6 +84,8 @@ namespace Backend.Controllers
         }
 
         [HttpPut("profile")]
+
+        // admin profile
         public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

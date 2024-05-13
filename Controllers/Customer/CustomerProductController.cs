@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/api/customers/products")] 
+    [Route("/api/products")] 
     // customer can show all products but not  add or delete products
 
     public class CustomerProductController : ControllerBase
