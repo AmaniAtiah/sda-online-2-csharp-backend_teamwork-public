@@ -17,6 +17,7 @@ namespace Backend.Services
             _appDbContext = appDbContext;
         }
         public async Task<IEnumerable<OrderDtos>> GetAllOrdersAsync()
+
         {
             try
             {
@@ -52,8 +53,8 @@ namespace Backend.Services
             }
 
         }
-        
-         public async Task<Order?> ShowAddressByAdmin(Guid OrderId)
+
+        public async Task<Order?> ShowAddressByAdmin(Guid OrderId)
         {
             try
             {
@@ -101,7 +102,7 @@ namespace Backend.Services
         {
 
 
-            var order = await _appDbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId &&  o.UserId == userId);
+            var order = await _appDbContext.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
             var product = await _appDbContext.Products.FindAsync(productId);
             if (order != null && product != null)
             {
@@ -115,14 +116,14 @@ namespace Backend.Services
         }
 
 
- 
+
 
         public async Task<Order?> UpdateOrdertAsync(Guid orderId, Order updateOrder, Guid userId)
         {
             try
             {
 
-                var existingOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == orderId  && order.UserId == userId);
+                var existingOrder = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == orderId && order.UserId == userId);
                 if (existingOrder != null)
                 {
                     existingOrder.OrderDate = updateOrder.OrderDate;
@@ -144,7 +145,7 @@ namespace Backend.Services
         {
             try
             {
-                var orderToRemove = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == orderId && order.UserId == userId); 
+                var orderToRemove = await _appDbContext.Orders.FirstOrDefaultAsync(order => order.OrderId == orderId && order.UserId == userId);
                 if (orderToRemove != null)
                 {
                     _appDbContext.Orders.Remove(orderToRemove);

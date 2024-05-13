@@ -21,7 +21,7 @@ namespace Backend.Controllers
         }
         [Authorize(Roles = "User")]
         [HttpGet] //Works 
-        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3)
+        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3, [FromQuery] string sortBy = "", [FromQuery] string sortDirection = "")
         {
             try
             {
@@ -30,7 +30,7 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.Forbidden("Only User can visit this route");
                 }
-                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize);
+                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize, sortBy, sortDirection);
                 return ApiResponse.Success(products, "All Product are returned successfully");
 
             }

@@ -68,33 +68,7 @@ namespace Backend.Controllers
         }
         
   
-////////////////////////////////
-        [HttpPut("{orderId:guid}")]
-        public async Task<IActionResult> UpdateOrder(Guid orderId, Order updateOrder)
-        {
-            try
-            {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString))
-                {
-                    return ApiResponse.UnAuthorized("User Id is misisng from token");
-                }
-                if (!Guid.TryParse(userIdString, out Guid userId))
-                {
-                    return ApiResponse.BadRequest("Invalid User Id");
-                }
-                var updateToOrder = await _orderServices.UpdateOrdertAsync(orderId, updateOrder, userId);
-                if (updateToOrder == null)
-                {
-                    return ApiResponse.NotFound("Order was not found");
-                }
-                return ApiResponse.Success(updateToOrder, "Order updated successfully");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
+
 
      
     }

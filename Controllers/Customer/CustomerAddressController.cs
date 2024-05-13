@@ -10,7 +10,7 @@ namespace Backend.Controllers
 {
     // customer can show all address or one address but can add address or delete
     [ApiController]
-    [Route("/api/customers/address")]
+    [Route("/api/address")]
     public class CustomerAddressController : ControllerBase
     {
         private readonly AddressService _addressService;

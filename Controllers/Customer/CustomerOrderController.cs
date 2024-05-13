@@ -44,7 +44,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpGet("{orderId:guid}")]
-        public async Task<IActionResult> GetOrderById(Guid orderId,Guid userId)//
+        public async Task<IActionResult> GetOrderById(Guid orderId, Guid userId)//
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.Forbidden("Only User can visit this route");
                 }
-                var order = await _orderServices.GetOrderAsync(orderId,userId);//
+                var order = await _orderServices.GetOrderAsync(orderId, userId);//
                 if (order == null)
                 {
                     return ApiResponse.NotFound("Order was not found");
@@ -78,7 +78,7 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.Forbidden("Only User can visit this route");
                 }
-                var createdOrder = await _orderServices.AddOrderAsync(newOrder,userId);//
+                var createdOrder = await _orderServices.AddOrderAsync(newOrder, userId);//
                 return ApiResponse.Created(createdOrder);
             }
             catch (Exception ex)
@@ -98,9 +98,10 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.Forbidden("Only User can visit this route");
                 }
-                await _orderServices.AddProductToOrder(orderId, productId,userId);//
-                return ApiResponse.Created("Products Added to the order successfully");}
-                catch (Exception e)
+                await _orderServices.AddProductToOrder(orderId, productId, userId);//
+                return ApiResponse.Created("Products Added to the order successfully");
+            }
+            catch (Exception e)
             {
                 return ApiResponse.ServerError(e.Message);
             }
