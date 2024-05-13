@@ -20,53 +20,42 @@ namespace Backend.Controllers
             _addressService = addressService;
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllAddresses()
-        {
-            try
-            {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
-                var addresses = await _addressService.GetAllAddressesAsync();
-                return ApiResponse.Success(addresses, "All addresses retrieved successfully");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse.ServerError(ex.Message);
-            }
-        }
-
+        // [HttpGet]
+        // public async Task<IActionResult> GetAllAddresses()
+        // {
+        //     try
+        //     {
+        //         var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+        //         if (!isAdmin)
+        //         {
+        //             return ApiResponse.Forbidden("Only admin can visit this route");
+        //         }
+        //         var addresses = await _addressService.GetAllAddressesAsync();
+        //         return ApiResponse.Success(addresses, "All addresses retrieved successfully");
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return ApiResponse.ServerError(ex.Message);
+        //     }
+        // }
+        [Authorize(Roles = "User")]
         [Authorize]
         [HttpGet("{addressId}")]
         public async Task<IActionResult> GetAddressById(Guid addressId, Guid userId)
         {
             try
             {
-                 var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out  userId))
+                var isUser = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "User");
+                if (!isUser)
                 {
-                    return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+                    return ApiResponse.Forbidden("Only User can visit this route");
                 }
-
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
+                var foundedAddress = await _addressService.GetAddressById(addressId, userId);
+                if (foundedAddress != null)
                 {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
+                    return ApiResponse.Success(foundedAddress, "Address retrieved successfully");
                 }
-                
-                var address = await _addressService.GetAddressById(addressId, userId);
-                if (address != null)
-                {
-                    return ApiResponse.Success(address, "Address retrieved successfully");
-                }
-                else
-                {
-                    return ApiResponse.NotFound("Address was not found");
-                }
+                return ApiResponse.NotFound("Address was not found");
             }
             catch (Exception ex)
             {
@@ -75,8 +64,8 @@ namespace Backend.Controllers
         }
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> AddAddressService([FromBody] AddressDto newAddress)
+        [HttpPost]//Works
+        public async Task<IActionResult> AddAddress([FromBody] AddressDto newAddress)
         {
             try
             {
@@ -118,78 +107,54 @@ namespace Backend.Controllers
         }
 
         [Authorize]
-        [HttpPut("{addressId}")]
-        public async Task<IActionResult> UpdateAddress(Guid addressId, AddressDto updateAddressDto)
+        [HttpPut("{addressId:guid}")]//Works
+        public async Task<IActionResult> UpdateAddress(Guid addressId, Address updateAddres)
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+                var isUser = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "User");
+                if (!isUser)
                 {
-                    return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+                    return ApiResponse.Forbidden("Only User can visit this route");
                 }
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+                var address = await _addressService.UpdateAddressService(addressId, updateAddres);
 
-                var existingAddress = await _addressService.GetAddressById(addressId, userId);
-
-                if (existingAddress == null)
+                if (address == null)
                 {
                     return ApiResponse.NotFound("Address was not found");
                 }
-
-                // Map the properties from the DTO to the existing address
-                existingAddress.AddressLine = updateAddressDto.AddressLine;
-                existingAddress.City = updateAddressDto.City;
-                existingAddress.State = updateAddressDto.State;
-                existingAddress.Country = updateAddressDto.Country;
-                existingAddress.ZipCode = updateAddressDto.ZipCode;
-
-                // Update the address
-                var updatedAddress = await _addressService.UpdateAddressService(addressId, existingAddress, userId);
-
-                if (updatedAddress != null)
-                {
-                    return ApiResponse.Success(updatedAddress, "Address updated successfully");
-                }
-                else
-                {
-                    return ApiResponse.ServerError("Failed to update the address.");
-                }
+                return ApiResponse.Success(address, "Address updated successfully");
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-
-        [HttpDelete("{addressId}")]
+        [Authorize]
+        [HttpDelete("{addressId:guid}")]//Works
         public async Task<IActionResult> DeleteAddress(Guid addressId)
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+                var isUser = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "User");
+                if (!isUser)
                 {
-                    return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+                    return ApiResponse.Forbidden("Only User can visit this route");
                 }
+                var result = await _addressService.DeleteAddressService(addressId);
 
-                var result = await _addressService.DeleteAddressService(addressId, userId);
-                if (result)
-                {
-                    return NoContent();
-                }
-                else
+                if (!result)
                 {
                     return ApiResponse.NotFound("Address was not found");
                 }
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return ApiResponse.ServerError(ex.Message);
             }
+
+
         }
     }
 }

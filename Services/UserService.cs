@@ -32,8 +32,10 @@ namespace Backend.Services
 
             var userDtos = _mapper.Map<List<UserDto>>(users);
 
-            foreach(var userDto in userDtos) {
-                if(userDto.IsAdmin) {
+            foreach (var userDto in userDtos)
+            {
+                if (userDto.IsAdmin)
+                {
                     userDto.Addresses = null;
                     userDto.Orders = null;
                 }
@@ -46,7 +48,7 @@ namespace Backend.Services
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
-            
+
         }
 
         public async Task<UserDto?> GetUserByIdAsync(Guid userId)
@@ -75,8 +77,8 @@ namespace Backend.Services
             };
             _appDbContext.Users.Add(user);
             await _appDbContext.SaveChangesAsync();
-         
-              var userDto = _mapper.Map<UserDto>(user);
+
+            var userDto = _mapper.Map<UserDto>(user);
             if (userDto.IsAdmin)
             {
                 userDto.Addresses = null;
@@ -102,7 +104,7 @@ namespace Backend.Services
 
             await _appDbContext.SaveChangesAsync();
 
-               var userDto = _mapper.Map<UserDto>(existingUser);
+            var userDto = _mapper.Map<UserDto>(existingUser);
             if (userDto.IsAdmin)
             {
                 userDto.Addresses = null;
@@ -123,7 +125,7 @@ namespace Backend.Services
             {
                 return null;
             }
-               var userDto = _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<UserDto>(user);
             if (userDto.IsAdmin)
             {
                 userDto.Addresses = null;
@@ -135,7 +137,7 @@ namespace Backend.Services
         public async Task DeleteUserAsync(Guid userId)
         {
             var userToRemove = await _appDbContext.Users.FindAsync(userId);
-            if (userToRemove!= null)
+            if (userToRemove != null)
             {
                 _appDbContext.Users.Remove(userToRemove);
                 await _appDbContext.SaveChangesAsync();
@@ -143,20 +145,20 @@ namespace Backend.Services
         }
 
 
-        //  public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
-        // {
-        //     return await _appDbContext.Addresses
-        //      .Where(p => p.UserId == userId)
-        //      .Select(p => new Address
-        //      {
-        //          AddressId = p.AddressId,
-        //          AddressLine = p.AddressLine,
-        //          City = p.City,
-        //          State = p.State,
-        //          Country = p.Country,
-        //          ZipCode = p.ZipCode,
-        //          UserId = p.UserId
-        //      }).ToListAsync();
-        // }
+        public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
+        {
+            return await _appDbContext.Addresses
+             .Where(p => p.UserId == userId)
+             .Select(p => new Address
+             {
+                 AddressId = p.AddressId,
+                 AddressLine = p.AddressLine,
+                 City = p.City,
+                 State = p.State,
+                 Country = p.Country,
+                 ZipCode = p.ZipCode,
+                 UserId = p.UserId
+             }).ToListAsync();
+        }
     }
 }

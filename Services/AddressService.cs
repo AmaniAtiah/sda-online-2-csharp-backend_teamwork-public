@@ -49,9 +49,9 @@ namespace Backend.Services
             return newAddress;
         }
 
-        public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress, Guid userId)
+        public async Task<Address?> UpdateAddressService(Guid addressId, Address updateAddress)
         {
-            var existingAddress = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId && a.UserId == userId);
+            var existingAddress = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
 
             if (existingAddress != null)
             {
@@ -60,17 +60,18 @@ namespace Backend.Services
                 existingAddress.State = updateAddress.State ?? existingAddress.State;
                 existingAddress.Country = updateAddress.Country ?? existingAddress.Country;
                 existingAddress.ZipCode = updateAddress.ZipCode ?? existingAddress.ZipCode;
+                existingAddress.UserId = existingAddress.UserId;
 
                 await _appDbContext.SaveChangesAsync();
             }
 
             // Return the updated address (or null if not found or not belonging to the user)
             return existingAddress;
-                    }
+        }
 
-        public async Task<bool> DeleteAddressService(Guid addressId, Guid userId)
+        public async Task<bool> DeleteAddressService(Guid addressId)
         {
-            var addressToRemove = await _appDbContext.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId && a.UserId == userId);
+            var addressToRemove = await _appDbContext.Addresses.FindAsync(addressId);
             if (addressToRemove != null)
             {
                 _appDbContext.Addresses.Remove(addressToRemove);

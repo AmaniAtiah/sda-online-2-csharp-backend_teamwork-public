@@ -15,10 +15,6 @@ namespace Backend.EntityFramework
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Fluent API for Categories: 
-            //modelBuilder.Entity<Categories>().HasKey(category => category.categoryId);
-            //modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
-            //modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
             //Fluent API:
             ////////////////////////*User*////////////////////////
             modelBuilder.Entity<User>().HasKey(u => u.UserId);//PK
@@ -77,8 +73,8 @@ namespace Backend.EntityFramework
             .HasForeignKey(a => a.UserId)
             .IsRequired();
 
-            //Relations:
-            //1 to many
+            ////////////////////////*Relations*////////////////////////
+            //one to many
             //User And Addresses:
             modelBuilder.Entity<User>()
             .HasMany(u => u.Addresses)
@@ -99,22 +95,18 @@ namespace Backend.EntityFramework
             .HasMany(c => c.Products)
             .WithOne(p => p.Category)
             .HasForeignKey(p => p.CategoriesId);
+            //Addres and order: 
+            modelBuilder.Entity<Address>()
+             .HasOne(a => a.User)
+             .WithMany(u => u.Addresses)
+             .HasForeignKey(a => a.UserId)
+             .IsRequired();
+            //Many to Many
             //Order And Product:
             modelBuilder.Entity<Order>()
            .HasMany(o => o.Products)
            .WithMany(p => p.Orders)
            .UsingEntity(j => j.ToTable("OrderDetails"));
-            //1 to 1:
-            // {
-            //     base.OnModelCreating(modelBuilder);
-
-            //     modelBuilder.Entity<Categories>().HasKey(category => category.categoryId);
-
-            //     modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
-            //     modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
-            // }
-
-
 
 
         }

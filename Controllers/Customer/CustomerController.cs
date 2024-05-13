@@ -121,18 +121,18 @@ namespace Backend.Controllers
         //     return NoContent();
         // }
 
-        // [Authorize]
-        // [HttpGet("addresses")]
-        // public async Task<IActionResult> GetAllAddressesByUserId()
-        // {
-        //      var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid  userId))
-        //         {
-        //             return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
-        //         }
-        //         var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
-        //         return ApiResponse.Success(addresses, "All addresses retrieved successfully");
+        [Authorize]
+        [HttpGet("addresses")]
+        public async Task<IActionResult> GetAllAddressesByUserId()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+            {
+                return ApiResponse.UnAuthorized("User Id is missing or invalid from token");
+            }
+            var addresses = await _userService.GetAllAddressesByUserIdAsync(userId);
+            return ApiResponse.Success(addresses, "All addresses retrieved successfully");
 
-        // }
-    }   
+        }
+    }
 }

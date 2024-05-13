@@ -10,15 +10,15 @@ namespace Backend.Controllers
 {
     [Authorize(Roles = "Admin")]
     [ApiController]
-    [Route("/api/admin/products")] 
+    [Route("/api/admin/products")]
     // admin can show all products and add or delete 
 
     public class AdminProductController : ControllerBase
     {
         private readonly ProductService _productServices;
-        public AdminProductController(AppDbContext appDbContext)
+        public AdminProductController(ProductService productServices)
         {
-            _productServices = new ProductService(appDbContext);
+            _productServices = productServices;
         }
 
         [HttpGet]
@@ -39,9 +39,9 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-
+        [Authorize]
         [HttpGet("{productId:guid}")]
-        public async Task<IActionResult> GetProductById(Guid proudectId)
+        public async Task<IActionResult> GetProductById(Guid productId)
         {
             try
             {
@@ -50,12 +50,12 @@ namespace Backend.Controllers
                 {
                     return ApiResponse.Forbidden("Only admin can visit this route");
                 }
-                var product = await _productServices.GetProductAsync(proudectId);
-                if (product == null)
+                var product = await _productServices.GetProductAsync(productId);
+                if (product != null)
                 {
-                    return ApiResponse.NotFound("Product was not found");
+                    return ApiResponse.Success(product, "product is retrieved successfully");
                 }
-                return ApiResponse.Created(product, "Product is return successfully");
+                return ApiResponse.NotFound("Product was not found");
             }
             catch (Exception ex)
             {

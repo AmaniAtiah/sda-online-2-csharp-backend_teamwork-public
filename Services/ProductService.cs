@@ -4,6 +4,8 @@ using Backend.Models;
 using Backend.Dtos;
 using Backend.EntityFramework;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
+using AutoMapper;
 
 namespace Backend.Services
 {
@@ -11,9 +13,12 @@ namespace Backend.Services
     {
         List<Product> products = new List<Product>();
         private readonly AppDbContext _appDbContext;
-        public ProductService(AppDbContext appcontext)
+
+        private readonly IMapper _mapper;
+        public ProductService(AppDbContext appcontext, IMapper mapper)
         {
             _appDbContext = appcontext;
+            _mapper = mapper;
         }
         public async Task<PaginationResult<ProductDtos>> GetAllProductsAsync(int pageNumber, int pageSize)
         {
@@ -40,9 +45,22 @@ namespace Backend.Services
             };
         }
 
-        public async Task<Product?> GetProductAsync(Guid ProductId)
+        public async Task<ProductDtos?> GetProductAsync(Guid productId)
         {
-            return await _appDbContext.Products.FindAsync(ProductId);
+            var product = await _appDbContext.Products
+            .Where(p => p.ProductId == productId)
+                .Select(p => new ProductDtos
+                {
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    Color = p.Color,
+                    Size = p.Size,
+                    Brand = p.Brand,
+                }).FirstOrDefaultAsync();
+            return product;
+            //var productDto = _mapper.Map<ProductDtos>(product);
+            //return product;
         }
 
         public async Task<Product> AddProductAsync(Product newProduct)

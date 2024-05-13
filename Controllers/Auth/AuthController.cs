@@ -9,6 +9,7 @@ using Backend.Dtos.User;
 using Backend.EntityFramework;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Auth
 {
@@ -43,6 +44,7 @@ namespace Backend.Auth
 
 
         [Route("/api/auth/login")]
+        [HttpPost]
         public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
@@ -60,9 +62,6 @@ namespace Backend.Auth
             var token = _authService.GenerateJwt(loggedInUser);
             return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
         }
-
-        // logout 
-        
 
     }
 }
