@@ -25,5 +25,7 @@ namespace Backend.Models
                 public Guid? CategoriesId { get; set; }
                 public Category? Category { get; set; }
                 public List<Order> Orders { get; set; } = new List<Order>();
+                public List<Cart> Cart { get; set; } = new List<Cart>();
+
         }
 }

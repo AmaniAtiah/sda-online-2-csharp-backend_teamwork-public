@@ -10,7 +10,8 @@ namespace Backend.EntityFramework
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Order> Orders { get; set; }
-        
+        public DbSet<Cart> Carts { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,6 +64,13 @@ namespace Backend.EntityFramework
             modelBuilder.Entity<Address>().Property(a => a.Country).IsRequired();
             modelBuilder.Entity<Address>().Property(a => a.State).IsRequired();
             modelBuilder.Entity<Address>().Property(a => a.ZipCode).IsRequired();
+            // ////////////////////////*Cart*////////////////////////
+            // modelBuilder.Entity<Cart>().HasKey(c => c.CartId);
+            // modelBuilder.Entity<Cart>().Property(c => c.CartId).IsRequired().ValueGeneratedOnAdd();
+            // modelBuilder.Entity<Cart>().Property(c => c.UserId).IsRequired();
+            // modelBuilder.Entity<Cart>().Property(c => c.Quantity).IsRequired();
+
+
             modelBuilder.Entity<Address>()
             .HasOne(a => a.User)
             .WithMany(u => u.Addresses)
@@ -105,6 +113,10 @@ namespace Backend.EntityFramework
             //     modelBuilder.Entity<Categories>().Property(category => category.category_name).IsRequired();
             //     modelBuilder.Entity<Categories>().HasIndex(category => category.category_name).IsUnique();
             // }
+
+
+
+
         }
     }
 }
