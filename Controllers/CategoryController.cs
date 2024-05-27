@@ -9,7 +9,7 @@ namespace Backend.Controllers
 {
   
     [ApiController]
-    [Route("/categories")]
+    [Route("/api/categories")]
     // admin can show all categories and add or delete 
 
 
