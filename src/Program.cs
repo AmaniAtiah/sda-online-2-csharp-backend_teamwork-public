@@ -10,6 +10,19 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DotNetEnv.Env.Load();
+
+var  jwtKey = Environment.GetEnvironmentVariable("Jwt__key") ?? throw new
+InvalidOperationException("JWT Key is missing in environment variable.");
+var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new
+InvalidOperationException("JWT Issuer is missing in environment variable.");
+var jwtAudience = Environment.GetEnvironmentVariable("JWT__Audience") ?? throw new
+InvalidOperationException("JWT Audience is missing in environment variable.");
+
+var defaultConnection = Environment.GetEnvironmentVariable
+("DefaultConnection") ?? throw new InvalidOperationException
+("Default Connection is missing in environment variable.");
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -17,12 +30,32 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<AddressService>();
+// builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", builder => {
+        builder.WithOrigins("http://localhost:3000")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+
+
+
+    });
+
+});
+
+// Console.WriteLine($"Jwt__Key: {Environment.GetEnvironmentVariable("Jwt__key")}");
+
+
+
 var Configuration = builder.Configuration;
-var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
+var key = Encoding.ASCII.GetBytes(jwtKey);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -42,12 +75,14 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-});
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(defaultConnection));
 
 var app = builder.Build();
 
@@ -58,6 +93,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowSpecificOrigins");
 app.UseHttpsRedirection();
 app.MapControllers().WithParameterValidation();
 app.Run();

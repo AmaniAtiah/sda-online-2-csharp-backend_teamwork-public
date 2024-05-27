@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Backend.Models;
 
 namespace Backend.EntityFramework
 {
@@ -13,10 +12,18 @@ namespace Backend.EntityFramework
         public required string Email { get; set; }
         public required string Password { get; set; }
         public required string PhoneNumber { get; set; }
+        // address not required 
+        public string Address { get; set; } = string.Empty;
+
         public bool IsAdmin { get; set; }
+        public bool IsBanned { get; set; } 
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public virtual ICollection<Address>? Addresses { get; set; } 
+        // public virtual ICollection<Address>? Addresses { get; set; } 
         public virtual ICollection<Order>? Orders { get; set; } 
+ 
+        public  Cart? Cart { get; set; }
+
     }
 }

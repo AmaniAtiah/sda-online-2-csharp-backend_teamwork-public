@@ -1,11 +1,11 @@
 using Backend.Dtos;
 using Backend.Dtos.Pagination;
-using Backend.Dtos.User;
 using Backend.EntityFramework;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Backend.Models;
+using Npgsql;
+using Backend.Middlewares;
 
 namespace Backend.Services
 {
@@ -24,23 +24,21 @@ namespace Backend.Services
 
         public async Task<PaginationResult<UserDto>> GetAllUsersAsync(int pageNumber, int pageSize)
         {
-            var totalUserAccount = await _appDbContext.Users.CountAsync();
+
+            var totalUserAccount = await _appDbContext.Users
+            .CountAsync();
+
             var users = await _appDbContext.Users
             .Skip((pageNumber - 1) * pageSize)
+            .Where(u => !u.IsAdmin)
             .Take(pageSize)
             .ToListAsync();
 
+
+
             var userDtos = _mapper.Map<List<UserDto>>(users);
 
-            foreach (var userDto in userDtos)
-            {
-                if (userDto.IsAdmin)
-                {
-                    userDto.Addresses = null;
-                    userDto.Orders = null;
-                }
-            }
-
+    
             return new PaginationResult<UserDto>
             {
                 Items = userDtos,
@@ -51,13 +49,42 @@ namespace Backend.Services
 
         }
 
+        // banned and unbanned user 
+
+       public async Task<bool> BannedAndUnbannedUserAsync(Guid userId)
+    {
+        var user = await _appDbContext.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.IsBanned = !user.IsBanned;  // Toggle the ban status
+            await _appDbContext.SaveChangesAsync();
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
         public async Task<UserDto?> GetUserByIdAsync(Guid userId)
         {
-            var user = await _appDbContext.Users.FindAsync(userId);
+            var user = await _appDbContext.Users
+                //    .Include(u => u.Addresses)
+        .Include(u => u.Orders)
+        // products of order 
+        .ThenInclude(order => order.OrderProducts)
+        .ThenInclude(orderProduct => orderProduct.Product)
+       
+        // .Include(u => u.Cart)
+        //     .ThenInclude(cart => cart.CartProducts)
+        //         .ThenInclude(cartProduct => cartProduct.Product)
+        .FirstOrDefaultAsync(u => u.UserId == userId);
+
             var userDto = _mapper.Map<UserDto>(user);
             if (userDto.IsAdmin)
             {
-                userDto.Addresses = null;
+                // userDto.Addresses = null;
                 userDto.Orders = null;
             }
             return userDto;
@@ -71,21 +98,55 @@ namespace Backend.Services
                 FirstName = newUserData.FirstName,
                 LastName = newUserData.LastName,
                 PhoneNumber = newUserData.PhoneNumber,
+                Address = newUserData.Address,
                 Email = newUserData.Email,
                 Password = _passwordHasher.HashPassword(null, newUserData.Password),
                 IsAdmin = newUserData.IsAdmin,
+                
             };
             _appDbContext.Users.Add(user);
-            await _appDbContext.SaveChangesAsync();
 
-            var userDto = _mapper.Map<UserDto>(user);
-            if (userDto.IsAdmin)
+            // try
+            // {
+                await _appDbContext.SaveChangesAsync();
+            // }
+            // catch (DbUpdateException ex)
+            // {
+            //     if (ex.InnerException is PostgresException postgresEx && postgresEx.SqlState == "23505")
+            //     {
+            //         // Unique constraint violation
+            //         throw new DuplicateEmailException("A user with this email address already exists.");
+            //     }
+            //     throw;
+            // }
+
+            var userDto = new UserDto
             {
-                userDto.Addresses = null;
-                userDto.Orders = null;
-            }
+                UserId = user.UserId,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                Email = user.Email,
+                IsAdmin = user.IsAdmin,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt,
+                // Addresses = user.Addresses,
+                // Orders = user.Orders,
+            };
+
+            // var userDto = _mapper.Map<UserDto>(user);
+            // if (userDto.IsAdmin)
+            // {
+            //     userDto.Addresses = null;
+            //     userDto.Orders = null;
+            // }
             return userDto;
         }
+
+
+
 
         public async Task<UserDto> UpdateUserAsync(Guid userId, UpdateUserDto userData)
         {
@@ -95,19 +156,27 @@ namespace Backend.Services
             {
                 throw new Exception("User not found");
             }
-            existingUser.UserName = userData.UserName;
-            existingUser.FirstName = userData.FirstName;
-            existingUser.LastName = userData.LastName;
-            existingUser.PhoneNumber = userData.PhoneNumber;
-            existingUser.Email = userData.Email;
-            existingUser.Password = _passwordHasher.HashPassword(null, userData.Password);
+            existingUser.UserName = userData.UserName ?? existingUser.UserName; ;
+            existingUser.FirstName = userData.FirstName ?? existingUser.FirstName;
+            existingUser.LastName = userData.LastName ?? existingUser.LastName;
+            existingUser.PhoneNumber = userData.PhoneNumber ?? existingUser.PhoneNumber;
+            existingUser.Email = userData.Email ?? existingUser.Email;
+            existingUser.Address = userData.Address?? existingUser.Address;
+            // existingUser.Password = _passwordHasher.HashPassword(null, userData.Password);
+
+            if(userData.IsAdmin.HasValue){
+                existingUser.IsAdmin = userData.IsAdmin.Value;
+            } 
+            if(userData.IsBanned.HasValue){
+                existingUser.IsBanned = userData.IsBanned.Value;
+            }
 
             await _appDbContext.SaveChangesAsync();
 
             var userDto = _mapper.Map<UserDto>(existingUser);
             if (userDto.IsAdmin)
             {
-                userDto.Addresses = null;
+                // userDto.Addresses = null;
                 userDto.Orders = null;
             }
             return userDto;
@@ -115,7 +184,12 @@ namespace Backend.Services
 
         public async Task<UserDto?> LoginUserAsync(LoginDto loginDto)
         {
-            var user = await _appDbContext.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
+            var user = await _appDbContext.Users
+             // .Include(user => user.Addresses)
+             // .Include(user => user.Orders)  
+             // .Include(user => user.Cart)
+
+             .SingleOrDefaultAsync(u => u.Email == loginDto.Email);
             if (user == null)
             {
                 return null;
@@ -128,8 +202,9 @@ namespace Backend.Services
             var userDto = _mapper.Map<UserDto>(user);
             if (userDto.IsAdmin)
             {
-                userDto.Addresses = null;
+                // userDto.Addresses = null;
                 userDto.Orders = null;
+
             }
             return userDto;
         }
@@ -145,20 +220,20 @@ namespace Backend.Services
         }
 
 
-        public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
-        {
-            return await _appDbContext.Addresses
-             .Where(p => p.UserId == userId)
-             .Select(p => new Address
-             {
-                 AddressId = p.AddressId,
-                 AddressLine = p.AddressLine,
-                 City = p.City,
-                 State = p.State,
-                 Country = p.Country,
-                 ZipCode = p.ZipCode,
-                 UserId = p.UserId
-             }).ToListAsync();
-        }
+        // public async Task<IEnumerable<Address>> GetAllAddressesByUserIdAsync(Guid userId)
+        // {
+        //     return await _appDbContext.Addresses
+        //      .Where(p => p.UserId == userId)
+        //      .Select(p => new Address
+        //      {
+        //          AddressId = p.AddressId,
+        //          AddressLine = p.AddressLine,
+        //          City = p.City,
+        //          State = p.State,
+        //          Country = p.Country,
+        //          ZipCode = p.ZipCode,
+        //          UserId = p.UserId
+        //      }).ToListAsync();
+        // }
     }
 }

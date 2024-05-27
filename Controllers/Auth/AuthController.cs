@@ -5,15 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Controllers;
 using Backend.Dtos;
-using Backend.Dtos.User;
 using Backend.EntityFramework;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Backend.Middlewares;
 
 namespace Backend.Auth
 {
-
+   [ApiController]//api controllers
+    [Route("/api/auth")]
     // add function register and login for user authentication
     public class AuthController : ControllerBase
     {
@@ -27,23 +28,49 @@ namespace Backend.Auth
             _authService = authService;
         }
 
-        // register 
+        // // register 
         [HttpPost]
-        [Route("/api/auth/register")]
+        [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
+            try {
             if (!ModelState.IsValid)
             {
                 throw new ValidationException("Invalid User Data");
             }
             var newUser = await _userService.AddUserAsync(registerDto);
             return ApiResponse.Created(newUser, "User created successfully");
+            } catch(Exception e){
+                return ApiResponse.ServerError(e.Message);
+            }
         }
 
+// [HttpPost]
+//  [Route("/api/auth/register")]
+//   public async Task<IActionResult> Register(RegisterDto registerDto)
+//     {
+//         try
+//         {
+//             var userDto = await _userService.AddUserAsync(registerDto);
+//             return CreatedAtAction(nameof(Register), userDto);
+//         }
+//         catch (DuplicateEmailException ex)
+//         {
+//             return Conflict(new { Message = ex.Message });
+//         }
+//         catch (DuplicatePhoneNumberException ex)
+//         {
+//             return Conflict(new { Message = ex.Message });
+//         }
+//         catch (Exception ex)
+//         {
+//             // Log exception details here as needed
+//             return StatusCode(500, new { Message = "An error occurred while processing your request." });
+//         }
+//     }
 
 
-
-        [Route("/api/auth/login")]
+        [Route("login")]
         [HttpPost]
         public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
         {

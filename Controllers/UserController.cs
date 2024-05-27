@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Backend.Dtos;
-using Backend.Dtos.User;
 using Backend.Middlewares;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,16 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
+
     [ApiController]
     [Route("/api/users")]
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
-        private readonly AuthService _authService;
-        public UserController(UserService userService, AuthService authService)
+
+        public UserController(UserService userService)
         {
             _userService = userService;
-            _authService = authService;
         }
 
         [Authorize(Roles = "Admin")]
@@ -27,96 +26,129 @@ namespace Backend.Controllers
         {
             var users = await _userService.GetAllUsersAsync(pageNumber, pageSize);
 
-            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-            if (!isAdmin)
-            {
-                return ApiResponse.Forbidden("Only admin can visit this route");
-            }
+            // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+            // if (!isAdmin)
+            // {
+            //     return ApiResponse.Forbidden("Only admin can visit this route");
+            // }
             return ApiResponse.Success(users, "All users are returned successfully");
         }
 
         [Authorize]
-        [HttpGet("profile")]
+        [HttpGet("{userId:guid}")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // if (string.IsNullOrEmpty(userIdString))
+            // {
+            //     return ApiResponse.UnAuthorized("User Id is misisng from token");
+            // }
+            // if (!Guid.TryParse(userIdString, out userId))
+            // {
+            //     return ApiResponse.BadRequest("Invalid User Id");
+            // }
 
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return ApiResponse.UnAuthorized("User Id is misisng from token");
-            }
-
-            if (!Guid.TryParse(userIdString, out userId))
-            {
-                return ApiResponse.BadRequest("Invalid User Id");
-            }
             var user = await _userService.GetUserByIdAsync(userId) ?? throw new NotFoundException("User not found");
             return ApiResponse.Success(user, "User profile is returned successfully");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] RegisterDto newUserData)
+
+
+  // banned and unbanned users 
+      [Authorize(Roles = "Admin")]
+        [HttpPut("ban-unban/{userId:guid}")]
+        public async Task<IActionResult> BanAndUnBannedUser(Guid userId)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new ValidationException("Invalid User Data");
-            }
-            var newUser = await _userService.AddUserAsync(newUserData);
-            return ApiResponse.Created(newUser, "User created successfully");
+              var isBanned = await _userService.BannedAndUnbannedUserAsync(userId);
+        if (isBanned)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+            var message = user.IsBanned ? $"User with this id  {userId} has been banned" : $"User with this id  {userId} has been unbanned";
+            return ApiResponse.Success(message);
+        }
+        else
+        {
+            return ApiResponse.NotFound("User not found.");
         }
 
+
+
+            
+       
+        }
+
+
+
+
+
+
+
+
+        // [HttpPost]
+        // public async Task<IActionResult> CreateUser([FromBody] RegisterDto registerDto)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         throw new ValidationException("Invalid User Data");
+        //     }
+        //     var newUser = await _userService.AddUserAsync(registerDto);
+        //     return ApiResponse.Created(newUser, "User created successfully");
+        // }
+
+
         [Authorize]
-        [HttpPut("profile")]
-        public async Task<IActionResult> UpdateUser(Guid userId, UpdateUserDto updateUserDto)
+        [HttpPut("{userId:guid}")]
+        // admin profile
+        public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserDto updateUserDto)
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return ApiResponse.UnAuthorized("User Id is misisng from token");
-            }
+            // if (string.IsNullOrEmpty(userIdString))
+            // {
+            //     return ApiResponse.UnAuthorized("User Id is misisng from token");
+            // }
 
-            if (!Guid.TryParse(userIdString, out userId))
-            {
-                return ApiResponse.BadRequest("Invalid User Id");
-            }
+            // if (!Guid.TryParse(userIdString, out userId))
+            // {
+            //     return ApiResponse.BadRequest("Invalid User Id");
+            // }
 
             if (!ModelState.IsValid)
             {
-                throw new ValidationException("Invalid User Data");
+                return ApiResponse.BadRequest("Invalid User data");
             }
 
             var updateUser = await _userService.UpdateUserAsync(userId, updateUserDto) ?? throw new NotFoundException("User not found");
+            if(updateUser == null) {
+                return ApiResponse.NotFound("User was not found");
+            }
             return ApiResponse.Success(updateUser, "User updated successfully");
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> LoginUser([FromBody] LoginDto loginDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return ApiResponse.BadRequest("Invalid user data");
-            }
-            var loggedInUser = await _userService.LoginUserAsync(loginDto);
-            var token = _authService.GenerateJwt(loggedInUser);
-            return ApiResponse.Success(new { token, loggedInUser }, "User is logged in successfully");
-        }
 
-        [Authorize]
-        [HttpDelete("profile")]
+
+         [Authorize]
+        [HttpDelete("{userId:guid}")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString))
+            // var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // if (string.IsNullOrEmpty(userIdString))
+            // {
+            //     return ApiResponse.UnAuthorized("User Id is misisng from token");
+            // }
+            // if (!Guid.TryParse(userIdString, out userId))
+            // {
+            //     return ApiResponse.BadRequest("Invalid User Id");
+            // }
+                   if (!ModelState.IsValid)
             {
-                return ApiResponse.UnAuthorized("User Id is misisng from token");
-            }
-            if (!Guid.TryParse(userIdString, out userId))
-            {
-                return ApiResponse.BadRequest("Invalid User Id");
+                ApiResponse.BadRequest("invalid user data provided");
             }
             await _userService.DeleteUserAsync(userId);
             return NoContent();
         }
+
+
+
     }
 }

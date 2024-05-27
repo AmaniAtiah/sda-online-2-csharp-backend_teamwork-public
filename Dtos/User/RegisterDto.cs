@@ -26,6 +26,9 @@ namespace Backend.Dtos
         [Required(ErrorMessage = "Phone Number is required")]
         [RegularExpression(@"^\+\d{10,15}$", ErrorMessage = "Invalid phone number format. Example: +1234567890")]
         public required string PhoneNumber { get; set; }
-        public bool IsAdmin { get; set; }     
+      
+        public string Address { get; set; } = string.Empty;
+        public bool IsAdmin { get; set; } 
+        public bool IsBanned { get; set; }    
     }
 }

@@ -8,8 +8,14 @@ namespace Backend.Middlewares
         public NotFoundException(string message) : base(message) { }
     }
 
- 
-
+ public class DuplicateEmailException : Exception
+{
+    public DuplicateEmailException(string message) : base(message) { }
+}
+public class DuplicatePhoneNumberException : Exception
+{
+    public DuplicatePhoneNumberException(string message) : base(message) { }
+}
     public class ForbiddenAccessException : Exception
     {
         public ForbiddenAccessException(string message) : base(message) { }

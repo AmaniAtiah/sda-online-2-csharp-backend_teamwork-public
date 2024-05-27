@@ -7,16 +7,16 @@ using System.Security.Claims;
 
 namespace Backend.Controllers
 {
-    [Authorize(Roles = "Admin")]
+  
     [ApiController]
-    [Route("/api/admin/categories")]
+    [Route("/api/categories")]
     // admin can show all categories and add or delete 
 
 
-    public class AdminCategoryController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly CategoryService _categoryService;
-        public AdminCategoryController(CategoryService categoryService)
+        public CategoryController(CategoryService categoryService)
         {
             _categoryService = categoryService;
         }
@@ -26,11 +26,11 @@ namespace Backend.Controllers
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+                // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                // if (!isAdmin)
+                // {
+                //     return ApiResponse.Forbidden("Only admin can visit this route");
+                // }
                 var categories = await _categoryService.GetAllCategoryAsync(pageNumber, pageSize);
                 return ApiResponse.Success(categories, "all categories retrieved successfully");
             }
@@ -45,11 +45,11 @@ namespace Backend.Controllers
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+                // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                // if (!isAdmin)
+                // {
+                //     return ApiResponse.Forbidden("Only admin can visit this route");
+                // }
                 var category = await _categoryService.GetCategoryByIdAsync(categoryId);
                 if (category != null)
                 {
@@ -66,32 +66,39 @@ namespace Backend.Controllers
             }
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddCategory([FromBody] CategoryDto newCategory)
         {
-            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-            if (!isAdmin)
-            {
-                return ApiResponse.Forbidden("Only admin can visit this route");
-            }
+            // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+            // if (!isAdmin)
+            // {
+            //     return ApiResponse.Forbidden("Only admin can visit this route");
+            // }
             if (!ModelState.IsValid)
             {
-                throw new ValidationException("Invalid  Data");
+                ApiResponse.BadRequest("invalid category data provided");
             }
             var category = await _categoryService.AddCategoryAsync(newCategory);
             return ApiResponse.Created(category, "New Category is added successfully");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{categoryId:guid}")]
         public async Task<IActionResult> UpdateCategory(Guid categoryId, CategoryDto updateCategory)
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+                // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                // if (!isAdmin)
+                // {
+                //     return ApiResponse.Forbidden("Only admin can visit this route");
+                // }
+             if (!ModelState.IsValid)
+            {
+                ApiResponse.BadRequest("invalid category data provided");
+            }
                 var category = await _categoryService.UpdateCategoryAsync(categoryId, updateCategory);
                 if (category == null)
                 {
@@ -108,16 +115,21 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{categoryId:guid}")]
         public async Task<IActionResult> DeleteCategory(Guid categoryId)
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+                // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                // if (!isAdmin)
+                // {
+                //     return ApiResponse.Forbidden("Only admin can visit this route");
+                // }
+                  if (!ModelState.IsValid)
+            {
+                ApiResponse.BadRequest("invalid category data provided");
+            }
                 var result = await _categoryService.DeleteCategoryAsync(categoryId);
                 if (result)
                 {

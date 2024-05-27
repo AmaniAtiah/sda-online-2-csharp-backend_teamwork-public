@@ -1,37 +1,32 @@
 using System.Security.Claims;
 using Backend.Dtos;
 using Backend.EntityFramework;
-using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
-    [Authorize(Roles = "Admin")]
+   
     [ApiController]
-    [Route("/api/admin/products")]
+    [Route("/api/products")]
     // admin can show all products and add or delete 
 
-    public class AdminProductController : ControllerBase
+    public class ProductController : ControllerBase
     {
         private readonly ProductService _productServices;
-        public AdminProductController(ProductService productServices)
+        public ProductController(ProductService productServices)
         {
             _productServices = productServices;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3, [FromQuery] string sortBy = "price", [FromQuery] string sortDirection = "asc")
+        public async Task<IActionResult> GetAllProduct([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 3, [FromQuery] string sortBy = "price", [FromQuery] string sortDirection = "asc", [FromQuery] string searchTerm = "", [FromQuery] List<Guid> selectedCategories = null, [FromQuery] decimal? minPrice = null , [FromQuery] decimal? maxPrice = null) 
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
-                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize, sortBy, sortDirection);
+               
+                var products = await _productServices.GetAllProductsAsync(pageNumber, pageSize, sortBy, sortDirection, searchTerm, selectedCategories, minPrice, maxPrice);
                 return ApiResponse.Success(products, "All Product are returned successfully");
             }
             catch (Exception ex)
@@ -39,23 +34,23 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
-        [Authorize]
+ 
+
         [HttpGet("{productId:guid}")]
         public async Task<IActionResult> GetProductById(Guid productId)
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+                
                 var product = await _productServices.GetProductAsync(productId);
                 if (product != null)
                 {
-                    return ApiResponse.Success(product, "product is retrieved successfully");
+                    return ApiResponse.Success(product, "Product is retrieved successfully");
                 }
-                return ApiResponse.NotFound("Product was not found");
+                else
+                {
+                    return ApiResponse.NotFound("product was not found");
+                }
             }
             catch (Exception ex)
             {
@@ -63,16 +58,17 @@ namespace Backend.Controllers
             }
         }
 
+         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddProduct(Product newProduct)
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+            
+                       if (!ModelState.IsValid)
+            {
+                ApiResponse.BadRequest("invalid product data provided");
+            }
                 var createdProduct = await _productServices.AddProductAsync(newProduct);
                 return ApiResponse.Created(createdProduct, "Product is added successfully");
             }
@@ -82,22 +78,32 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPut("{productId:guid}")]
-        public async Task<IActionResult> UpdateProduct(Guid proudectId, ProductDtos updateProudect)
+
+          [Authorize(Roles = "Admin")]
+          [HttpPut("{productId:guid}")]
+        public async Task<IActionResult> UpdateProduct(Guid productId, ProductDtos updateProudect)
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
+                // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                // if (!isAdmin)
+                // {
+                //     return ApiResponse.Forbidden("Only admin can visit this route");
+                // }
+
+                       if (!ModelState.IsValid)
+            {
+                ApiResponse.BadRequest("invalid product data provided");
+            }
+                var product = await _productServices.UpdateProductAsync(productId, updateProudect);
+                if (product == null)
                 {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
+                    return ApiResponse.NotFound("product was not found");
                 }
-                var productToUpdate = await _productServices.UpdateProductAsync(proudectId, updateProudect);
-                if (productToUpdate == null)
+                else
                 {
-                    return ApiResponse.NotFound("Product was not found");
+                    return ApiResponse.Success(product, "Update product successfully");
                 }
-                return ApiResponse.Success(productToUpdate, "Product updated successfully");
             }
             catch (Exception ex)
             {
@@ -105,16 +111,21 @@ namespace Backend.Controllers
             }
         }
 
+         [Authorize(Roles = "Admin")]
         [HttpDelete("{productId:guid}")]
         public async Task<IActionResult> DeleteProduct(Guid productId)
         {
             try
             {
-                var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-                if (!isAdmin)
-                {
-                    return ApiResponse.Forbidden("Only admin can visit this route");
-                }
+                // var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                // if (!isAdmin)
+                // {
+                //     return ApiResponse.Forbidden("Only admin can visit this route");
+                // }
+                       if (!ModelState.IsValid)
+            {
+                ApiResponse.BadRequest("invalid product data provided");
+            }
                 var result = await _productServices.DeleteUserAsync(productId);
                 if (!result)
                 {
@@ -128,6 +139,7 @@ namespace Backend.Controllers
                 return ApiResponse.ServerError(ex.Message);
             }
         }
+        
         [HttpGet("search")]
         public async Task<IActionResult> SearchProducts(string searchkeyword)
         {

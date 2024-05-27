@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Backend.Models
+namespace Backend.EntityFramework
 {
   [Table("Categories")]
   public class Category
@@ -19,6 +19,6 @@ namespace Backend.Models
     public string Description { get; set; } = string.Empty;
 
     //Relations:
-    public List<Product> Products { get; set; } = new List<Product>();
+ public  List<Product> Products { get; set; } = new List<Product>();
   }
 }

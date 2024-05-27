@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.EntityFramework;
 using Backend.Helpers;
-using Backend.Models;
 using Backend.Dtos;
 using Backend.Dtos.Pagination;
 using AutoMapper;
@@ -21,13 +20,18 @@ namespace Backend.Services
 
         public async Task<PaginationResult<CategoryDto>> GetAllCategoryAsync(int pageNumber, int pageSize)
         {
+             
             try
             {
+                
                 var totalCategoryCount = await _appDbContext.Categories.CountAsync();
 
                 var categories = await _appDbContext.Categories
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
+                    .Include(c => c.Products) 
+                    
+                   
                     .ToListAsync();
 
                 var categoryDtos = _mapper.Map<List<CategoryDto>>(categories);
@@ -46,12 +50,18 @@ namespace Backend.Services
             }
         }
 
-        public async Task<CategoryDto> GetCategoryByIdAsync(Guid categoryId)
-        {
-            var category = await _appDbContext.Categories.FindAsync(categoryId);
-            var categoryDto = _mapper.Map<CategoryDto>(category);
-            return categoryDto;
-        }
+      public async Task<CategoryDto> GetCategoryByIdAsync(Guid categoryId)
+{
+    var category = await _appDbContext.Categories
+                                       .Include(c => c.Products) // Include the Products navigation property
+                                       
+                                       .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
+
+    
+    var categoryDto = _mapper.Map<CategoryDto>(category);
+
+    return categoryDto;
+}
 
         public async Task<CategoryDto> AddCategoryAsync(CategoryDto newCategory)
         {
@@ -59,6 +69,7 @@ namespace Backend.Services
             {
                 Name = newCategory.Name,
                 Description = newCategory.Description,
+                Slug = SlugResponse.GenerateSlug(newCategory.Name),
             };
             _appDbContext.Categories.Add(category);
             await _appDbContext.SaveChangesAsync();
@@ -66,6 +77,8 @@ namespace Backend.Services
             {
                 CategoryId = category.CategoryId,
                 Name = category.Name,
+                //add slug 
+                Slug = category.Slug,
                 Description = category.Description,
             };
             return newCategoryDto;
