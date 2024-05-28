@@ -42,7 +42,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("http://localhost:3000", "https://ecommercecoffee.netlify.app/")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
@@ -102,6 +102,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapGet("/", () => {
+    return "Welcome to the Ecommerce API";
+}).WithOpenApi();
 
 app.UseCors("AllowSpecificOrigins");
 app.UseHttpsRedirection();
