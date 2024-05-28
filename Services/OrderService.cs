@@ -231,14 +231,13 @@ namespace Backend.Services
 
         public async Task<OrderDto> CreateOrderAsync(Guid userId, CreateOrderDto createOrderDto)
     {
-        // Validate createOrderDto and perform necessary checks
 
         var order = new Order
         {
             OrderId = Guid.NewGuid(),
             OrderDate = DateTime.UtcNow,
-            TotalPrice = 0, // You may need to calculate the total price based on products
-            Status = OrderStatus.Delivered, // Set default status or get it from DTO
+            TotalPrice = createOrderDto.TotalPrice, 
+            Status = OrderStatus.Pending, 
             UserId = userId
         };
 
@@ -255,7 +254,7 @@ namespace Backend.Services
                     // Set other order product properties
                 };
                 _appDbContext.OrderProducts.Add(orderProduct);
-                order.TotalPrice += product.Price; // Add product price to total price
+             // Add product price to total price
             }
             else
             {

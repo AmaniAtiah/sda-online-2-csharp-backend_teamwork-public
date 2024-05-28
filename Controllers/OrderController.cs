@@ -159,7 +159,7 @@ namespace Backend.Controllers
         }
 
         
-    [Authorize()]
+    [Authorize]
         [HttpPost("{userId}/add-order")]
 public async Task<IActionResult> CreateOrder(Guid userId, [FromBody] CreateOrderDto createOrderDto)
     {

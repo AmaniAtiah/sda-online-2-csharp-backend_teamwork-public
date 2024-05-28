@@ -11,20 +11,18 @@ namespace Backend.Services
 
         public AuthService()
         {
-            Console.WriteLine($"JWT Issuer: {Environment.GetEnvironmentVariable("Jwt__Issuer")}");
         }
 
         public string GenerateJwt(UserDto user)
         {
-
-            var jwtKey = Environment.GetEnvironmentVariable("Jwt__key") ?? throw new
+            var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new
             InvalidOperationException("JWT Key is missing in environment variable.");
             var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new
             InvalidOperationException("JWT Issuer is missing in environment variable.");
-            var jwtAudience = Environment.GetEnvironmentVariable("JWT__Audience") ?? throw new
+            var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new
             InvalidOperationException("JWT Audience is missing in environment variable.");
 
-            var key = Encoding.ASCII.GetBytes(jwtKey);
+            var key = Encoding.ASCII.GetBytes(jwtKey);//the key from configuration
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -47,3 +45,5 @@ namespace Backend.Services
         }
     }
 }
+
+

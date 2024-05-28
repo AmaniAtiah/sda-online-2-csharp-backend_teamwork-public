@@ -10,18 +10,20 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 DotNetEnv.Env.Load();
 
-var  jwtKey = Environment.GetEnvironmentVariable("Jwt__key") ?? throw new
+var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new
 InvalidOperationException("JWT Key is missing in environment variable.");
 var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new
 InvalidOperationException("JWT Issuer is missing in environment variable.");
-var jwtAudience = Environment.GetEnvironmentVariable("JWT__Audience") ?? throw new
+var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new
 InvalidOperationException("JWT Audience is missing in environment variable.");
 
 var defaultConnection = Environment.GetEnvironmentVariable
 ("DefaultConnection") ?? throw new InvalidOperationException
 ("Default Connection is missing in environment variable.");
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,7 +40,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", builder => {
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
         builder.WithOrigins("http://localhost:3000")
         .AllowAnyHeader()
         .AllowAnyMethod()
@@ -49,9 +52,6 @@ builder.Services.AddCors(options =>
     });
 
 });
-
-// Console.WriteLine($"Jwt__Key: {Environment.GetEnvironmentVariable("Jwt__key")}");
-
 
 
 var Configuration = builder.Configuration;
@@ -75,6 +75,16 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
+Console.WriteLine($"Jwt__Key: {Environment.GetEnvironmentVariable("Jwt__Key")}");
+
+Console.WriteLine($"Jwt__Issuer: {Environment.GetEnvironmentVariable("Jwt__Issuer")}");
+
+Console.WriteLine($"Jwt__Audience: {Environment.GetEnvironmentVariable("Jwt__Audience")}");
+
+
+
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

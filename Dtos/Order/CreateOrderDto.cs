@@ -9,5 +9,7 @@ namespace Backend.Dtos
     {
         //  public Guid UserId { get; set; }
     public List<Guid> ProductIds { get; set; }  = new List<Guid>();
+    public decimal TotalPrice { get; set; }
+
     }
 }
