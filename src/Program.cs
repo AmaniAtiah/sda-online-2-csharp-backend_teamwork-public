@@ -42,7 +42,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("http://localhost:3000", "https://ecommercecoffee.netlify.app/")
+        builder.WithOrigins("http://localhost:3000", "https://ecommercecoffee.netlify.app")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
